@@ -229,6 +229,102 @@ Esta arquitectura está alineada con las mejores prácticas para aplicaciones co
 
 > Recomendamos usar mermaid para el modelo de datos, y utilizar todos los parámetros que permite la sintaxis para dar el máximo detalle, por ejemplo las claves primarias y foráneas.
 
+erDiagram
+    USER {
+        int id PK
+        string nombre
+        string email
+        string departamento
+        string zona_residencia
+        string preferencias_viaje
+        string rol
+        string foto
+        bool activo
+    }
+    TRAYECTO {
+        int id PK
+        int conductor_id FK
+        string origen
+        float origen_latitud
+        float origen_longitud
+        string destino
+        float destino_latitud
+        float destino_longitud
+        datetime fecha_hora
+        int plazas_disponibles
+        string estado
+        string tipo_trayecto
+        string puntos_encuentro
+        string notas
+    }
+    RESERVA {
+        int id PK
+        int trayecto_id FK
+        int pasajero_id FK
+        string estado
+        datetime fecha_reserva
+        bool confirmada
+    }
+    VALORACION {
+        int id PK
+        int reserva_id FK
+        int evaluador_id FK
+        int evaluado_id FK
+        int puntuacion
+        string comentario
+        datetime fecha_valoracion
+        string etiquetas
+    }
+    NOTIFICACION {
+        int id PK
+        int user_id FK
+        string mensaje
+        datetime fecha_envio
+        bool leida
+        string tipo
+    }
+    CHAT {
+        int id PK
+        int trayecto_id FK
+        int user_id FK
+        string mensaje
+        datetime fecha_envio
+    }
+    HISTORIAL {
+        int id PK
+        int user_id FK
+        int trayecto_id FK
+        datetime fecha
+        string rol
+    }
+    INCENTIVO {
+        int id PK
+        int user_id FK
+        int puntos
+        string tipo
+        datetime fecha
+        string descripcion
+    }
+    EVENTO {
+        int id PK
+        string nombre
+        string descripcion
+        datetime fecha
+        string ubicacion
+    }
+    TRAYECTO ||--o{ RESERVA : tiene
+    USER ||--o{ TRAYECTO : conduce
+    USER ||--o{ RESERVA : realiza
+    RESERVA ||--o{ VALORACION : genera
+    USER ||--o{ VALORACION : evalua
+    USER ||--o{ NOTIFICACION : recibe
+    TRAYECTO ||--o{ CHAT : tiene
+    USER ||--o{ CHAT : escribe
+    USER ||--o{ HISTORIAL : registra
+    TRAYECTO ||--o{ HISTORIAL : registra
+    USER ||--o{ INCENTIVO : obtiene
+    EVENTO ||--o{ TRAYECTO : asocia
+
 
 ### **3.2. Descripción de entidades principales:**
 
@@ -246,11 +342,47 @@ Esta arquitectura está alineada con las mejores prácticas para aplicaciones co
 
 > Documenta 3 de las historias de usuario principales utilizadas durante el desarrollo, teniendo en cuenta las buenas prácticas de producto al respecto.
 
+Eres un analista de software experto. Enumera y describe brevemente las tres historias de usuario más importantes a implementar para lograr una funcionalidad básica. Usa el template para documentar cada una de estas historias de usuario
+
 **Historia de Usuario 1**
+
+# Historia de Usuario 1: Registro de usuario
+
+**Como** empleado de la empresa  
+**Quiero** registrarme en la plataforma de covoituraje  
+**Para** poder acceder y utilizar el sistema para compartir viajes
+
+## Criterios de aceptación
+- El usuario puede crear una cuenta con su correo corporativo.
+- El sistema valida que el correo pertenezca a la empresa.
+- El usuario recibe confirmación de registro.
 
 **Historia de Usuario 2**
 
+# Historia de Usuario 2: Publicar trayecto como conductor
+
+**Como** empleado registrado  
+**Quiero** publicar un trayecto como conductor  
+**Para** ofrecer plazas disponibles en mi coche a otros compañeros
+
+## Criterios de aceptación
+- El usuario puede indicar origen, destino, fecha, hora y número de plazas.
+- El trayecto queda visible para otros usuarios.
+- El usuario puede editar o cancelar el trayecto publicado.
+
+
 **Historia de Usuario 3**
+
+# Historia de Usuario 3: Reservar plaza como pasajero
+
+**Como** empleado registrado  
+**Quiero** reservar una plaza en un trayecto publicado  
+**Para** compartir viaje con un compañero y llegar juntos al trabajo
+
+## Criterios de aceptación
+- El usuario puede ver los trayectos disponibles.
+- El usuario puede solicitar una plaza en un trayecto.
+- El sistema confirma la reserva y notifica al conductor.
 
 ---
 

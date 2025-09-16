@@ -117,9 +117,20 @@ Ahora, cambiando de rol al de un arquitecto de software experimentado, renderiza
 
 **Prompt 1:**
 
+Vamos a trabajar en el modelo de datos. Propon un esquem ER en mermaid
+
 **Prompt 2:**
 
+quiero un modelo de datos completo segun las funcionalidades descritas en la documentación
+
 **Prompt 3:**
+
+para poder localizar el origen y el destino vas a necesitar las coordenadas?
+
+**Prompt 4:**
+
+reflejalo en el modelo de datos
+
 
 ---
 
