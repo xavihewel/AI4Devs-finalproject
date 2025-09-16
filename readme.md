@@ -15,18 +15,37 @@
 
 ### **0.1. Tu nombre completo:**
 
+Xavier Vergés Berga
+
 ### **0.2. Nombre del proyecto:**
 
+bonÀreaGo
+
 ### **0.3. Descripción breve del proyecto:**
+
+Descripción del Proyecto
+**bonÀreaGo** es una aplicación interna que permite a los empleados compartir coche de forma segura y sencilla para sus trayectos laborales. El sistema integra autenticación corporativa (SSO), garantiza la privacidad de los datos y se adapta a la cultura y procesos internos de la empresa. Los usuarios pueden publicar trayectos como conductores, buscar y reservar plazas como pasajeros, y recibir notificaciones automáticas de confirmación y recordatorio.
+
+La solución aporta beneficios directos:
+
+- **Reducción de costes** de transporte y parking para empleados y empresa.
+- **Disminución de la huella de carbono** y mejora de la ocupación de vehículos.
+- **Mejora del bienestar laboral** y la colaboración interna.
+- **Control total sobre los datos**, integración con sistemas corporativos y flexibilidad para evolucionar el producto según necesidades futuras.
+
+El MVP propuesto prioriza la adopción rápida y la validación funcional, permitiendo escalar posteriormente con funcionalidades avanzadas (matching inteligente, gamificación, métricas de sostenibilidad, integración con calendario y BI corporativo).
+
+**bonÀreaGo** posiciona a la empresa como referente en movilidad sostenible y bienestar, alineando la iniciativa con los objetivos estratégicos de RSC y eficiencia operativa. La plataforma es fácilmente extensible y puede integrarse con campañas internas, incentivos y reportes personalizados para RRHH y Sostenibilidad.
 
 ### **0.4. URL del proyecto:**
 
 > Puede ser pública o privada, en cuyo caso deberás compartir los accesos de manera segura. Puedes enviarlos a [alvaro@lidr.co](mailto:alvaro@lidr.co) usando algún servicio como [onetimesecret](https://onetimesecret.com/).
 
+https://github.com/xavihewel/AI4Devs-finalproject
+
 ### 0.5. URL o archivo comprimido del repositorio
 
 > Puedes tenerlo alojado en público o en privado, en cuyo caso deberás compartir los accesos de manera segura. Puedes enviarlos a [alvaro@lidr.co](mailto:alvaro@lidr.co) usando algún servicio como [onetimesecret](https://onetimesecret.com/). También puedes compartir por correo un archivo zip con el contenido
-
 
 ---
 
@@ -36,15 +55,103 @@
 
 ### **1.1. Objetivo:**
 
-> Propósito del producto. Qué valor aporta, qué soluciona, y para quién.
+**bonÀreaGo** es una plataforma interna de covoituraje diseñada para facilitar que los empleados compartan coche en sus desplazamientos laborales, tanto recurrentes como puntuales. El objetivo principal es ofrecer una alternativa eficiente, segura y sostenible al transporte individual, reduciendo costes y emisiones, y mejorando la experiencia y el bienestar de los empleados.
+
+La solución aporta valor en varios niveles:
+
+- **Para los empleados**: Ahorro en gastos de transporte y parking, mayor comodidad y oportunidades de networking interno.
+- **Para la empresa**: Reducción de la huella de carbono, optimización de recursos, mejora del clima laboral y alineación con los objetivos de sostenibilidad y responsabilidad social corporativa (RSC).
+- **Para RRHH y Sostenibilidad**: Herramienta de gestión y reporte sobre movilidad, impacto ambiental y adopción interna.
+El producto está pensado para ser fácil de usar, integrarse con los sistemas corporativos existentes y evolucionar según las necesidades de la organización.
 
 ### **1.2. Características y funcionalidades principales:**
 
-> Enumera y describe las características y funcionalidades específicas que tiene el producto para satisfacer las necesidades identificadas.
+### 1.2. Características y funcionalidades principales
+
+**bonÀreaGo** incorpora las siguientes características y funcionalidades para satisfacer las necesidades de movilidad corporativa:
+
+1. **Registro e inicio de sesión corporativo**
+   - Acceso seguro mediante credenciales de empresa (SSO).
+   - Garantiza que solo empleados puedan usar la plataforma.
+
+2. **Gestión de perfil de usuario**
+   - Datos básicos, preferencias de viaje y zona de residencia aproximada.
+   - Configuración de rol: conductor, pasajero o ambos.
+
+3. **Creación y publicación de trayectos**
+   - Permite a los empleados publicar trayectos como conductores o solicitar viajes como pasajeros.
+   - Definición de origen, destino, horario y plazas disponibles.
+
+4. **Búsqueda y emparejamiento inteligente**
+   - Motor de coincidencias que sugiere viajes compatibles según ruta, horario y preferencias.
+   - Filtros por zona, afinidades y horarios.
+
+5. **Reserva y confirmación de plazas**
+   - Solicitud y reserva de plaza en un trayecto con confirmación automática o manual.
+   - Notificaciones en tiempo real de nuevas coincidencias, confirmaciones y recordatorios.
+
+6. **Mapa y geolocalización básica**
+   - Visualización de rutas y puntos de encuentro sugeridos.
+
+7. **Historial de viajes y plantillas**
+   - Registro de trayectos realizados y posibilidad de repetir trayectos habituales.
+
+8. **Sistema de reputación y feedback**
+   - Valoraciones rápidas entre usuarios y etiquetas de comportamiento.
+
+9. **Privacidad avanzada**
+   - Ocultación de datos sensibles, chat interno y control sobre la visibilidad de la información.
+
+10. **Reportes para RRHH y sostenibilidad**
+    - Estadísticas de uso, ahorro de CO₂ y métricas de impacto.
+
+11. **Integración con sistemas corporativos**
+    - Sincronización con calendario interno y herramientas de RRHH.
+
+12. **Gamificación e incentivos**
+    - Rankings, puntos y recompensas para fomentar la adopción.
+
+Estas funcionalidades permiten cubrir tanto los desplazamientos diarios como los puntuales, garantizando una experiencia segura, eficiente y alineada con los objetivos estratégicos de la empresa.
 
 ### **1.3. Diseño y experiencia de usuario:**
 
-> Proporciona imágenes y/o videotutorial mostrando la experiencia del usuario desde que aterriza en la aplicación, pasando por todas las funcionalidades principales.
+### 1.3. Diseño y experiencia de usuario
+
+La experiencia de usuario de **bonÀreaGo** está diseñada para ser intuitiva, segura y eficiente, facilitando la adopción por parte de los empleados. El flujo principal incluye:
+
+1. **Pantalla de bienvenida y acceso corporativo**
+   - Login mediante credenciales de empresa (SSO).
+   - Mensaje de bienvenida y explicación breve del servicio.
+
+2. **Panel principal**
+   - Visualización rápida de trayectos disponibles y próximos viajes.
+   - Acceso directo a crear un nuevo trayecto como conductor o solicitar uno como pasajero.
+
+3. **Creación de trayecto**
+   - Formulario sencillo para definir origen, destino, horario y plazas disponibles.
+   - Selección de preferencias (música, fumador/no fumador, etc.).
+
+4. **Búsqueda y emparejamiento**
+   - Motor de coincidencias que muestra los viajes compatibles.
+   - Filtros por zona, horario y afinidades.
+
+5. **Reserva y confirmación**
+   - Solicitud de plaza en un trayecto con confirmación automática o manual.
+   - Notificaciones en tiempo real sobre el estado de la reserva.
+
+6. **Mapa y puntos de encuentro**
+   - Visualización de rutas y sugerencia de puntos de recogida.
+
+7. **Historial y reputación**
+   - Acceso al historial de viajes realizados y valoraciones recibidas.
+   - Sistema de feedback rápido entre usuarios.
+
+8. **Privacidad y chat interno**
+   - Chat integrado para coordinar detalles del viaje sin compartir datos personales.
+
+9. **Reportes y estadísticas**
+   - Panel para consultar métricas personales y corporativas (CO₂ ahorrado, viajes realizados).
+
 
 ### **1.4. Instrucciones de instalación:**
 > Documenta de manera precisa las instrucciones para instalar y poner en marcha el proyecto en local (librerías, backend, frontend, servidor, base de datos, migraciones y semillas de datos, etc.)
@@ -56,6 +163,43 @@
 ### **2.1. Diagrama de arquitectura:**
 > Usa el formato que consideres más adecuado para representar los componentes principales de la aplicación y las tecnologías utilizadas. Explica si sigue algún patrón predefinido, justifica por qué se ha elegido esta arquitectura, y destaca los beneficios principales que aportan al proyecto y justifican su uso, así como sacrificios o déficits que implica.
 
+La arquitectura de **bonÀreaGo** sigue un enfoque modular basado en el patrón de contenedores, facilitando la escalabilidad, la seguridad y la integración con sistemas corporativos. El sistema se compone de los siguientes elementos principales:
+
+- **Frontend web/app**: Interfaz de usuario accesible desde navegador y dispositivos móviles, desarrollada con tecnologías modernas (React, Vue o similar). Permite a los empleados registrarse, gestionar trayectos, buscar viajes y recibir notificaciones.
+- **Backend/API**: Servidor central que gestiona la lógica de negocio, autenticación, emparejamiento de trayectos y comunicación con la base de datos. Implementado en Node.js, Python o similar.
+- **Base de datos**: Almacena usuarios, trayectos, reservas, valoraciones y estadísticas. Se recomienda el uso de una base relacional (PostgreSQL, MySQL) por la naturaleza transaccional del sistema.
+- **Servicio de autenticación corporativa**: Integración con el sistema de Single Sign-On (SSO) de la empresa para garantizar el acceso seguro y restringido a empleados.
+- **Servicios externos**: Integración opcional con mapas (Google Maps, OpenStreetMap) y sistemas de notificaciones (email, push).
+- **Panel de administración y reportes**: Acceso para RRHH y responsables de sostenibilidad para consultar métricas y gestionar el sistema.
+
+#### Diagrama de arquitectura (simplificado)
+
+```mermaid
+flowchart TD
+    A[Empleado] -->|Web/App| B[Frontend]
+    B -->|API REST| C[Backend]
+    C --> D[Base de datos]
+    C --> E[Servicio SSO]
+    C --> F[Servicios de mapas]
+    C --> G[Servicio de notificaciones]
+    H[RRHH/Admin] -->|Panel| B
+    C --> I[Panel de reportes]
+```
+
+**Justificación y beneficios**
+
+- **Modularidad**: Permite evolucionar cada componente de forma independiente.
+- **Seguridad**: El acceso está restringido mediante SSO y la información sensible se gestiona en el backend.
+- **Escalabilidad**: La arquitectura soporta crecimiento en número de usuarios y funcionalidades.
+- **Integración**: Facilita la conexión con sistemas corporativos y servicios externos.
+- **Mantenibilidad**: Separación clara de responsabilidades y facilidad para realizar actualizaciones.
+
+**Sacrificios o déficits**:
+
+- Requiere integración inicial con sistemas corporativos (SSO, mapas).
+- La gestión de notificaciones y mapas puede depender de servicios externos.
+
+Esta arquitectura está alineada con las mejores prácticas para aplicaciones corporativas y garantiza una base sólida para el crecimiento futuro del producto.
 
 ### **2.2. Descripción de componentes principales:**
 
