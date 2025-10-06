@@ -1,6 +1,7 @@
 package com.company.covoituraje.auth;
 
 import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;

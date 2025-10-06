@@ -54,6 +54,8 @@ public class JwtValidator {
 
         ConfigurableJWTProcessor<SecurityContext> processor = new DefaultJWTProcessor<>();
         processor.setJWSKeySelector(new JWSVerificationKeySelector<>(JWSAlgorithm.RS256, jwkSource));
+        // Disable Nimbus default time/claims verification to control error messages explicitly
+        processor.setJWTClaimsSetVerifier((claims, ctx) -> {});
 
         JWTClaimsSet claims;
         try {
