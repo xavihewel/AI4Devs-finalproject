@@ -1,0 +1,64 @@
+openapi: 3.0.3
+info:
+  title: Booking Service
+  version: 0.1.0
+servers:
+  - url: http://localhost:8083
+paths:
+  /bookings:
+    post:
+      summary: Create a booking for a trip
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tripId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+    get:
+      summary: List my bookings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Booking:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tripId:
+          type: string
+          format: uuid
+        passengerId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [PENDING, CONFIRMED, CANCELLED, COMPLETED, NOSHOW]

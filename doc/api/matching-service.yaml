@@ -1,0 +1,46 @@
+openapi: 3.0.3
+info:
+  title: Matching Service
+  version: 0.1.0
+servers:
+  - url: http://localhost:8084
+paths:
+  /matches:
+    get:
+      summary: Get trip matches for the current user (basic score)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: destinationSedeId
+          schema:
+            type: string
+        - in: query
+          name: time
+          schema:
+            type: string
+            format: time
+      responses:
+        '200':
+          description: List of matches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Match'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Match:
+      type: object
+      properties:
+        tripId:
+          type: string
+          format: uuid
+        score:
+          type: number
