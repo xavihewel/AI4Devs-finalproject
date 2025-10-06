@@ -7,15 +7,17 @@
 - Users-service: `/users/me` GET/PUT (DTO directo) + tests.
 - Trips-service: `/trips` POST/GET (DTOs directos) + tests.
 - Booking-service: `/bookings` POST/GET (DTO directo) + tests.
+- Matching-service: `/matches` GET (mock + score simple) + tests.
+- Seguridad mínima: `AuthFilter` (Bearer) en users/trips/booking/matching.
 
 ## What's Left
-- Matching-service: `/matches` GET (score básico) + tests.
-- Añadir validación JWT en recursos (filtro) y wiring mínimo.
-- Seeds/migraciones y conexión a PG/Redis en local.
+- Seeds/migraciones; repos en memoria/PG para alimentar matching y booking.
+- Añadir validación JWT real (usando `JwtValidator`) en recursos y tests de aceptación.
+- Alinear DTOs con OpenAPI y ampliar verificación de contrato.
 
 ## Current Status
-MVP backend esqueleto en marcha con endpoints y tests unitarios básicos; pendiente matching y seguridad a nivel de endpoints.
+MVP backend esqueleto listo con endpoints y tests unitarios; matching básico implementado y filtros mínimos de seguridad activos.
 
 ## Known Issues
-- Falta integración real entre servicios (por ahora stubs/echo DTOs).
-- Alinear DTOs con OpenAPI si evolucionan.
+- Sin persistencia ni integración real entre servicios (mock/echo DTOs).
+- Falta wiring de `JwtValidator` en filtros para validación real.
