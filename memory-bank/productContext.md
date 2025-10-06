@@ -1,21 +1,27 @@
 # Product Context
 
 ## Problem Statement
-Describe the user problems and pains this product addresses.
+- Costes altos de transporte (combustible, parking, peajes) y baja ocupación de vehículos.
+- Necesidad corporativa de reducir CO₂ y mejorar bienestar y parking.
+- Falta de una herramienta interna y segura para coordinar trayectos entre empleados.
 
 ## Target Users
-- Primary users:
-- Secondary users:
+- Primary users: Empleados (Conductores y Pasajeros).
+- Secondary users: RRHH, Sostenibilidad, Facilities/Seguridad.
 
 ## Value Proposition
-Explain how this product uniquely solves the problem.
+- Plataforma interna y segura para compartir coche con integración SSO, privacidad y control de datos.
+- Reduce costes, CO₂ y presión de parking; mejora coordinación y experiencia de empleados.
+- Integración con sistemas corporativos (calendario, BI) y capacidad de personalización.
 
 ## Key Use Cases
-- Use case 1:
-- Use case 2:
-- Use case 3:
+- UC1 Autenticación corporativa (SSO) y perfil mínimo.
+- UC3 Publicar trayecto como conductor.
+- UC4 Buscar trayecto como pasajero.
+- UC5 Reservar plaza y recibir confirmaciones/notificaciones.
+- UC6 Ver viajes confirmados.
 
 ## UX Principles
-- Principle 1:
-- Principle 2:
-- Principle 3:
+- Onboarding rápido y privacidad (zona aproximada, no dirección exacta).
+- Matching claro y filtrado básico por sede/horario en MVP.
+- Coordinación simple pre‑viaje; feedback 1‑clic en evolutivo.
