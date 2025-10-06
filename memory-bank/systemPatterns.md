@@ -1,22 +1,34 @@
 # System Patterns
 
 ## Architecture Overview
-- Context (C1): SPA Web/Móvil, Backend de dominio, Data Platform. Integraciones: SSO (OIDC/SAML), Email/Push, Mapas/Geocoding, Calendario, BI.
-- Contenedores (C2): SPA (React/TS), API Gateway (OIDC), Servicios de Dominio: Users, Trips, Matching, Booking, Notifications, Admin; Data & Infra: PostgreSQL+PostGIS, Redis, Elastic/OpenSearch, Event Bus, DWH.
-- Componentes (C3): Matching (Match API, Scoring Engine, Geo Index), Booking (Booking API, Orchestrator, State Machine), Event Bus y Workers de notificaciones.
+- Context (C1): SPA Web/Móvil (React/TS), Backend Java 17 + Jakarta (dominio), Data Platform. Integraciones: SSO (OIDC/SAML), Email/Push, Mapas/Geocoding, Calendario, BI.
+- Contenedores (C2): SPA, API Gateway (OIDC), Servicios: Users, Trips, Matching, Booking, Notifications, Admin; Data & Infra: PostgreSQL+PostGIS, Redis, Elastic/OpenSearch, Event Bus, DWH.
+- Componentes (C3): Matching (Match API, Scoring Engine, Geo Index), Booking (Booking API, Orchestrator, State Machine), Event Bus y Workers.
+
+## DDD Layers and Structure
+- Domain: entidades/agregados, repositorios (interfaces), servicios de dominio, eventos de dominio.
+- Application: casos de uso (servicios de aplicación), orquestación, DTOs/comandos, transacciones.
+- Infrastructure: adaptadores (REST JAX‑RS, persistencia JPA/Hibernate, mensajería), configs, mappers.
+- Interface: controladores/recursos (JAX‑RS), validación, auth (OIDC), serialización.
+
+## TDD Workflow
+1) Definir casos de uso y criterios de aceptación. 2) Escribir tests de aplicación y dominio (JUnit5/Mockito). 3) Implementar lo mínimo para pasar tests. 4) Refactor con SOLID. 5) Añadir tests de integración (repos JPA, recursos JAX‑RS) y contratos.
 
 ## Key Patterns
-- Edge Authentication via OIDC en gateway; RBAC interno por rol (Empleado, Admin RRHH, Moderador Seguridad).
-- Event-driven para notificaciones y analítica (TX outbox; colas/bus de eventos).
-- Geospatial scoring simplificado en MVP (sede + franja horaria), ampliable a desvío/ETA.
-- Templates de notificación y recordatorios (T-60/T-15) disparados por eventos Booking.
-- Privacidad por diseño: origen aproximado en perfil, ubicación temporal opcional.
+- Edge Authentication via OIDC; RBAC interno por rol.
+- Event-driven para notificaciones/analítica (TX outbox + bus). 
+- Geospatial scoring simplificado en MVP; ampliable a desvío/ETA.
+- Notificaciones basadas en eventos (BookingConfirmed, recordatorios T‑60/T‑15).
+- Privacidad por diseño: zona aproximada; ubicación temporal.
 
 ## Technical Decisions
-- PostgreSQL + PostGIS para persistencia transaccional y soporte geográfico básico.
-- Redis para caché de sesiones/matching; Elastic/OpenSearch opcional para búsquedas.
-- Monolito modular o pocos servicios inicialmente; evolución a microservicios si escala.
-- Observabilidad: logs estructurados, tracing OTEL, métricas (p95 matching time, booking success rate).
+- Backend en Java 17 + Jakarta; Maven como build. JPA/Hibernate con PostgreSQL/PostGIS.
+- Redis para caché; Elastic/OpenSearch opcional; Keycloak como IdP en dev.
+- Observabilidad: logs estructurados, tracing OTEL, métricas clave.
+
+## Collaboration and Documentation
+- Mantener documentación en `/doc` (PlantUML/Mermaid) y prompts en `/Prompts/prompts_xvb.md`.
+- Flujo: Epics/US → tickets técnicos → modelos/diagramas → tests (TDD) → implementación → actualizar doc y prompts.
 
 ## Diagrams
-- Ver `doc/MVP/C1-Contexto.md`, `C2-Contenedores principales.md`, `C3-Componentes Matching y Booking.md` y `casos-de-uso.md`.
+- Ver `doc/MVP/*` y `readme.md` para contexto ampliado.

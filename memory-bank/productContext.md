@@ -21,6 +21,11 @@
 - UC5 Reservar plaza y recibir confirmaciones/notificaciones.
 - UC6 Ver viajes confirmados.
 
+## Methodology & Collaboration
+- Enfoque DDD/TDD/SOLID: definir epics y US, derivar tickets técnicos, tests antes de código.
+- Documentación viva en `/doc` (PlantUML/Mermaid) y registro de prompts en `/Prompts/prompts_xvb.md`.
+- El asistente pregunta dudas antes de implementar y no genera código sin autorización explícita.
+
 ## UX Principles
 - Onboarding rápido y privacidad (zona aproximada, no dirección exacta).
 - Matching claro y filtrado básico por sede/horario en MVP.

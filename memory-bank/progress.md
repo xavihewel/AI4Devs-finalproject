@@ -1,17 +1,18 @@
 # Progress
 
 ## What Works
-- Estructura de documentación en `doc/MVP` (contexto, contenedores, componentes, casos de uso, ER).
-- Carpeta `memory-bank/` creada con core files.
-- `productContext.md`, `systemPatterns.md`, `techContext.md`, `activeContext.md` actualizados.
+- Documentación MVP en `doc/MVP` (contexto, contenedores, componentes, casos de uso, ER).
+- Memory Bank actualizado: `productContext.md`, `systemPatterns.md`, `techContext.md`, `activeContext.md` alineados con Java/Jakarta, React/TS, PostgreSQL y DDD/TDD/SOLID.
 
 ## What's Left
-- Completar documentación de API (OpenAPI base) y roadmap en `readme.md`.
-- Añadir guías de instalación local y `docker-compose` (PG, Redis, IdP opcional).
+- Definir Epics y User Stories iniciales (DDD) y derivar tickets técnicos.
+- Preparar `docker-compose` de dev (PostgreSQL, Redis, opcional Keycloak) y guía de instalación.
+- Especificar contratos base (OpenAPI/PlantUML) para `/users`, `/trips`, `/bookings`, `/matches`.
+- Crear `Prompts/prompts_xvb.md` y registrar próximas decisiones.
 
 ## Current Status
-Memory Bank inicializado y sincronizado con el contexto del MVP. Listo para iterar sobre especificaciones técnicas y setup local.
+Memory Bank sincronizado con el prompt de trabajo y metodología. Listo para entrar en Planner Mode y definir epics/US/tickets antes de implementar (TDD).
 
 ## Known Issues
-- Falta definición formal de endpoints y contratos (OpenAPI).
-- Decisión pendiente: monolito modular vs. primeros microservicios.
+- Pendiente decisión fina sobre monolito modular vs. servicios iniciales (sugerido monolito modular Java 17 + Jakarta).
+- Falta definir pipeline de CI y estándares de calidad (lint, tests, coverage).

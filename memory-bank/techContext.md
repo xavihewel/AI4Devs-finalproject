@@ -1,20 +1,23 @@
 # Tech Context
 
 ## Stack
-- Languages: TypeScript (frontend), one of Node.js/TypeScript or Python for backend.
-- Frameworks: React (SPA/PWA), API Gateway with OIDC, optional workers.
-- Libraries/Services: PostGIS, Redis, Elastic/OpenSearch (opcional), Event Bus (Kafka/RabbitMQ), Map APIs, Email/Push.
+- Languages: Java 17 (backend), TypeScript (frontend).
+- Backend: Jakarta EE on Java 17, Maven (v10) build, JUnit 5 + Mockito for tests.
+- Frontend: React (SPA/PWA) con TypeScript.
+- Optional edge/server: Node.js + Express para middleware o herramientas dev.
+- Database: PostgreSQL (con PostGIS si se requiere geo), Redis opcional.
 
 ## Development Setup
-- Frontend SPA (React/TS) con autenticación OIDC.
-- Backend/API con endpoints: users, trips, matching, booking, notifications; integración SSO/IdP y mapas.
-- Local services: PostgreSQL + PostGIS, Redis; opcional Elastic y Message Broker.
-- Scripts: seed mínima (usuarios/sedes), migraciones (Flyway/Liquibase), OpenAPI base para `/trips`, `/bookings`, `/matches`.
+- Backend (Java 17 + Jakarta + Maven): estructura según DDD (módulos dominio, aplicación, infraestructura); pruebas con JUnit5/Mockito via Maven surefire; perfiles de configuración (dev/test).
+- Frontend (React/TS): autenticación OIDC, PWA opcional; scripts de desarrollo y build.
+- Servicios locales: PostgreSQL, Redis; docker-compose recomendado para orquestación.
+- Documentación técnica en `/doc` con PlantUML y Mermaid; prompts en `/Prompts/prompts_xvb.md`.
 
 ## Constraints
-- Privacidad: almacenar zona aproximada en perfil, compartir ubicación temporal solo bajo consentimiento.
-- Cumplimiento: RGPD, cifrado en tránsito (TLS) y reposo; auditoría de acciones administrativas.
+- DDD/TDD/SOLID como guía: pruebas antes de código funcional; límites de contexto claros; separación de capas.
+- Privacidad y cumplimiento (RGPD): almacenar zona aproximada; cifrado en tránsito/ reposo.
 
 ## Dependencies
-- PostgreSQL 14+/PostGIS, Redis 6+, Elastic/OpenSearch opcional, Kafka/RabbitMQ opcional.
-- Integraciones: IdP corporativo (OIDC/SAML), proveedor de email/push, proveedor de mapas/geocoding.
+- Maven: Jakarta EE API, JAX-RS, JPA/Hibernate, PostgreSQL driver, JUnit5, Mockito.
+- Frontend: React, react-router, OIDC/OAuth client, tooling (Vite/CRA), testing-library/Jest.
+- Infra: Docker, docker-compose; opcional Keycloak como IdP de dev.
