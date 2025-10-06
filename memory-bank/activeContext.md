@@ -1,16 +1,18 @@
 # Active Context
 
 ## Current Focus
-- Alinear Memory Bank con el plan (epics, US, tickets) y preparar infraestructura dev.
+- Implementación MVP por microservicios (Auth, Users, Trips, Booking; Matching en curso).
 
 ## Recent Changes
-- Añadidos `doc/plan/epics.md`, `doc/plan/user-stories.md`, `doc/plan/tickets.md`.
-- Registro de prompts en `Prompts/prompts_xvb.md`.
+- Auth: `JwtValidator` con Nimbus + tests en verde.
+- Users: `/users/me` GET/PUT (DTO directo) + tests.
+- Trips: `/trips` POST/GET (DTOs directos) + tests.
+- Booking: `/bookings` POST/GET (DTO directo) + tests.
 
 ## Next Steps
-- Orquestar `docker-compose` (PostgreSQL+PostGIS, Redis, Keycloak) y guía setup.
-- Priorizar tickets I1→A1→U1→T1→B1→M1 siguiendo TDD.
+- Matching-service `/matches` GET (score básico) + tests.
+- Integración básica entre servicios y validación JWT en endpoints.
 
 ## Decisions & Considerations
-- Arquitectura microservicios Java 17/Jakarta; SSO con Keycloak; PostGIS habilitado.
-- Mantener documentación y prompts sincronizados en cada iteración.
+- Tests unitarios de recursos sin RuntimeDelegate (retornando DTOs directamente).
+- Mantener OpenAPI como contrato guía; alinear DTOs si cambian.

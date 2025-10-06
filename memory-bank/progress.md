@@ -1,20 +1,21 @@
 # Progress
 
 ## What Works
-- Documentación MVP en `doc/MVP` (contexto, contenedores, componentes, casos de uso, ER).
-- Memory Bank alineado (product, patterns, tech, active, progress).
-- Plan creado en `doc/plan/` (epics, user stories, tickets).
-- Infraestructura local: `docker-compose.yml` (PostGIS, Redis, Keycloak, Mailhog), guías `doc/setup/local.md`, `doc/setup/keycloak.md`, `doc/setup/env.md`.
-- OpenAPI inicial: `doc/api/` (auth, users, trips, booking, matching).
-- Estructura de repo: `Backend/` (microservicios con READMEs) y `Frontend/` (README).
+- Documentación MVP (`doc/MVP`), plan (`doc/plan/*`), infra (`docker-compose`, `doc/setup/*`).
+- OpenAPI inicial (`doc/api/*`).
+- Auth-service: `JwtValidator` (JWKS) + tests OK.
+- Users-service: `/users/me` GET/PUT (DTO directo) + tests.
+- Trips-service: `/trips` POST/GET (DTOs directos) + tests.
+- Booking-service: `/bookings` POST/GET (DTO directo) + tests.
 
 ## What's Left
-- Configurar realm/clients de Keycloak en dev según guía.
-- Implementar servicios siguiendo TDD a partir de OpenAPI.
-- Seeds iniciales (usuarios, sedes) y scripts de migración.
+- Matching-service: `/matches` GET (score básico) + tests.
+- Añadir validación JWT en recursos (filtro) y wiring mínimo.
+- Seeds/migraciones y conexión a PG/Redis en local.
 
 ## Current Status
-Infra local, guías, contratos API y estructura de carpetas listos. Iniciar implementación por tickets A1→U1→T1→B1→M1.
+MVP backend esqueleto en marcha con endpoints y tests unitarios básicos; pendiente matching y seguridad a nivel de endpoints.
 
 ## Known Issues
-- Pendiente decisión fina de nomenclatura y paquetes Jakarta por servicio.
+- Falta integración real entre servicios (por ahora stubs/echo DTOs).
+- Alinear DTOs con OpenAPI si evolucionan.
