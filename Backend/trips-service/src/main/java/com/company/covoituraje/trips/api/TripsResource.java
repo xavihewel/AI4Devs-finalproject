@@ -34,7 +34,10 @@ public class TripsResource {
         // Parse dateTime from ISO8601 string
         OffsetDateTime dateTime = OffsetDateTime.parse(create.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
         
-        Trip trip = new Trip(currentUser, create.origin, create.destinationSedeId, dateTime, create.seatsTotal);
+        // Convert origin to string format
+        String originString = create.origin.lat + "," + create.origin.lng;
+        
+        Trip trip = new Trip(currentUser, originString, create.destinationSedeId, dateTime, create.seatsTotal);
         trip = repository.save(trip);
         
         return mapToDto(trip);
@@ -72,7 +75,14 @@ public class TripsResource {
         TripDto dto = new TripDto();
         dto.id = trip.getId().toString();
         dto.driverId = trip.getDriverId();
-        dto.origin = trip.getOrigin();
+        
+        // Convert origin string to TripDto.Origin
+        String[] coords = trip.getOrigin().split(",");
+        TripDto.Origin origin = new TripDto.Origin();
+        origin.lat = Double.parseDouble(coords[0]);
+        origin.lng = Double.parseDouble(coords[1]);
+        dto.origin = origin;
+        
         dto.destinationSedeId = trip.getDestinationSedeId();
         dto.dateTime = trip.getDateTime().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
         dto.seatsTotal = trip.getSeatsTotal();

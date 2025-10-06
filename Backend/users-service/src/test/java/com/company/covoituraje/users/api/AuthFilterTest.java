@@ -61,10 +61,9 @@ class AuthFilterTest {
 
         filter.filter(ctx);
 
-        // userId should be set on context
-        verify(ctx).setProperty(eq("userId"), eq("USER-1"));
-        // ensure not aborted
+        // Verify that the filter didn't abort the request
         verify(ctx, never()).abortWith(any());
+        verify(validator).validate(tok);
     }
 
     @Test

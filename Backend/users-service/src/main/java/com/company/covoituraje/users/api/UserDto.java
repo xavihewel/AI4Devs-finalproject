@@ -4,6 +4,7 @@ import java.util.List;
 
 public class UserDto {
     public String id;
+    public String name;
     public String email;
     public String sedeId;
     public String zone;

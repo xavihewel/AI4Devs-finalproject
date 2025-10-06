@@ -8,21 +8,33 @@ class UsersResourceTest {
 
     @Test
     void getMe_returnsDefaultUser() {
-        UsersResource resource = new UsersResource();
-        UserDto body = resource.getMe();
-        assertNotNull(body);
-        assertEquals("me@example.com", body.email);
-        assertTrue(body.roles.contains("EMPLOYEE"));
+        // Set user context
+        UsersResource.AuthContext.setUserId("user-001");
+        try {
+            UsersResource resource = new UsersResource();
+            UserDto body = resource.getMe();
+            assertNotNull(body);
+            assertEquals("user-001", body.id);
+            assertEquals("Ana García", body.name);
+        } finally {
+            UsersResource.AuthContext.clear();
+        }
     }
 
     @Test
     void putMe_echoesUpdate() {
-        UsersResource resource = new UsersResource();
-        UserDto update = new UserDto();
-        update.email = "new@example.com";
-        update.zone = "08025";
-        UserDto body = resource.updateMe(update);
-        assertEquals("new@example.com", body.email);
-        assertEquals("08025", body.zone);
+        // Set user context
+        UsersResource.AuthContext.setUserId("user-001");
+        try {
+            UsersResource resource = new UsersResource();
+            UserDto update = new UserDto();
+            update.name = "Updated Name";
+            update.sedeId = "SEDE-2";
+            UserDto body = resource.updateMe(update);
+            assertEquals("Updated Name", body.name);
+            assertEquals("SEDE-2", body.sedeId);
+        } finally {
+            UsersResource.AuthContext.clear();
+        }
     }
 }
