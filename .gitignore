@@ -26,3 +26,8 @@ yarn-error.log*
 .vscode
 
 # .env
+
+# Java/Maven
+**/target/
+**/*.class
+.mvn/wrapper/maven-wrapper.jar
