@@ -5,6 +5,7 @@
 
 ## Recent Changes
 - Añadidos `doc/plan/epics.md`, `doc/plan/user-stories.md`, `doc/plan/tickets.md`.
+- Registro de prompts en `Prompts/prompts_xvb.md`.
 
 ## Next Steps
 - Orquestar `docker-compose` (PostgreSQL+PostGIS, Redis, Keycloak) y guía setup.

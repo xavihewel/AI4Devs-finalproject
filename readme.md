@@ -408,3 +408,7 @@ Eres un analista de software experto. Enumera y describe brevemente las tres his
 
 **Pull Request 3**
 
+## Registro de Prompts
+
+Consulta `Prompts/prompts_xvb.md` para ver las decisiones y acciones clave documentadas durante el proyecto.
+
