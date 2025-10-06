@@ -66,6 +66,25 @@ class AuthFilterTest {
         // ensure not aborted
         verify(ctx, never()).abortWith(any());
     }
+
+    @Test
+    void missingEmployeeRole_aborts403_whenRequired() {
+        JwtValidator validator = mock(JwtValidator.class);
+        // Enable role requirement via constructor
+        AuthFilter filter = new AuthFilter(validator, true);
+        ContainerRequestContext ctx = mock(ContainerRequestContext.class);
+        // token without realm_access.roles EMPLOYEE
+        String header = base64Url("{\"alg\":\"RS256\"}");
+        String payload = base64Url("{\"iss\":\"i\",\"sub\":\"U\",\"aud\":[\"backend-api\"],\"exp\":9999999999,\"realm_access\":{\"roles\":[\"OTHER\"]}}");
+        String tok = header + "." + payload + ".sig";
+        when(ctx.getHeaderString("Authorization")).thenReturn("Bearer " + tok);
+
+        filter.filter(ctx);
+
+        ArgumentCaptor<Response> cap = ArgumentCaptor.forClass(Response.class);
+        verify(ctx).abortWith(cap.capture());
+        assertEquals(403, cap.getValue().getStatus());
+    }
 }
 
 

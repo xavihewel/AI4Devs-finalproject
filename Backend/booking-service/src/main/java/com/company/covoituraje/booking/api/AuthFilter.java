@@ -8,20 +8,30 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 import com.company.covoituraje.auth.JwtValidator;
 import com.company.covoituraje.auth.JwtValidationException;
+import com.company.covoituraje.auth.AuthUtils;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class AuthFilter implements ContainerRequestFilter {
     private final JwtValidator jwtValidator;
+    private final boolean requireEmployeeRole;
 
     public AuthFilter() {
         String issuer = System.getenv("OIDC_ISSUER_URI");
         String jwks = System.getenv("OIDC_JWKS_URI");
         this.jwtValidator = new JwtValidator(issuer, jwks);
+        String require = System.getenv("REQUIRE_ROLE_EMPLOYEE");
+        this.requireEmployeeRole = "true".equalsIgnoreCase(require);
     }
 
     public AuthFilter(JwtValidator jwtValidator) {
         this.jwtValidator = jwtValidator;
+        this.requireEmployeeRole = false;
+    }
+
+    public AuthFilter(JwtValidator jwtValidator, boolean requireEmployeeRole) {
+        this.jwtValidator = jwtValidator;
+        this.requireEmployeeRole = requireEmployeeRole;
     }
 
     @Override
@@ -34,10 +44,18 @@ public class AuthFilter implements ContainerRequestFilter {
         String token = auth.substring("Bearer ".length());
         try {
             jwtValidator.validate(token);
-            String userId = com.nimbusds.jwt.SignedJWT.parse(token).getJWTClaimsSet().getSubject();
+            String userId = AuthUtils.extractUserIdFromToken(token);
             requestContext.setProperty("userId", userId);
             RequestUser.set(userId);
-        } catch (JwtValidationException | java.text.ParseException e) {
+            String require = System.getenv("REQUIRE_ROLE_EMPLOYEE");
+            if (requireEmployeeRole) {
+                java.util.List<String> roles = AuthUtils.extractRealmRoles(token);
+                if (roles == null || roles.stream().noneMatch("EMPLOYEE"::equals)) {
+                    requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).entity("Forbidden").build());
+                    return;
+                }
+            }
+        } catch (JwtValidationException e) {
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build());
         }
     }
