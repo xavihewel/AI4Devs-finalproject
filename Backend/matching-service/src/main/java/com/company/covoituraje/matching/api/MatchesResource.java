@@ -1,61 +1,117 @@
 package com.company.covoituraje.matching.api;
 
+import com.company.covoituraje.matching.service.MatchingService;
+import com.company.covoituraje.matching.infrastructure.MatchRepository;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Path("/matches")
 @Produces(MediaType.APPLICATION_JSON)
 public class MatchesResource {
 
+    private final MatchingService matchingService;
+    
+    static final class AuthContext {
+        private static final ThreadLocal<String> USER_ID = new ThreadLocal<>();
+        static void setUserId(String userId) { USER_ID.set(userId); }
+        static String getUserId() { return USER_ID.get(); }
+        static void clear() { USER_ID.remove(); }
+    }
+
+    public MatchesResource() {
+        this.matchingService = new MatchingService(new MatchRepository());
+    }
+
     @GET
-    public List<MatchDto> get(@QueryParam("destinationSedeId") String destinationSedeId,
-                              @QueryParam("time") String time) {
-        // TODO: integrate with trips-service repository when exposed/shared.
-        List<MockTrip> trips = List.of(
-                new MockTrip("TRIP-1", "SEDE-1", "08:30"),
-                new MockTrip("TRIP-2", "SEDE-1", "09:00"),
-                new MockTrip("TRIP-3", "SEDE-2", "08:30")
+    public List<MatchDto> findMatches(@QueryParam("destinationSedeId") String destinationSedeId,
+                                     @QueryParam("time") String time,
+                                     @QueryParam("origin") String origin) {
+        
+        String currentUser = AuthContext.getUserId();
+        if (currentUser == null || currentUser.isBlank()) {
+            throw new BadRequestException("User ID is required");
+        }
+
+        // Validate required parameters
+        if (destinationSedeId == null || destinationSedeId.isBlank()) {
+            throw new BadRequestException("Destination sede ID is required");
+        }
+
+        // Use the matching service to find real matches
+        List<MatchResult> matches = matchingService.findMatches(
+            currentUser, 
+            destinationSedeId, 
+            time, 
+            origin
         );
-        return trips.stream()
-                .filter(t -> destinationSedeId == null || destinationSedeId.equals(t.destinationSedeId))
-                .map(t -> {
-                    double s = 0.0;
-                    if (destinationSedeId != null && destinationSedeId.equals(t.destinationSedeId)) s += 1.0;
-                    if (time != null && time.equals(t.time)) s += 0.5;
-                    if (time != null && isWithin30Minutes(time, t.time)) s += 0.25;
-                    MatchDto m = new MatchDto();
-                    m.tripId = t.id;
-                    m.score = s;
-                    return m;
-                })
-                .sorted((a, b) -> Double.compare(b.score, a.score))
-                .collect(Collectors.toCollection(ArrayList::new));
+
+        // Convert to DTOs
+        return matches.stream()
+                .map(this::mapToDto)
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
     }
 
-    private boolean isWithin30Minutes(String base, String other) {
-        try {
-            String[] b = base.split(":");
-            String[] o = other.split(":");
-            int bm = Integer.parseInt(b[0]) * 60 + Integer.parseInt(b[1]);
-            int om = Integer.parseInt(o[0]) * 60 + Integer.parseInt(o[1]);
-            return Math.abs(bm - om) <= 30;
-        } catch (Exception e) {
-            return false;
+    @GET
+    @Path("/my-matches")
+    public List<MatchDto> getMyMatches() {
+        String currentUser = AuthContext.getUserId();
+        if (currentUser == null || currentUser.isBlank()) {
+            throw new BadRequestException("User ID is required");
         }
+
+        // Get matches from database for this user
+        MatchRepository repository = new MatchRepository();
+        List<com.company.covoituraje.matching.domain.Match> matches = repository.findByPassengerId(currentUser);
+
+        return matches.stream()
+                .map(this::mapDomainToDto)
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
     }
 
-    private static class MockTrip {
-        final String id;
-        final String destinationSedeId;
-        final String time;
-        MockTrip(String id, String destinationSedeId, String time) {
-            this.id = id;
-            this.destinationSedeId = destinationSedeId;
-            this.time = time;
+    @GET
+    @Path("/driver/{driverId}")
+    public List<MatchDto> getDriverMatches(@PathParam("driverId") String driverId) {
+        String currentUser = AuthContext.getUserId();
+        if (currentUser == null || currentUser.isBlank()) {
+            throw new BadRequestException("User ID is required");
         }
+
+        // For now, only allow users to see their own matches
+        // In the future, drivers should be able to see matches for their trips
+        if (!currentUser.equals(driverId)) {
+            throw new ForbiddenException("Access denied");
+        }
+
+        MatchRepository repository = new MatchRepository();
+        List<com.company.covoituraje.matching.domain.Match> matches = repository.findByDriverId(driverId);
+
+        return matches.stream()
+                .map(this::mapDomainToDto)
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+    }
+
+    private MatchDto mapToDto(MatchResult matchResult) {
+        MatchDto dto = new MatchDto();
+        dto.tripId = matchResult.tripId;
+        dto.driverId = matchResult.driverId;
+        dto.origin = matchResult.origin;
+        dto.destinationSedeId = matchResult.destinationSedeId;
+        dto.dateTime = matchResult.dateTime;
+        dto.seatsFree = matchResult.seatsFree;
+        dto.score = matchResult.score;
+        dto.reasons = matchResult.reasons;
+        return dto;
+    }
+
+    private MatchDto mapDomainToDto(com.company.covoituraje.matching.domain.Match match) {
+        MatchDto dto = new MatchDto();
+        dto.tripId = match.getTripId().toString();
+        dto.driverId = match.getDriverId();
+        dto.score = match.getMatchScore().doubleValue();
+        dto.status = match.getStatus();
+        return dto;
     }
 }

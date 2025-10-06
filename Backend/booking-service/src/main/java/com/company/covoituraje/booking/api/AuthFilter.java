@@ -44,19 +44,27 @@ public class AuthFilter implements ContainerRequestFilter {
         String token = auth.substring("Bearer ".length());
         try {
             jwtValidator.validate(token);
+            
+            // Extract user info and set in context
             String userId = AuthUtils.extractUserIdFromToken(token);
-            requestContext.setProperty("userId", userId);
-            RequestUser.set(userId);
-            String require = System.getenv("REQUIRE_ROLE_EMPLOYEE");
+            if (userId != null && !userId.isBlank()) {
+                BookingResource.AuthContext.setUserId(userId);
+            }
+            
+            // Check employee role if required
             if (requireEmployeeRole) {
-                java.util.List<String> roles = AuthUtils.extractRealmRoles(token);
-                if (roles == null || roles.stream().noneMatch("EMPLOYEE"::equals)) {
-                    requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).entity("Forbidden").build());
+                var roles = AuthUtils.extractRealmRoles(token);
+                if (!roles.contains("EMPLOYEE")) {
+                    requestContext.abortWith(Response.status(403).build());
                     return;
                 }
             }
+            
         } catch (JwtValidationException e) {
-            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build());
+            requestContext.abortWith(Response.status(401).build());
+        } finally {
+            // Clean up thread local in finally block
+            BookingResource.AuthContext.clear();
         }
     }
 }

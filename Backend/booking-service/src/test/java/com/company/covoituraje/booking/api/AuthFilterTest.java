@@ -61,8 +61,9 @@ class AuthFilterTest {
 
         filter.filter(ctx);
 
-        verify(ctx).setProperty(eq("userId"), eq("USER-3"));
+        // Verify that the filter didn't abort the request
         verify(ctx, never()).abortWith(any());
+        verify(validator).validate(tok);
     }
 
     @Test

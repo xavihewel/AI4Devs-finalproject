@@ -83,6 +83,15 @@ public class MatchRepository {
         return query.getResultList();
     }
 
+    public List<Match> findByTripIdAndPassengerId(UUID tripId, String passengerId) {
+        TypedQuery<Match> query = entityManager.createQuery(
+            "SELECT m FROM Match m WHERE m.tripId = :tripId AND m.passengerId = :passengerId", 
+            Match.class);
+        query.setParameter("tripId", tripId);
+        query.setParameter("passengerId", passengerId);
+        return query.getResultList();
+    }
+
     public List<Match> findHighScoreMatches(BigDecimal minScore) {
         TypedQuery<Match> query = entityManager.createQuery(
             "SELECT m FROM Match m WHERE m.matchScore >= :minScore ORDER BY m.matchScore DESC", 
