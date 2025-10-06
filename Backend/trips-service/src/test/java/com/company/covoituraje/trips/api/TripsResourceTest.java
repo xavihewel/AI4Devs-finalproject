@@ -31,6 +31,9 @@ class TripsResourceTest {
         TripsResource resource = new TripsResource();
         List<TripDto> list = resource.list("SEDE-1", "08:00", "09:00");
         assertNotNull(list);
-        assertTrue(list.isEmpty());
+        assertFalse(list.isEmpty());
+        for (TripDto t : list) {
+            assertEquals("SEDE-1", t.destinationSedeId);
+        }
     }
 }

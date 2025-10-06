@@ -12,6 +12,8 @@
     <jakarta.json.bind.version>3.0.1</jakarta.json.bind.version>
     <nimbus.version>9.37.3</nimbus.version>
     <mockito.version>5.12.0</mockito.version>
+    <jakarta.annotation.version>2.1.1</jakarta.annotation.version>
+    <jersey.version>3.1.6</jersey.version>
   </properties>
   <dependencies>
     <dependency>
@@ -41,6 +43,17 @@
       <artifactId>mockito-core</artifactId>
       <version>${mockito.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-common</artifactId>
+      <version>${jersey.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
+      <version>${jakarta.annotation.version}</version>
     </dependency>
     <dependency>
       <groupId>com.company.covoituraje</groupId>
