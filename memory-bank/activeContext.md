@@ -1,15 +1,15 @@
 # Active Context
 
 ## Current Focus
-- Alinear Memory Bank con el prompt de `Prompts/prompts_codigo.md` (stack Java 17/Jakarta, React/TS, PostgreSQL) y metodología DDD/TDD/SOLID.
+- Alinear Memory Bank con el plan (epics, US, tickets) y preparar infraestructura dev.
 
 ## Recent Changes
-- Actualizados `techContext.md`, `systemPatterns.md`, `productContext.md` con stack, estructura DDD y flujo TDD.
+- Añadidos `doc/plan/epics.md`, `doc/plan/user-stories.md`, `doc/plan/tickets.md`.
 
 ## Next Steps
-- Revisar `progress.md` con nuevo estado y pendientes (epics/US/tickets, setup dev con docker-compose).
-- Registrar próximo prompt de planificación en `Prompts/prompts_xvb.md`.
+- Orquestar `docker-compose` (PostgreSQL+PostGIS, Redis, Keycloak) y guía setup.
+- Priorizar tickets I1→A1→U1→T1→B1→M1 siguiendo TDD.
 
 ## Decisions & Considerations
-- No generar código sin autorización explícita (flujo de trabajo del asistente).
+- Arquitectura microservicios Java 17/Jakarta; SSO con Keycloak; PostGIS habilitado.
 - Mantener documentación y prompts sincronizados en cada iteración.

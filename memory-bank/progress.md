@@ -2,17 +2,17 @@
 
 ## What Works
 - Documentación MVP en `doc/MVP` (contexto, contenedores, componentes, casos de uso, ER).
-- Memory Bank actualizado: `productContext.md`, `systemPatterns.md`, `techContext.md`, `activeContext.md` alineados con Java/Jakarta, React/TS, PostgreSQL y DDD/TDD/SOLID.
+- Memory Bank alineado (product, patterns, tech, active, progress).
+- Plan creado en `doc/plan/` (epics, user stories, tickets).
 
 ## What's Left
-- Definir Epics y User Stories iniciales (DDD) y derivar tickets técnicos.
-- Preparar `docker-compose` de dev (PostgreSQL, Redis, opcional Keycloak) y guía de instalación.
-- Especificar contratos base (OpenAPI/PlantUML) para `/users`, `/trips`, `/bookings`, `/matches`.
-- Crear `Prompts/prompts_xvb.md` y registrar próximas decisiones.
+- I1: docker-compose (PostgreSQL+PostGIS, Redis, Keycloak) y README de setup.
+- A1: Config OIDC en `auth-service`; U1/T1/B1/M1 según TDD.
+- Registrar prompts clave en `Prompts/prompts_xvb.md`.
 
 ## Current Status
-Memory Bank sincronizado con el prompt de trabajo y metodología. Listo para entrar en Planner Mode y definir epics/US/tickets antes de implementar (TDD).
+Listos para implementar infraestructura local e iniciar servicios con TDD.
 
 ## Known Issues
-- Pendiente decisión fina sobre monolito modular vs. servicios iniciales (sugerido monolito modular Java 17 + Jakarta).
-- Falta definir pipeline de CI y estándares de calidad (lint, tests, coverage).
+- Pendiente definición de contratos OpenAPI iniciales por servicio.
+- Decidir estructura exacta de paquetes Jakarta por servicio (convención común).
