@@ -10,6 +10,7 @@ paths:
       summary: Create a booking for a trip
       security:
         - bearerAuth: []
+      description: Requires Authorization header. Example: `Authorization: Bearer eyJ...`
       requestBody:
         required: true
         content:
@@ -27,10 +28,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Booking'
+        '401':
+          description: Unauthorized (missing or invalid JWT)
+        '403':
+          description: Forbidden (insufficient permissions)
     get:
       summary: List my bookings
       security:
         - bearerAuth: []
+      description: Requires Authorization header. Example: `Authorization: Bearer eyJ...`
       responses:
         '200':
           description: List of bookings
@@ -40,6 +46,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Booking'
+        '401':
+          description: Unauthorized (missing or invalid JWT)
+        '403':
+          description: Forbidden (insufficient permissions)
 components:
   securitySchemes:
     bearerAuth:

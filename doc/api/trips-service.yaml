@@ -10,6 +10,7 @@ paths:
       summary: Create a trip
       security:
         - bearerAuth: []
+      description: Requires Authorization header. Example: `Authorization: Bearer eyJ...`
       requestBody:
         required: true
         content:
@@ -23,10 +24,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Trip'
+        '401':
+          description: Unauthorized (missing or invalid JWT)
+        '403':
+          description: Forbidden (insufficient permissions)
     get:
       summary: List trips
       security:
         - bearerAuth: []
+      description: Requires Authorization header. Example: `Authorization: Bearer eyJ...`
       parameters:
         - in: query
           name: destinationSedeId
@@ -51,6 +57,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Trip'
+        '401':
+          description: Unauthorized (missing or invalid JWT)
+        '403':
+          description: Forbidden (insufficient permissions)
 components:
   securitySchemes:
     bearerAuth:

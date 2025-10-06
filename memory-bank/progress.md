@@ -8,11 +8,11 @@
 - Trips-service: `/trips` POST/GET (DTOs directos) + tests.
 - Booking-service: `/bookings` POST/GET (DTO directo) + tests.
 - Matching-service: `/matches` GET (mock + score simple) + tests.
-- Seguridad mínima: `AuthFilter` (Bearer) en users/trips/booking/matching.
+- Seguridad: `AuthFilter` con validación JWT real (Nimbus) en users/trips/booking/matching; tests unitarios de filtros.
+- Propagación `userId` en `trips` (driverId) y `booking` (passengerId, listMine).
 
 ## What's Left
 - Seeds/migraciones; repos en memoria/PG para alimentar matching y booking.
-- Añadir validación JWT real (usando `JwtValidator`) en recursos y tests de aceptación.
 - Alinear DTOs con OpenAPI y ampliar verificación de contrato.
 
 ## Current Status

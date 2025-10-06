@@ -10,6 +10,7 @@ paths:
       summary: Get current user profile
       security:
         - bearerAuth: []
+      description: Requires Authorization header. Example: `Authorization: Bearer eyJ...`
       responses:
         '200':
           description: Current user
@@ -17,10 +18,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized (missing or invalid JWT)
+        '403':
+          description: Forbidden (insufficient permissions)
     put:
       summary: Update current user profile (minimal fields)
       security:
         - bearerAuth: []
+      description: Requires Authorization header. Example: `Authorization: Bearer eyJ...`
       requestBody:
         required: true
         content:
@@ -34,6 +40,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized (missing or invalid JWT)
+        '403':
+          description: Forbidden (insufficient permissions)
 components:
   securitySchemes:
     bearerAuth:

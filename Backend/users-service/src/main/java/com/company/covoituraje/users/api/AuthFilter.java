@@ -20,6 +20,11 @@ public class AuthFilter implements ContainerRequestFilter {
         this.jwtValidator = new JwtValidator(issuer, jwks);
     }
 
+    // Injectable constructor for tests
+    public AuthFilter(JwtValidator jwtValidator) {
+        this.jwtValidator = jwtValidator;
+    }
+
     @Override
     public void filter(ContainerRequestContext requestContext) {
         String auth = requestContext.getHeaderString("Authorization");

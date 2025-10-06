@@ -8,8 +8,16 @@ public class BookingRepository {
     private static final List<BookingDto> BOOKINGS = new ArrayList<>();
 
     public List<BookingDto> listMine(String passengerId) {
-        // For now, return all as we don't have auth context wiring
-        return Collections.unmodifiableList(BOOKINGS);
+        if (passengerId == null || passengerId.isBlank()) {
+            return Collections.unmodifiableList(BOOKINGS);
+        }
+        List<BookingDto> mine = new ArrayList<>();
+        for (BookingDto b : BOOKINGS) {
+            if (passengerId.equals(b.passengerId)) {
+                mine.add(b);
+            }
+        }
+        return Collections.unmodifiableList(mine);
     }
 
     public BookingDto save(BookingDto dto) {

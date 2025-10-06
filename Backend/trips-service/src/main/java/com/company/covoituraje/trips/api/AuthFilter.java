@@ -20,6 +20,10 @@ public class AuthFilter implements ContainerRequestFilter {
         this.jwtValidator = new JwtValidator(issuer, jwks);
     }
 
+    public AuthFilter(JwtValidator jwtValidator) {
+        this.jwtValidator = jwtValidator;
+    }
+
     @Override
     public void filter(ContainerRequestContext requestContext) {
         String auth = requestContext.getHeaderString("Authorization");
@@ -32,6 +36,7 @@ public class AuthFilter implements ContainerRequestFilter {
             jwtValidator.validate(token);
             String userId = com.nimbusds.jwt.SignedJWT.parse(token).getJWTClaimsSet().getSubject();
             requestContext.setProperty("userId", userId);
+            RequestUser.set(userId);
         } catch (JwtValidationException | java.text.ParseException e) {
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build());
         }
