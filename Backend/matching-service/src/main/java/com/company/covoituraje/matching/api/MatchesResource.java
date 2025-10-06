@@ -14,13 +14,12 @@ public class MatchesResource {
     @GET
     public List<MatchDto> get(@QueryParam("destinationSedeId") String destinationSedeId,
                               @QueryParam("time") String time) {
-        // Mock trips: three trips to different sedes and times
+        // TODO: integrate with trips-service repository when exposed/shared.
         List<MockTrip> trips = List.of(
                 new MockTrip("TRIP-1", "SEDE-1", "08:30"),
                 new MockTrip("TRIP-2", "SEDE-1", "09:00"),
                 new MockTrip("TRIP-3", "SEDE-2", "08:30")
         );
-        // Simple score: +1 if same destination, +0.5 if time equal, +0.25 if within 30m window
         return trips.stream()
                 .filter(t -> destinationSedeId == null || destinationSedeId.equals(t.destinationSedeId))
                 .map(t -> {
@@ -38,7 +37,6 @@ public class MatchesResource {
     }
 
     private boolean isWithin30Minutes(String base, String other) {
-        // times as HH:MM in same day; naive minutes diff
         try {
             String[] b = base.split(":");
             String[] o = other.split(":");
