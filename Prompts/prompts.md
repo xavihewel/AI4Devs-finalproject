@@ -1033,3 +1033,14 @@ erDiagram
 * Estados sugeridos: `TRIP.estado` y `BOOKING.estado` cubren el ciclo básico del viaje/reserva.
 
 ¿Quieres que lo convierta a **schema.prisma**, **DDL SQL (PostgreSQL + PostGIS)** o un **diagrama de clases UML** a partir de este ER?
+
+# prompt para iniciar proyecto
+
+Dispondremos de un backend desarrollado en Java 17, maven 10 y jakarta. Los testos unitarios se haran en junit 5 y mockito.
+El frontend estará desarrollado en TypeScript y REACT.
+Podemos usar Node, Express y la base de datos será PostgreSQL.
+Seguiremos los prinicipos de Diseño Dirigido por el Dominio (DDD) y Desarrollo Dirigido por Pruebas (TDD).
+Todo ello siguiendo buenas prácticas, basado en los principios SOLID y usando patrones de diseño cuando sea adecuado.
+Para cada etapa deberemos redactar las Epicas, casos de usuario y tiquets necesarios. Para ello usaremos PlanUML y mermaid. La documentación generada se añadirá en la carpeta doc y siempre deberá estar actualizada.
+Guardaremos el registro de prompots en un archivo llamado promps_xvb.md dentro de la carpeta /Prompts
+Siempre preguntarás lo que necesites para seguir y no desarrollarás nada hasta que te lo indique.
