@@ -24,10 +24,13 @@
  - Frontend Testing: Vitest + RTL; entorno `jsdom` y `jest-dom`; mocking de `getKeycloak()` para tests sin OIDC real.
 
 ## Technical Decisions
-- Backend en Java 17 + Jakarta; Maven como build. JPA/Hibernate con PostgreSQL/PostGIS.
+- Backend en Java 17 + Jakarta; Maven como build. **JPA/Hibernate con PostgreSQL/PostGIS IMPLEMENTADO**.
+- **Flyway para migraciones** con schemas separados por servicio (trips, users, bookings, matches).
+- **DependencyManagement centralizado** en parent POM para versiones consistentes.
+- **RESOURCE_LOCAL transactions** para simplificar MVP sin CDI completo.
 - Redis para caché; Elastic/OpenSearch opcional; Keycloak como IdP en dev.
 - Observabilidad: logs estructurados, tracing OTEL, métricas clave.
- - Frontend usa Vite para dev/build; variables de entorno `VITE_*` para configuración OIDC y base URL.
+- Frontend usa Vite para dev/build; variables de entorno `VITE_*` para configuración OIDC y base URL.
 
 ## Collaboration and Documentation
 - Mantener documentación en `/doc` (PlantUML/Mermaid) y prompts en `/Prompts/prompts_xvb.md`.

@@ -1,24 +1,24 @@
 # Active Context
 
 ## Current Focus
-- Validación JWT real integrada en filtros y propagación de `userId`; tests de filtros.
-- Frontend: scaffolding SPA (React/TS con Vite), auth OIDC (Keycloak), routing, y cliente API con Bearer.
+- **FASE 1 COMPLETADA**: Persistencia con PostgreSQL + JPA + Flyway implementada en todos los servicios.
+- Migraciones probadas exitosamente: 4 servicios, 8 migraciones, 20 registros seed.
+- Transición de repositorios in-memory a JPA con entidades reales.
 
 ## Recent Changes
-- Auth: `JwtValidator` (Nimbus) + tests OK.
-- Users: `/users/me` GET/PUT (DTO directo) + tests.
-- Trips: `/trips` POST/GET (DTOs directos) + tests.
-- Booking: `/bookings` POST/GET (DTO directo) + tests.
-- Matching: `/matches` GET con mock + score simple + tests.
-- Seguridad: `AuthFilter` con validación JWT real en users/trips/booking/matching; ctor inyectable; tests de `AuthFilter` en los cuatro servicios.
-- Propagación de `userId`: `trips` asigna `driverId`; `booking` usa `userId` para `passengerId` y filtrar `listMine`.
-- Frontend creado en `Frontend/` con Vite + React/TS: Keycloak-js (PKCE), rutas (`/`, `/trips`, `/matches`, `/bookings`, `/me`), axios con token Bearer.
+- **Backend Parent POM**: Actualizado con dependencyManagement centralizado para JPA/Hibernate, PostgreSQL, Flyway, Testcontainers.
+- **Docker Compose**: PostgreSQL configurado en puerto 5433 con PostGIS.
+- **Migraciones Flyway**: Creadas para todos los servicios (trips, users, bookings, matches) con schemas separados.
+- **Entidades JPA**: Implementadas `Trip`, `User`, `Booking`, `Match` con anotaciones completas.
+- **Repositorios JPA**: Reemplazados repositorios in-memory con `TripRepository`, `UserRepository`, `BookingRepository`, `MatchRepository`.
+- **Seeds realistas**: 5 registros por tabla con datos coherentes entre servicios.
+- **Configuración JPA**: `persistence.xml` y `JpaConfig` para cada servicio con conexión a PostgreSQL.
 
 ## Next Steps
-- Completar persistencia/Seeds y repos PG.
-- Alinear DTOs con OpenAPI y verificación de contrato.
-- Integraciones entre servicios (matching usando trips seedados).
-- Frontend: preparar `.env`, validar login/logout y llamadas a API; generar tipos desde OpenAPI, añadir formularios (crear trip/reserva), estados de carga/errores y layout.
+- **FASE 2**: Actualizar recursos REST para usar JPA en lugar de in-memory.
+- **FASE 3**: Tests de integración con Testcontainers.
+- **FASE 4**: Configurar docker-compose completo para desarrollo local.
+- **FASE 5**: Integraciones entre servicios usando datos reales.
 
 ## Decisions & Considerations
 - Tests de recursos devolviendo DTOs directamente para evitar `RuntimeDelegate`.

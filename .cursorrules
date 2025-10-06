@@ -152,5 +152,57 @@ The format is flexible - focus on capturing valuable insights that help me work 
 
 REMEMBER: After every memory reset, I begin completely fresh. The Memory Bank is my only link to previous work. It must be maintained with precision and clarity, as my effectiveness depends entirely on its accuracy.
 
+# Project Intelligence - Covoituraje Corporativo
+
+## Critical Implementation Patterns
+
+### Persistence Layer (IMPLEMENTED)
+- **PostgreSQL + JPA + Flyway**: All services use schemas separated by service (trips, users, bookings, matches)
+- **DependencyManagement**: Centralized in parent POM for version consistency
+- **RESOURCE_LOCAL transactions**: Simplified MVP approach without full CDI
+- **Migration pattern**: V1 (create table), V2 (seed data) for each service
+- **Entity pattern**: JPA entities with business methods, @PrePersist/@PreUpdate for timestamps
+
+### Authentication & Security
+- **JWT Validation**: Nimbus JOSE JWT with JWKS support
+- **AuthFilter pattern**: ThreadLocal AuthContext for userId propagation
+- **Role-based access**: EMPLOYEE role enforcement via environment variable
+
+### Service Architecture
+- **Microservices**: auth-service, users-service, trips-service, booking-service, matching-service
+- **Shared library**: Common auth utilities and JWT handling
+- **REST Resources**: JAX-RS with DTO mapping patterns
+
+## Development Workflow
+
+### Phase-Based Development
+- **FASE 1**: Persistence (COMPLETED) - PostgreSQL + JPA + Flyway + Seeds
+- **FASE 2**: Update REST resources to use JPA (NEXT)
+- **FASE 3**: Integration tests with Testcontainers
+- **FASE 4**: Docker-compose for local development
+- **FASE 5**: Service integrations with real data
+
+### Testing Strategy
+- **Unit tests**: JUnit5 + Mockito for business logic
+- **Integration tests**: Testcontainers for database testing
+- **Contract tests**: OpenAPI as contract guide
+
+## User Preferences
+- **Approval-based workflow**: Always ask for approval before implementing plans
+- **Memory Bank updates**: Update after significant changes or when requested
+- **Progress tracking**: Use TODO lists for complex multi-step tasks
+- **Documentation**: Maintain living documentation in memory-bank/
+
+## Known Challenges & Solutions
+- **Port conflicts**: PostgreSQL on 5433 to avoid conflicts
+- **Transaction management**: RESOURCE_LOCAL for MVP simplicity
+- **Frontend integration**: Pending types generation from OpenAPI
+
+## Tool Usage Patterns
+- **Maven**: Parent POM with dependencyManagement for consistency
+- **Flyway**: Schema-based migrations for service isolation
+- **Docker**: Temporary containers for testing migrations
+- **Memory Bank**: Comprehensive documentation for session continuity
+
 # Planning
 When asked to enter "Planner Mode" or using the /plan command, deeply reflect upon the changes being asked and analyze existing code to map the full scope of changes needed. Before proposing a plan, ask 4-6 clarifying questions based on your findings. Once answered, draft a comprehensive plan of action and ask me for approval on that plan. Once approved, implement all steps in that plan. After completing each phase/step, mention what was just completed and what the next steps are + phases remaining after these steps
