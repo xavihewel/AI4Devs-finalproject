@@ -20,11 +20,14 @@
 - Geospatial scoring simplificado en MVP; ampliable a desvío/ETA.
 - Notificaciones basadas en eventos (BookingConfirmed, recordatorios T‑60/T‑15).
 - Privacidad por diseño: zona aproximada; ubicación temporal.
+ - Frontend SPA: OIDC (Keycloak) con PKCE, almacenamiento de token en memoria (keycloak-js), routing con `react-router-dom`, cliente HTTP Axios con `Authorization: Bearer` inyectado por interceptor.
+ - Frontend Testing: Vitest + RTL; entorno `jsdom` y `jest-dom`; mocking de `getKeycloak()` para tests sin OIDC real.
 
 ## Technical Decisions
 - Backend en Java 17 + Jakarta; Maven como build. JPA/Hibernate con PostgreSQL/PostGIS.
 - Redis para caché; Elastic/OpenSearch opcional; Keycloak como IdP en dev.
 - Observabilidad: logs estructurados, tracing OTEL, métricas clave.
+ - Frontend usa Vite para dev/build; variables de entorno `VITE_*` para configuración OIDC y base URL.
 
 ## Collaboration and Documentation
 - Mantener documentación en `/doc` (PlantUML/Mermaid) y prompts en `/Prompts/prompts_xvb.md`.
