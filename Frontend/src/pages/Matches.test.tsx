@@ -28,7 +28,7 @@ describe('Matches', () => {
   it('renders matches page title', () => {
     render(<Matches />);
     
-    expect(screen.getByText('Buscar Viajes')).toBeInTheDocument();
+    expect(screen.getAllByText('Buscar Viajes')[0]).toBeInTheDocument();
   });
 
   it('renders search form', () => {
@@ -37,7 +37,7 @@ describe('Matches', () => {
     expect(screen.getByLabelText('Destino')).toBeInTheDocument();
     expect(screen.getByLabelText('Hora Preferida (HH:MM)')).toBeInTheDocument();
     expect(screen.getByLabelText('Ubicación de Origen (lat,lng)')).toBeInTheDocument();
-    expect(screen.getByText('Buscar Viajes')).toBeInTheDocument();
+    expect(screen.getAllByText('Buscar Viajes')[1]).toBeInTheDocument();
   });
 
   it('shows initial state message', () => {
@@ -58,7 +58,7 @@ describe('Matches', () => {
     fireEvent.change(screen.getByLabelText('Ubicación de Origen (lat,lng)'), { target: { value: '40.4168,-3.7038' } });
     
     // Submit form
-    fireEvent.click(screen.getByText('Buscar Viajes'));
+    fireEvent.click(screen.getAllByText('Buscar Viajes')[1]);
     
     await waitFor(() => {
       expect(MatchesService.findMatches).toHaveBeenCalledWith({
@@ -69,15 +69,10 @@ describe('Matches', () => {
     });
   });
 
-  it('shows validation error when destination is not selected', async () => {
+  it('shows disabled submit when no destination selected', () => {
     render(<Matches />);
-    
-    // Try to submit without selecting destination
-    fireEvent.click(screen.getByText('Buscar Viajes'));
-    
-    await waitFor(() => {
-      expect(screen.getByText('Por favor selecciona un destino')).toBeInTheDocument();
-    });
+    const submit = screen.getAllByText('Buscar Viajes')[1].closest('button');
+    expect(submit).toBeDisabled();
   });
 
   it('displays search results', async () => {
@@ -87,12 +82,14 @@ describe('Matches', () => {
     
     // Perform search
     fireEvent.change(screen.getByLabelText('Destino'), { target: { value: 'SEDE-1' } });
-    fireEvent.click(screen.getByText('Buscar Viajes'));
+    fireEvent.click(screen.getAllByText('Buscar Viajes')[1]);
     
     await waitFor(() => {
       expect(screen.getByText('Encontrados 1 viajes compatibles')).toBeInTheDocument();
       expect(screen.getByText('Viaje a SEDE-1')).toBeInTheDocument();
-      expect(screen.getByText('2 disponibles')).toBeInTheDocument();
+      // Texto dividido en <strong>Asientos disponibles:</strong> 2
+      expect(screen.getByText('Asientos disponibles:', { exact: false })).toBeInTheDocument();
+      expect(screen.getByText('2')).toBeInTheDocument();
       expect(screen.getByText('Ubicación cercana')).toBeInTheDocument();
       expect(screen.getByText('Horario compatible')).toBeInTheDocument();
     });
@@ -105,7 +102,7 @@ describe('Matches', () => {
     
     // Perform search
     fireEvent.change(screen.getByLabelText('Destino'), { target: { value: 'SEDE-1' } });
-    fireEvent.click(screen.getByText('Buscar Viajes'));
+    fireEvent.click(screen.getAllByText('Buscar Viajes')[1]);
     
     await waitFor(() => {
       const scoreBadge = screen.getByText('Excelente (85%)');
@@ -120,7 +117,7 @@ describe('Matches', () => {
     
     // Perform search
     fireEvent.change(screen.getByLabelText('Destino'), { target: { value: 'SEDE-1' } });
-    fireEvent.click(screen.getByText('Buscar Viajes'));
+    fireEvent.click(screen.getAllByText('Buscar Viajes')[1]);
     
     await waitFor(() => {
       expect(screen.getByText('No se encontraron viajes')).toBeInTheDocument();
@@ -135,7 +132,7 @@ describe('Matches', () => {
     
     // Perform search
     fireEvent.change(screen.getByLabelText('Destino'), { target: { value: 'SEDE-1' } });
-    fireEvent.click(screen.getByText('Buscar Viajes'));
+    fireEvent.click(screen.getAllByText('Buscar Viajes')[1]);
     
     await waitFor(() => {
       expect(screen.getByText('No se encontraron viajes')).toBeInTheDocument();
@@ -156,7 +153,7 @@ describe('Matches', () => {
     
     // Perform search
     fireEvent.change(screen.getByLabelText('Destino'), { target: { value: 'SEDE-1' } });
-    fireEvent.click(screen.getByText('Buscar Viajes'));
+    fireEvent.click(screen.getAllByText('Buscar Viajes')[1]);
     
     await waitFor(() => {
       expect(screen.getByText('Buscando...')).toBeInTheDocument();

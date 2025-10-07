@@ -155,3 +155,10 @@
 - DTOs compartidos para estandarización de comunicación
 - React + TypeScript + Tailwind CSS para frontend moderno y escalable
 - Componentes reutilizables para UI consistente
+
+### 2025-10-07 (tarde)
+- Intent: Alinear Memory Bank con el estado real del repo en testing frontend.
+- Actions:
+  - Actualizar `systemPatterns.md` y `techContext.md` para reflejar Jest + React Testing Library en lugar de Vitest.
+  - Anotar en `activeContext.md` y `progress.md` el setup de testing frontend.
+- Result: ✅ Documentación sincronizada con la configuración actual (`Frontend/jest.config.js`, `jest.setup.js`).

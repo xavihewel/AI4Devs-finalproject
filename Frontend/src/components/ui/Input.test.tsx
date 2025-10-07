@@ -29,7 +29,7 @@ describe('Input', () => {
   });
 
   it('handles input changes', () => {
-    const handleChange = vi.fn();
+    const handleChange = jest.fn();
     render(<Input onChange={handleChange} />);
     
     const input = screen.getByRole('textbox');
@@ -74,7 +74,7 @@ describe('Select', () => {
   });
 
   it('handles select changes', () => {
-    const handleChange = vi.fn();
+    const handleChange = jest.fn();
     render(<Select options={options} onChange={handleChange} />);
     
     const select = screen.getByRole('combobox');

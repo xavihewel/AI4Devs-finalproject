@@ -26,7 +26,7 @@
 - **Jakarta Bean Validation**: Para validación de entrada en REST APIs.
 - **ServiceHttpClient**: Cliente HTTP compartido para comunicación entre microservicios.
 - **DTOs compartidos**: Tipos estandarizados para comunicación entre servicios.
-- Frontend: React 19, TypeScript, Tailwind CSS, react-router-dom, keycloak-js, axios, Vite, Vitest, Testing Library.
+- Frontend: React 19, TypeScript, Tailwind CSS, react-router-dom, keycloak-js, axios, Vite, Jest, Testing Library.
 - Infra: Docker, docker-compose; PostgreSQL con PostGIS; Keycloak como IdP de dev; scripts de automatización.
 
 ## Implementation Status

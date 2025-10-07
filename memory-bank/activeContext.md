@@ -62,6 +62,7 @@
 - **Transacciones manuales**: RESOURCE_LOCAL para simplicidad del MVP
 - **Business methods**: Implementados en entidades JPA para lógica de negocio (reserveSeats, accept, confirm, etc.)
 - **Validaciones**: Jakarta Bean Validation para validación de entrada en REST APIs
+ - **Frontend testing**: Jest + React Testing Library con `jsdom` y `jest-dom`; mocking de `getKeycloak()` para tests sin OIDC real
 - **Docker-compose**: Profiles para desarrollo opcional, scripts de automatización para setup completo
 - **Puerto PostgreSQL**: Cambiado a 5434 para evitar conflictos con instalaciones locales
 - **Integraciones entre servicios**: ServiceHttpClient para comunicación HTTP con manejo de errores

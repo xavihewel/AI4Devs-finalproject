@@ -12,20 +12,20 @@ describe('Card', () => {
   });
 
   it('renders with default padding', () => {
-    render(<Card>Content</Card>);
-    const card = screen.getByText('Content').parentElement;
+    const { container } = render(<Card>Content</Card>);
+    const card = container.firstChild as HTMLElement;
     expect(card).toHaveClass('p-6');
   });
 
   it('renders with custom padding', () => {
-    render(<Card padding="sm">Content</Card>);
-    const card = screen.getByText('Content').parentElement;
+    const { container } = render(<Card padding="sm">Content</Card>);
+    const card = container.firstChild as HTMLElement;
     expect(card).toHaveClass('p-3');
   });
 
   it('accepts custom className', () => {
-    render(<Card className="custom-class">Content</Card>);
-    const card = screen.getByText('Content').parentElement;
+    const { container } = render(<Card className="custom-class">Content</Card>);
+    const card = container.firstChild as HTMLElement;
     expect(card).toHaveClass('custom-class');
   });
 });
@@ -41,8 +41,9 @@ describe('CardHeader', () => {
   });
 
   it('has border bottom styling', () => {
-    render(<CardHeader>Header</CardHeader>);
-    expect(screen.getByText('Header').parentElement).toHaveClass('border-b', 'border-gray-200');
+    const { container } = render(<CardHeader>Header</CardHeader>);
+    const header = container.firstChild as HTMLElement;
+    expect(header).toHaveClass('border-b', 'border-gray-200');
   });
 });
 

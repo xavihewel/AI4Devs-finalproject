@@ -50,6 +50,7 @@
   - **UX moderna**: Estados de carga, empty states, formularios validados
 
 - **Seguridad**: `AuthFilter` con validación JWT real (Nimbus) en todos los servicios
+- **Frontend testing**: Configurado con Jest + React Testing Library (`jsdom` + `jest-dom`)
 - **Documentación**: MVP, OpenAPI, infraestructura con docker-compose
 
 ## What's Left

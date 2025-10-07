@@ -21,7 +21,7 @@
 - Notificaciones basadas en eventos (BookingConfirmed, recordatorios T‑60/T‑15).
 - Privacidad por diseño: zona aproximada; ubicación temporal.
  - Frontend SPA: OIDC (Keycloak) con PKCE, almacenamiento de token en memoria (keycloak-js), routing con `react-router-dom`, cliente HTTP Axios con `Authorization: Bearer` inyectado por interceptor.
- - Frontend Testing: Vitest + RTL; entorno `jsdom` y `jest-dom`; mocking de `getKeycloak()` para tests sin OIDC real.
+ - Frontend Testing: Jest + React Testing Library; entorno `jsdom` y `jest-dom`; mocking de `getKeycloak()` para tests sin OIDC real.
 
 ## Technical Decisions
 - Backend en Java 17 + Jakarta; Maven como build. **JPA/Hibernate con PostgreSQL/PostGIS IMPLEMENTADO**.

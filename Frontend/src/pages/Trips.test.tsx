@@ -25,12 +25,14 @@ describe('Trips', () => {
     jest.clearAllMocks();
   });
 
-  it('renders trips page title', () => {
+  it('renders trips page title', async () => {
     jest.mocked(TripsService.getMyTrips).mockResolvedValue([]);
     
     render(<Trips />);
     
-    expect(screen.getByText('Mis Viajes')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Mis Viajes')).toBeInTheDocument();
+    });
   });
 
   it('shows loading state initially', () => {
@@ -52,12 +54,14 @@ describe('Trips', () => {
     });
   });
 
-  it('shows create trip button', () => {
+  it('shows create trip button', async () => {
     jest.mocked(TripsService.getMyTrips).mockResolvedValue([]);
     
     render(<Trips />);
     
-    expect(screen.getByText('Crear Viaje')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Crear Viaje')).toBeInTheDocument();
+    });
   });
 
   it('shows create form when create button is clicked', async () => {
@@ -65,7 +69,7 @@ describe('Trips', () => {
     
     render(<Trips />);
     
-    const createButton = screen.getByText('Crear Viaje');
+    const createButton = await screen.findByText('Crear Viaje');
     fireEvent.click(createButton);
     
     await waitFor(() => {
@@ -96,7 +100,7 @@ describe('Trips', () => {
     render(<Trips />);
     
     // Open form
-    fireEvent.click(screen.getByText('Crear Viaje'));
+    fireEvent.click(await screen.findByText('Crear Viaje'));
     
     await waitFor(() => {
       expect(screen.getByText('Crear Nuevo Viaje')).toBeInTheDocument();
@@ -128,14 +132,14 @@ describe('Trips', () => {
     render(<Trips />);
     
     // Open form
-    fireEvent.click(screen.getByText('Crear Viaje'));
+    fireEvent.click(await screen.findByText('Crear Viaje'));
     
     await waitFor(() => {
       expect(screen.getByText('Crear Nuevo Viaje')).toBeInTheDocument();
     });
     
     // Cancel form
-    fireEvent.click(screen.getByText('Cancelar'));
+    fireEvent.click(screen.getAllByText('Cancelar')[1]);
     
     await waitFor(() => {
       expect(screen.queryByText('Crear Nuevo Viaje')).not.toBeInTheDocument();

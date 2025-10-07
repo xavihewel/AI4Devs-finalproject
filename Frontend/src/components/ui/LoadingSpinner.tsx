@@ -18,7 +18,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   const classes = `animate-spin text-primary-600 ${sizeClasses[size]} ${className}`;
   
   return (
-    <svg className={classes} fill="none" viewBox="0 0 24 24">
+    <svg className={classes} role="status" fill="none" viewBox="0 0 24 24">
       <circle
         className="opacity-25"
         cx="12"
