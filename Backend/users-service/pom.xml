@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>users-service</artifactId>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
   <dependencies>
     <!-- Jakarta EE APIs -->
     <dependency>
@@ -104,10 +104,18 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.4.0</version>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-maven-plugin</artifactId>
         <configuration>
-          <url>jdbc:postgresql://localhost:5433/app</url>
+          <url>jdbc:postgresql://db:5432/app</url>
           <user>app</user>
           <password>app</password>
           <schemas>

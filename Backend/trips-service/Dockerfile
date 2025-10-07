@@ -10,16 +10,6 @@ RUN mvn -q -DskipTests -pl shared -am install
 RUN mvn -q -DskipTests -pl trips-service -am package
 
 # Runtime stage
-FROM eclipse-temurin:17-jre
-
-# Establecer directorio de trabajo
-WORKDIR /app
-
-# Copiar JAR desde el stage de build
-COPY --from=builder /backend/trips-service/target/trips-service-0.1.0-SNAPSHOT.jar app.jar
-
-# Exponer puerto
+FROM payara/micro:6.2024.6-jdk17
+COPY --from=builder /backend/trips-service/target/trips-service-0.1.0-SNAPSHOT.war /opt/payara/deployments/ROOT.war
 EXPOSE 8080
-
-# Comando para ejecutar la aplicación
-CMD ["java", "-jar", "app.jar"]

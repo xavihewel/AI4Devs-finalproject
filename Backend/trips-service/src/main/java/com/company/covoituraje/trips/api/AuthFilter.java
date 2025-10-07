@@ -36,6 +36,11 @@ public class AuthFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
+        String path = requestContext.getUriInfo().getPath();
+        if (path != null && (path.equals("health") || path.equals("/health"))) {
+            return;
+        }
+
         String auth = requestContext.getHeaderString("Authorization");
         if (auth == null || !auth.startsWith("Bearer ")) {
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
@@ -44,14 +49,10 @@ public class AuthFilter implements ContainerRequestFilter {
         String token = auth.substring("Bearer ".length());
         try {
             jwtValidator.validate(token);
-            
-            // Extract user info and set in context
             String userId = AuthUtils.extractUserIdFromToken(token);
             if (userId != null && !userId.isBlank()) {
                 TripsResource.AuthContext.setUserId(userId);
             }
-            
-            // Check employee role if required
             if (requireEmployeeRole) {
                 var roles = AuthUtils.extractRealmRoles(token);
                 if (!roles.contains("EMPLOYEE")) {
@@ -59,11 +60,9 @@ public class AuthFilter implements ContainerRequestFilter {
                     return;
                 }
             }
-            
         } catch (JwtValidationException e) {
             requestContext.abortWith(Response.status(401).build());
         } finally {
-            // Clean up thread local in finally block
             TripsResource.AuthContext.clear();
         }
     }

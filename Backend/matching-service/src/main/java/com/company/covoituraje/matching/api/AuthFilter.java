@@ -36,6 +36,10 @@ public class AuthFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
+        String path = requestContext.getUriInfo().getPath();
+        if (path != null && (path.equals("health") || path.equals("/health"))) {
+            return;
+        }
         String auth = requestContext.getHeaderString("Authorization");
         if (auth == null || !auth.startsWith("Bearer ")) {
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
