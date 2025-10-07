@@ -1,5 +1,5 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
 
 export const Protected: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -8,8 +8,12 @@ export const Protected: React.FC<{ children: React.ReactNode }> = ({ children })
 
   if (!initialized) return null;
   if (!authenticated) {
-    login();
-    return <Navigate to="/" state={{ from: location }} replace />;
+    // Trigger login after mount; do not render a Navigate here to avoid redirect loops
+    useEffect(() => {
+      login();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    return null;
   }
   return <>{children}</>;
 };

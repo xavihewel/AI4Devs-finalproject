@@ -159,4 +159,21 @@ describe('Matches', () => {
       expect(screen.getByText('Buscando...')).toBeInTheDocument();
     });
   });
+
+  it('shows alert on API error', async () => {
+    jest.mocked(MatchesService.findMatches).mockRejectedValue(new Error('network'));
+    const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
+
+    render(<Matches />);
+    
+    // Perform search
+    fireEvent.change(screen.getByLabelText('Destino'), { target: { value: 'SEDE-1' } });
+    fireEvent.click(screen.getAllByText('Buscar Viajes')[1]);
+
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalled();
+    });
+
+    alertSpy.mockRestore();
+  });
 });

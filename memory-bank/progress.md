@@ -52,6 +52,7 @@
 - **Seguridad**: `AuthFilter` con validación JWT real (Nimbus) en todos los servicios
 - **Frontend testing**: Configurado con Jest + React Testing Library (`jsdom` + `jest-dom`)
 - **Documentación**: MVP, OpenAPI, infraestructura con docker-compose
+ - **Frontend OIDC**: Loader de env compatible, guards activos, refresh/inyección de token en Axios
 
 ## What's Left
 - **Frontend**: 

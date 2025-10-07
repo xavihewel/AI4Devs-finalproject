@@ -77,6 +77,13 @@ describe('MatchesService', () => {
       expect((api.get as any)).toHaveBeenCalledWith('/matches?destinationSedeId=SEDE-1&time=09%3A00');
       expect(result).toEqual(mockMatches);
     });
+
+    it('propagates API errors', async () => {
+      (api.get as any).mockRejectedValueOnce(new Error('Network Error'));
+      await expect(
+        MatchesService.findMatches({ destinationSedeId: 'SEDE-1' })
+      ).rejects.toThrow('Network Error');
+    });
   });
 
   describe('getMyMatches', () => {

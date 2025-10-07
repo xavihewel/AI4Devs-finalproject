@@ -41,6 +41,11 @@ describe('TripsService', () => {
       expect((api as any).get).toHaveBeenCalledWith('/trips');
       expect(result).toEqual(mockTrips);
     });
+
+    it('propagates API errors', async () => {
+      (api as any).get.mockRejectedValueOnce(new Error('Boom'));
+      await expect(TripsService.getAllTrips()).rejects.toThrow('Boom');
+    });
   });
 
   describe('getTripsByDestination', () => {

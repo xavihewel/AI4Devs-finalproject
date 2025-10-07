@@ -65,8 +65,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       initialized,
       authenticated,
       token,
-      login: () => keycloak.login({ redirectUri: env.oidcRedirectUri }),
-      logout: () => keycloak.logout({ redirectUri: window.location.origin }),
+      login: () => {
+        const kc = getKeycloak();
+        if (kc) kc.login({ redirectUri: env.oidcRedirectUri });
+      },
+      logout: () => {
+        const kc = getKeycloak();
+        if (kc) kc.logout({ redirectUri: window.location.origin });
+      },
     }),
     [initialized, authenticated, token]
   );

@@ -6,6 +6,11 @@
 - **Próximo objetivo**: Completar funcionalidades frontend restantes (bookings, perfil, autenticación OIDC).
 
 ## Recent Changes
+### P1 - Autenticación OIDC Frontend ✅
+- **Env loader**: Acepta `VITE_OIDC_ISSUER` y `VITE_OIDC_ISSUER_URI` para compatibilidad.
+- **AuthProvider**: `login`/`logout` usan `getKeycloak()` de forma segura; refresh programado.
+- **Axios interceptor**: Refresca token con `updateToken(5)` antes de cada request e inyecta `Authorization: Bearer`.
+- **Routing**: Ruta `/callback` presente; `Protected` invoca `login()` si no autenticado.
 ### FASE 2 - APIs REST con JPA ✅
 - **Recursos REST actualizados**: Todos los servicios migrados de repositorios in-memory a JPA real
 - **AuthFilter estandarizado**: ThreadLocal AuthContext implementado en todos los servicios para propagación de userId
@@ -55,6 +60,7 @@
   - Completar autenticación OIDC con Keycloak
   - Implementar página de perfil de usuario
   - Tests de integración frontend-backend
+  - Validar flujo de refresh silencioso en navegación y reintentos HTTP
 
 ## Decisions & Considerations
 - **ThreadLocal AuthContext**: Patrón estándar para manejo de contexto de usuario en todos los servicios

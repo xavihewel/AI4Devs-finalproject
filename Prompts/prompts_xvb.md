@@ -162,3 +162,12 @@
   - Actualizar `systemPatterns.md` y `techContext.md` para reflejar Jest + React Testing Library en lugar de Vitest.
   - Anotar en `activeContext.md` y `progress.md` el setup de testing frontend.
 - Result: ✅ Documentación sincronizada con la configuración actual (`Frontend/jest.config.js`, `jest.setup.js`).
+
+### 2025-10-07 (noche)
+- Intent: P1 Autenticación OIDC en Frontend.
+- Actions:
+  - Ajustar `env.ts` para aceptar `VITE_OIDC_ISSUER` y `VITE_OIDC_ISSUER_URI`.
+  - Corregir `AuthProvider` para usar `getKeycloak()` en `login/logout` y mantener refresh.
+  - Actualizar interceptor Axios para refrescar token (`updateToken(5)`) e inyectar `Authorization`.
+  - Verificar ruta `/callback` y guard `Protected`.
+- Result: ✅ OIDC operativo a nivel de UI; token refresh e inyección listos.
