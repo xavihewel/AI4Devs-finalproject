@@ -98,6 +98,50 @@
 - Error: Configuración de Keycloak requiere tiempo de inicialización
 - Error: Docker-compose version obsoleta (warning eliminado)
 
+### FASE 5: Integraciones entre servicios ✅
+- Intent: Implementar comunicación real entre microservicios para eliminar mocks y datos estáticos.
+- Actions:
+  - Crear ServiceHttpClient compartido para comunicación HTTP entre microservicios
+  - Implementar DTOs compartidos (TripDto, UserDto) en módulo shared
+  - Integrar matching-service con trips-service para datos reales de viajes
+  - Integrar booking-service con trips-service y users-service para validaciones cross-service
+  - Crear BookingValidationService para validaciones entre servicios
+  - Configurar variables de entorno para URLs de servicios en docker-compose
+  - Agregar health check endpoints (/health) para verificación de disponibilidad
+  - Implementar tests de integración mockeados para comunicación entre servicios
+- Decisions:
+  - ServiceHttpClient con manejo de errores y timeouts para robustez
+  - DTOs compartidos para estandarizar comunicación entre servicios
+  - Validaciones cross-service para mantener consistencia de datos
+- Result: ✅ Completado - Comunicación real entre microservicios implementada
+
+### FRONTEND DEVELOPMENT - Base implementada ✅
+- Intent: Crear frontend moderno con React + TypeScript + Tailwind CSS para interfaz de usuario completa.
+- Actions:
+  - Configurar React 19 + TypeScript + Vite + Tailwind CSS
+  - Crear tipos TypeScript completos sincronizados con backend (TripDto, UserDto, BookingDto, MatchDto)
+  - Implementar servicios API dedicados (TripsService, UsersService, BookingsService, MatchesService)
+  - Crear componentes UI reutilizables (Button, Card, Input, LoadingSpinner)
+  - Implementar layout responsive con Navbar y Layout consistente
+  - Desarrollar páginas principales:
+    - Home: Hero section, features, proceso paso a paso
+    - Trips: Formulario de creación, lista de viajes, estados de carga
+    - Matches: Búsqueda avanzada, sistema de scoring visual, resultados detallados
+  - Configurar autenticación OIDC con Keycloak (preparado)
+  - Implementar estados de carga, empty states y formularios validados
+- Decisions:
+  - React 19 + TypeScript para type safety y performance
+  - Tailwind CSS para diseño consistente y responsive
+  - Componentes reutilizables para escalabilidad
+  - Servicios API dedicados para separación de responsabilidades
+- Result: ✅ Completado - Frontend moderno con componentes principales funcionando
+
+### Problemas resueltos durante FASE 5 y Frontend:
+- Error: Versiones de Jackson faltantes en parent POM
+- Error: Conflicto de nombres HttpClient vs java.net.http.HttpClient (renombrado a ServiceHttpClient)
+- Error: Exception handling incorrecto en BookingValidationService
+- Error: Dependencias Tailwind CSS no instaladas correctamente
+
 ### Patrones técnicos establecidos:
 - ThreadLocal AuthContext para propagación de userId
 - Business methods en entidades JPA para encapsular lógica de negocio
@@ -107,3 +151,7 @@
 - Jakarta Bean Validation para validación de entrada en REST APIs
 - Docker-compose con profiles para desarrollo opcional
 - Scripts de automatización para setup completo y configuración de servicios
+- ServiceHttpClient para comunicación robusta entre microservicios
+- DTOs compartidos para estandarización de comunicación
+- React + TypeScript + Tailwind CSS para frontend moderno y escalable
+- Componentes reutilizables para UI consistente

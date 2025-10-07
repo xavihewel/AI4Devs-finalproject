@@ -39,6 +39,8 @@
   - Cobertura de tests >80%
   - APIs REST bien documentadas
   - Entorno de desarrollo completo con Docker
+  - Integración real entre microservicios
+  - Frontend moderno con React + TypeScript + Tailwind CSS
 
 ## Stakeholders
 - **Product:** Equipo de producto corporativo
@@ -59,7 +61,14 @@
   - Infraestructura completa (PostgreSQL, Redis, Keycloak, Mailhog)
   - Microservicios dockerizados con scripts de automatización
   - Documentación completa de setup local
-- **M5 (FASE 5):** Integraciones entre servicios
+- **M5 (FASE 5):** Integraciones entre servicios ✅
+  - ServiceHttpClient para comunicación entre microservicios
+  - DTOs compartidos para estandarización
+  - Validaciones cross-service implementadas
+- **M6 (FRONTEND):** Frontend moderno ✅
+  - React + TypeScript + Tailwind CSS
+  - Componentes UI reutilizables
+  - Páginas principales implementadas
 
 ## Risks & Assumptions
 - **Risks:**

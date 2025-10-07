@@ -2,6 +2,7 @@ package com.company.covoituraje.matching.api;
 
 import com.company.covoituraje.matching.service.MatchingService;
 import com.company.covoituraje.matching.infrastructure.MatchRepository;
+import com.company.covoituraje.matching.integration.TripsServiceClient;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
@@ -22,7 +23,15 @@ public class MatchesResource {
     }
 
     public MatchesResource() {
-        this.matchingService = new MatchingService(new MatchRepository());
+        // Get trips service URL from environment variable
+        String tripsServiceUrl = System.getenv("TRIPS_SERVICE_URL");
+        if (tripsServiceUrl == null || tripsServiceUrl.isBlank()) {
+            tripsServiceUrl = "http://localhost:8081"; // Default fallback
+        }
+        
+        MatchRepository matchRepository = new MatchRepository();
+        TripsServiceClient tripsServiceClient = new TripsServiceClient(tripsServiceUrl);
+        this.matchingService = new MatchingService(matchRepository, tripsServiceClient);
     }
 
     @GET

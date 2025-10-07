@@ -2,6 +2,10 @@ package com.company.covoituraje.booking.api;
 
 import com.company.covoituraje.booking.domain.Booking;
 import com.company.covoituraje.booking.infrastructure.BookingRepository;
+import com.company.covoituraje.booking.service.BookingValidationService;
+import com.company.covoituraje.booking.service.BookingValidationException;
+import com.company.covoituraje.booking.integration.TripsServiceClient;
+import com.company.covoituraje.booking.integration.UsersServiceClient;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
@@ -14,13 +18,33 @@ import java.util.UUID;
 @Consumes(MediaType.APPLICATION_JSON)
 public class BookingResource {
 
-    private final BookingRepository repository = new BookingRepository();
+    private final BookingRepository repository;
+    private final BookingValidationService validationService;
     
     static final class AuthContext {
         private static final ThreadLocal<String> USER_ID = new ThreadLocal<>();
         static void setUserId(String userId) { USER_ID.set(userId); }
         static String getUserId() { return USER_ID.get(); }
         static void clear() { USER_ID.remove(); }
+    }
+    
+    public BookingResource() {
+        this.repository = new BookingRepository();
+        
+        // Get service URLs from environment variables
+        String tripsServiceUrl = System.getenv("TRIPS_SERVICE_URL");
+        if (tripsServiceUrl == null || tripsServiceUrl.isBlank()) {
+            tripsServiceUrl = "http://localhost:8081"; // Default fallback
+        }
+        
+        String usersServiceUrl = System.getenv("USERS_SERVICE_URL");
+        if (usersServiceUrl == null || usersServiceUrl.isBlank()) {
+            usersServiceUrl = "http://localhost:8082"; // Default fallback
+        }
+        
+        TripsServiceClient tripsServiceClient = new TripsServiceClient(tripsServiceUrl);
+        UsersServiceClient usersServiceClient = new UsersServiceClient(usersServiceUrl);
+        this.validationService = new BookingValidationService(tripsServiceClient, usersServiceClient);
     }
 
     @POST
@@ -44,6 +68,16 @@ public class BookingResource {
             tripId = UUID.fromString(request.tripId);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid trip ID format");
+        }
+
+        // Cross-service validations
+        try {
+            validationService.validateUserExists(currentUser);
+            validationService.validateTripAvailability(request.tripId, request.seatsRequested);
+            // TODO: Add driver validation when trips-service provides driver info
+            // validationService.validateUserIsNotDriver(request.tripId, currentUser);
+        } catch (BookingValidationException e) {
+            throw new BadRequestException("Validation failed: " + e.getMessage());
         }
 
         // Create booking

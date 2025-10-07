@@ -30,31 +30,52 @@
   - **Dockerfiles multi-stage**: Optimizados para desarrollo y producción
   - **Documentación completa**: doc/setup/local.md con guías detalladas y troubleshooting
 
+- **✅ FASE 5 COMPLETADA**: Integraciones entre servicios
+  - **Cliente HTTP compartido**: ServiceHttpClient para comunicación entre microservicios
+  - **DTOs compartidos**: TripDto, UserDto para comunicación estandarizada
+  - **Integración matching-service ↔ trips-service**: Datos reales en lugar de mocks
+  - **Integración booking-service ↔ trips + users services**: Validaciones cross-service
+  - **Servicio de validación**: BookingValidationService para validaciones entre servicios
+  - **Variables de entorno**: URLs de servicios configuradas en docker-compose
+  - **Health checks**: Endpoints /health para verificación de disponibilidad
+  - **Tests de integración**: Tests mockeados para comunicación entre servicios
+
+- **✅ FRONTEND DEVELOPMENT COMPLETADO**: React + TypeScript + Tailwind CSS
+  - **Arquitectura moderna**: React 19, TypeScript, Vite, Tailwind CSS
+  - **Tipos TypeScript**: DTOs completos sincronizados con backend
+  - **Servicios API**: TripsService, UsersService, BookingsService, MatchesService
+  - **Componentes UI**: Button, Card, Input, LoadingSpinner reutilizables
+  - **Layout responsive**: Navbar con autenticación, Layout consistente
+  - **Páginas implementadas**: Home (hero + features), Trips (formulario + lista), Matches (búsqueda + scoring)
+  - **UX moderna**: Estados de carga, empty states, formularios validados
+
 - **Seguridad**: `AuthFilter` con validación JWT real (Nimbus) en todos los servicios
-- **Frontend**: SPA React/TS con Vite, Keycloak OIDC (PKCE) y routing básico
 - **Documentación**: MVP, OpenAPI, infraestructura con docker-compose
 
 ## What's Left
-- **FASE 5**: Integraciones reales entre servicios
-  - Matching service integrado con trips service
-  - Booking service integrado con trips y users services
-  - Validaciones cross-service
-  - Manejo de transacciones distribuidas
-
 - **Frontend**: 
-  - Generar tipos desde OpenAPI
-  - Formularios de creación (trips, bookings)
-  - Manejo de errores y layout mejorado
+  - Implementar gestión de bookings (página Bookings)
+  - Completar autenticación OIDC con Keycloak
+  - Implementar página de perfil de usuario
   - Tests de integración frontend-backend
+  - Optimizaciones de performance y SEO
+
+- **Backend**:
+  - Implementar validación de conductor en booking-service
+  - Agregar endpoint de información de conductor en trips-service
+  - Manejo avanzado de transacciones distribuidas
+  - Monitoring y logging avanzado
 
 ## Current Status
-**FASES 1, 2, 3 y 4 COMPLETADAS**: Backend completamente funcional con persistencia real, APIs REST con JPA, tests de integración robustos, y entorno de desarrollo completo con Docker. Todos los servicios funcionando con PostgreSQL + JPA + Flyway. Testcontainers configurado y funcionando para todos los servicios. Docker-compose con infraestructura completa y scripts de automatización.
+**FASES 1, 2, 3, 4 y 5 COMPLETADAS + FRONTEND BASE**: Backend completamente funcional con persistencia real, APIs REST con JPA, tests de integración robustos, integraciones entre servicios, y entorno de desarrollo completo con Docker. Frontend moderno con React + TypeScript + Tailwind CSS implementado con componentes principales. Todos los servicios funcionando con PostgreSQL + JPA + Flyway. Testcontainers configurado y funcionando para todos los servicios. Docker-compose con infraestructura completa y scripts de automatización. Comunicación real entre microservicios implementada.
 
 ## Known Issues
 - **Resuelto**: Persistencia implementada - ya no hay mock/echo DTOs
 - **Resuelto**: APIs REST migradas a JPA - ya no hay repositorios in-memory
 - **Resuelto**: Tests de integración implementados - cobertura completa
 - **Resuelto**: Docker-compose completo - infraestructura de desarrollo funcionando
+- **Resuelto**: Integraciones entre servicios - comunicación real implementada
+- **Resuelto**: Frontend base implementado - componentes principales funcionando
 - **Menor**: users-service tests unitarios con problemas de configuración JPA (pero funcionalidad OK)
 - **Menor**: Puerto PostgreSQL cambiado a 5434 por conflicto con instalación local
-- Frontend aún sin tipos generados ni formularios de creación
+- **Pendiente**: Validación de conductor en booking-service (requiere endpoint adicional en trips-service)

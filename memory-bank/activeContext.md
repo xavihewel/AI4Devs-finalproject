@@ -1,8 +1,9 @@
 # Active Context
 
 ## Current Focus
-- **FASES 1, 2, 3 y 4 COMPLETADAS**: Backend completamente funcional con persistencia real, APIs REST con JPA, tests de integración robustos, y entorno de desarrollo completo con Docker.
-- **Preparando FASE 5**: Integraciones reales entre servicios.
+- **FASES 1, 2, 3, 4 y 5 COMPLETADAS**: Backend completamente funcional con persistencia real, APIs REST con JPA, tests de integración robustos, integraciones entre servicios, y entorno de desarrollo completo con Docker.
+- **FRONTEND BASE COMPLETADO**: React + TypeScript + Tailwind CSS con componentes principales implementados.
+- **Próximo objetivo**: Completar funcionalidades frontend restantes (bookings, perfil, autenticación OIDC).
 
 ## Recent Changes
 ### FASE 2 - APIs REST con JPA ✅
@@ -29,12 +30,31 @@
 - **Dockerfiles multi-stage**: Optimizados para desarrollo y producción
 - **Documentación completa**: doc/setup/local.md con guías detalladas y troubleshooting
 
+### FASE 5 - Integraciones entre servicios ✅
+- **Cliente HTTP compartido**: ServiceHttpClient para comunicación entre microservicios
+- **DTOs compartidos**: TripDto, UserDto para comunicación estandarizada
+- **Integración matching-service ↔ trips-service**: Datos reales en lugar de mocks
+- **Integración booking-service ↔ trips + users services**: Validaciones cross-service
+- **Servicio de validación**: BookingValidationService para validaciones entre servicios
+- **Variables de entorno**: URLs de servicios configuradas en docker-compose
+- **Health checks**: Endpoints /health para verificación de disponibilidad
+- **Tests de integración**: Tests mockeados para comunicación entre servicios
+
+### FRONTEND DEVELOPMENT - Base implementada ✅
+- **Arquitectura moderna**: React 19, TypeScript, Vite, Tailwind CSS
+- **Tipos TypeScript**: DTOs completos sincronizados con backend
+- **Servicios API**: TripsService, UsersService, BookingsService, MatchesService
+- **Componentes UI**: Button, Card, Input, LoadingSpinner reutilizables
+- **Layout responsive**: Navbar con autenticación, Layout consistente
+- **Páginas implementadas**: Home (hero + features), Trips (formulario + lista), Matches (búsqueda + scoring)
+- **UX moderna**: Estados de carga, empty states, formularios validados
+
 ## Next Steps
-- **FASE 5**: Integraciones reales entre servicios
-  - Matching service integrado con trips service
-  - Booking service integrado con trips y users services
-  - Validaciones cross-service
-  - Manejo de transacciones distribuidas
+- **Frontend**: 
+  - Implementar gestión de bookings (página Bookings)
+  - Completar autenticación OIDC con Keycloak
+  - Implementar página de perfil de usuario
+  - Tests de integración frontend-backend
 
 ## Decisions & Considerations
 - **ThreadLocal AuthContext**: Patrón estándar para manejo de contexto de usuario en todos los servicios
@@ -44,3 +64,7 @@
 - **Validaciones**: Jakarta Bean Validation para validación de entrada en REST APIs
 - **Docker-compose**: Profiles para desarrollo opcional, scripts de automatización para setup completo
 - **Puerto PostgreSQL**: Cambiado a 5434 para evitar conflictos con instalaciones locales
+- **Integraciones entre servicios**: ServiceHttpClient para comunicación HTTP con manejo de errores
+- **Frontend moderno**: React + TypeScript + Tailwind CSS para UI consistente y escalable
+- **Componentes reutilizables**: Biblioteca de UI con variantes y estados para consistencia
+- **Servicios API**: Clases dedicadas para cada microservicio con tipos estrictos

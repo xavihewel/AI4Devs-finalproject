@@ -1,5 +1,6 @@
 import React from 'react';
-import { Link, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
+import { Layout } from './components/layout/Layout';
 import { Protected } from './auth/Protected';
 import Home from './pages/Home';
 import Trips from './pages/Trips';
@@ -11,14 +12,7 @@ import NotFound from './pages/NotFound';
 
 const App: React.FC = () => {
   return (
-    <div>
-      <nav style={{ display: 'flex', gap: 12, padding: 12, borderBottom: '1px solid #ddd' }}>
-        <Link to="/">Home</Link>
-        <Link to="/trips">Trips</Link>
-        <Link to="/matches">Matches</Link>
-        <Link to="/bookings">Bookings</Link>
-        <Link to="/me">Mi Perfil</Link>
-      </nav>
+    <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/callback" element={<Callback />} />
@@ -56,7 +50,7 @@ const App: React.FC = () => {
         />
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </div>
+    </Layout>
   );
 };
 

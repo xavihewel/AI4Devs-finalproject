@@ -102,11 +102,17 @@ services:
       - OIDC_ISSUER_URI=http://keycloak:8080/realms/covoituraje
       - OIDC_JWKS_URI=http://keycloak:8080/realms/covoituraje/protocol/openid-connect/certs
       - REQUIRE_ROLE_EMPLOYEE=false
+      - TRIPS_SERVICE_URL=http://trips-service:8080
+      - USERS_SERVICE_URL=http://users-service:8080
     ports:
       - "8083:8080"
     depends_on:
       db:
         condition: service_healthy
+      trips-service:
+        condition: service_started
+      users-service:
+        condition: service_started
     profiles:
       - services
 
@@ -122,11 +128,14 @@ services:
       - OIDC_ISSUER_URI=http://keycloak:8080/realms/covoituraje
       - OIDC_JWKS_URI=http://keycloak:8080/realms/covoituraje/protocol/openid-connect/certs
       - REQUIRE_ROLE_EMPLOYEE=false
+      - TRIPS_SERVICE_URL=http://trips-service:8080
     ports:
       - "8084:8080"
     depends_on:
       db:
         condition: service_healthy
+      trips-service:
+        condition: service_started
     profiles:
       - services
 

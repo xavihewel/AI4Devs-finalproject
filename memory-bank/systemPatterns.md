@@ -34,8 +34,15 @@
 - **Jakarta Bean Validation**: Validación de entrada en REST APIs.
 - **Docker-compose con profiles**: Infraestructura base siempre activa, microservicios opcionales para desarrollo.
 - **Scripts de automatización**: Setup completo, migraciones, configuración de Keycloak automatizados.
+- **Integraciones entre servicios**: ServiceHttpClient para comunicación HTTP con manejo de errores y timeouts.
+- **DTOs compartidos**: Tipos estandarizados para comunicación entre microservicios.
+- **Health checks**: Endpoints /health para monitoreo de disponibilidad de servicios.
 - Redis para caché; Elastic/OpenSearch opcional; Keycloak como IdP en dev.
 - Observabilidad: logs estructurados, tracing OTEL, métricas clave.
+- **Frontend moderno**: React 19 + TypeScript + Vite + Tailwind CSS para UI consistente.
+- **Componentes reutilizables**: Biblioteca de UI con Button, Card, Input, LoadingSpinner.
+- **Servicios API**: Clases dedicadas para cada microservicio con tipos estrictos.
+- **Layout responsive**: Navbar con autenticación, Layout consistente en todas las páginas.
 - Frontend usa Vite para dev/build; variables de entorno `VITE_*` para configuración OIDC y base URL.
 
 ## Collaboration and Documentation

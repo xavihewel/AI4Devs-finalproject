@@ -2,8 +2,11 @@ package com.company.covoituraje.matching.service;
 
 import com.company.covoituraje.matching.domain.Match;
 import com.company.covoituraje.matching.infrastructure.MatchRepository;
+import com.company.covoituraje.matching.integration.TripsServiceClient;
 import com.company.covoituraje.matching.api.TripInfo;
 import com.company.covoituraje.matching.api.MatchResult;
+import com.company.covoituraje.http.ServiceIntegrationException;
+import com.company.covoituraje.shared.dto.TripDto;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -14,17 +17,18 @@ import java.util.stream.Collectors;
 public class MatchingService {
     
     private final MatchRepository matchRepository;
+    private final TripsServiceClient tripsServiceClient;
     
-    public MatchingService(MatchRepository matchRepository) {
+    public MatchingService(MatchRepository matchRepository, TripsServiceClient tripsServiceClient) {
         this.matchRepository = matchRepository;
+        this.tripsServiceClient = tripsServiceClient;
     }
     
     public List<MatchResult> findMatches(String passengerId, String destinationSedeId, 
                                        String preferredTime, String originLocation) {
         
-        // For now, we'll use mock trip data since we don't have service-to-service communication yet
-        // In a real implementation, this would call the trips-service API
-        List<TripInfo> availableTrips = getAvailableTrips(destinationSedeId);
+        // Get real trip data from trips-service
+        List<TripInfo> availableTrips = getAvailableTripsFromService(destinationSedeId);
         
         List<MatchResult> matches = new ArrayList<>();
         
@@ -57,39 +61,37 @@ public class MatchingService {
         return matches;
     }
     
-    private List<TripInfo> getAvailableTrips(String destinationSedeId) {
-        // Mock data based on our seed data
-        // In production, this would be an HTTP call to trips-service
-        List<TripInfo> trips = new ArrayList<>();
-        
-        // Mock trips from seed data
-        trips.add(createMockTrip("550e8400-e29b-41d4-a716-446655440001", "user-001", "Madrid Centro", "SEDE-1", "2025-10-06T08:30:00+00", 3, 3));
-        trips.add(createMockTrip("550e8400-e29b-41d4-a716-446655440002", "user-002", "Madrid Norte", "SEDE-1", "2025-10-06T09:00:00+00", 2, 2));
-        trips.add(createMockTrip("550e8400-e29b-41d4-a716-446655440003", "user-003", "Madrid Sur", "SEDE-2", "2025-10-06T08:30:00+00", 4, 4));
-        trips.add(createMockTrip("550e8400-e29b-41d4-a716-446655440004", "user-004", "Madrid Este", "SEDE-1", "2025-10-07T08:30:00+00", 2, 1));
-        trips.add(createMockTrip("550e8400-e29b-41d4-a716-446655440005", "user-005", "Madrid Oeste", "SEDE-2", "2025-10-07T09:00:00+00", 3, 3));
-        
-        // Filter by destination if specified
-        if (destinationSedeId != null) {
-            trips = trips.stream()
-                    .filter(trip -> destinationSedeId.equals(trip.destinationSedeId))
+    private List<TripInfo> getAvailableTripsFromService(String destinationSedeId) {
+        try {
+            List<TripDto> tripDtos = tripsServiceClient.getAvailableTrips(destinationSedeId);
+            return tripDtos.stream()
+                    .filter(trip -> trip.seatsFree > 0) // Only trips with available seats
+                    .map(this::convertToTripInfo)
                     .collect(Collectors.toList());
+        } catch (ServiceIntegrationException e) {
+            // Log the error and return empty list as fallback
+            System.err.println("Error fetching trips from trips-service: " + e.getMessage());
+            return new ArrayList<>();
         }
-        
-        return trips;
     }
     
-    private TripInfo createMockTrip(String id, String driverId, String origin, String destinationSedeId, 
-                                   String dateTime, int seatsTotal, int seatsFree) {
-        TripInfo trip = new TripInfo();
-        trip.id = id;
-        trip.driverId = driverId;
-        trip.origin = origin;
-        trip.destinationSedeId = destinationSedeId;
-        trip.dateTime = dateTime;
-        trip.seatsTotal = seatsTotal;
-        trip.seatsFree = seatsFree;
-        return trip;
+    private TripInfo convertToTripInfo(TripDto tripDto) {
+        TripInfo tripInfo = new TripInfo();
+        tripInfo.id = tripDto.id;
+        tripInfo.driverId = tripDto.driverId;
+        tripInfo.destinationSedeId = tripDto.destinationSedeId;
+        tripInfo.dateTime = tripDto.dateTime;
+        tripInfo.seatsTotal = tripDto.seatsTotal;
+        tripInfo.seatsFree = tripDto.seatsFree;
+        
+        // Convert origin from DTO format to string format
+        if (tripDto.origin != null) {
+            tripInfo.origin = tripDto.origin.lat + "," + tripDto.origin.lng;
+        } else {
+            tripInfo.origin = "0.0,0.0"; // Default fallback
+        }
+        
+        return tripInfo;
     }
     
     private double calculateMatchScore(TripInfo trip, String destinationSedeId, 
