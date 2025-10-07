@@ -36,7 +36,8 @@ public class AuthFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
-        String path = requestContext.getUriInfo().getPath();
+        var uriInfo = requestContext.getUriInfo();
+        String path = uriInfo != null ? uriInfo.getPath() : null;
         if (path != null && (path.equals("health") || path.equals("/health"))) {
             return;
         }

@@ -171,3 +171,28 @@
   - Actualizar interceptor Axios para refrescar token (`updateToken(5)`) e inyectar `Authorization`.
   - Verificar ruta `/callback` y guard `Protected`.
 - Result: ✅ OIDC operativo a nivel de UI; token refresh e inyección listos.
+
+## 2025-10-07 (tarde-noche, revisión de estado)
+- Intent: Auditar estado real del proyecto y alinear Memory Bank.
+- Findings:
+  - `docker-compose`: puertos expuestos 8081-8084; Keycloak y DB ok.
+  - `@ApplicationPath("/api")`: presentes en `users` y `matching`; `booking` y `trips` con `JaxrsConfig` sin trackear.
+  - `HealthResource`: presente en `trips` y `users`; pendiente confirmar en `booking` y `matching`.
+  - Cambios sin confirmar en `pom.xml`, `persistence.xml`, `Dockerfile` de varios servicios.
+- Actions:
+  - Actualizar `activeContext.md`, `progress.md`, `systemPatterns.md`, `techContext.md` con rutas/puertos/health.
+  - Plan para unificar health y base path en todos los servicios.
+- Next:
+  - Versionar `JaxrsConfig` faltantes; añadir/confirmar `HealthResource` y exención de auth para `/api/health` en todos.
+  - Confirmar `persistence.xml` homogéneo; consolidar cambios en `pom.xml`.
+  - (Opcional) Configurar proxy/gateway path-based.
+
+### 2025-10-07 (noche)
+- Intent: Migrar microservicios a WAR + Payara Micro y estabilizar P4 (tests FE↔BE).
+- Actions:
+  - Migrar `trips/users/booking/matching` a WAR con `payara/micro:6.2024.6-jdk17` y `@ApplicationPath("/api")`.
+  - Añadir `HealthResource` y eximir `/api/health` en filtros de auth.
+  - Ajustar `persistence.xml` a `RESOURCE_LOCAL` y `hbm2ddl=update` (trips/booking/matching); DB host `db:5432`.
+  - Keycloak: crear cliente `backend-api` y mapper de audiencia en `covoituraje-frontend`; alinear `OIDC_ISSUER_URI` a localhost.
+  - Health OK en 8081–8084; tests de salud pasan; flujos Trips/Matches aún con 401/timeout puntuales.
+- Result: Backend desplegado localmente con rutas unificadas y auth en marcha; pendiente estabilizar `/api/trips` para completar P4.

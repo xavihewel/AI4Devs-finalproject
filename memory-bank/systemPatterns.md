@@ -49,5 +49,10 @@
 - Mantener documentación en `/doc` (PlantUML/Mermaid) y prompts en `/Prompts/prompts_xvb.md`.
 - Flujo: Epics/US → tickets técnicos → modelos/diagramas → tests (TDD) → implementación → actualizar doc y prompts.
 
+## Runtime Conventions (actualizado)
+- **Routing**: Servicios expuestos bajo `/api` en cada microservicio (puertos locales 8081–8084). En gateway se enrutará por prefijo (`/api/users`, `/api/trips`, `/api/bookings`, `/api/matches`).
+- **Health**: `GET /api/health` disponible y exento de autenticación en todos los servicios.
+- **Auth**: `OIDC_ISSUER_URI` debe ser coherente con `iss` del token (localhost en dev); `aud` debe incluir `backend-api`.
+
 ## Diagrams
 - Ver `doc/MVP/*` y `readme.md` para contexto ampliado.

@@ -36,3 +36,8 @@
 - **✅ FASE 4**: Docker-compose para desarrollo local (infraestructura completa, scripts automatización)
 - **✅ FASE 5**: Integraciones entre servicios (ServiceHttpClient, DTOs compartidos, validaciones cross-service)
 - **✅ FRONTEND BASE**: React + TypeScript + Tailwind CSS (componentes UI, servicios API, páginas principales)
+
+## Local Ports & Health Checks
+- Puertos locales: trips `8081`, users `8082`, booking `8083`, matching `8084` (todos bajo `@ApplicationPath("/api")`).
+- Health: `GET /api/health` exento de autenticación en todos los servicios.
+- OIDC dev: `OIDC_ISSUER_URI=http://localhost:8080/realms/covoituraje`; tokens con `aud=backend-api`.

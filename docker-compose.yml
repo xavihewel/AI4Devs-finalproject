@@ -59,7 +59,7 @@ services:
       - DATABASE_URL=jdbc:postgresql://db:5432/app
       - DATABASE_USER=app
       - DATABASE_PASSWORD=app
-      - OIDC_ISSUER_URI=http://keycloak:8080/realms/covoituraje
+      - OIDC_ISSUER_URI=http://localhost:8080/realms/covoituraje
       - OIDC_JWKS_URI=http://keycloak:8080/realms/covoituraje/protocol/openid-connect/certs
       - REQUIRE_ROLE_EMPLOYEE=false
     ports:
@@ -79,7 +79,7 @@ services:
       - DATABASE_URL=jdbc:postgresql://db:5432/app
       - DATABASE_USER=app
       - DATABASE_PASSWORD=app
-      - OIDC_ISSUER_URI=http://keycloak:8080/realms/covoituraje
+      - OIDC_ISSUER_URI=http://localhost:8080/realms/covoituraje
       - OIDC_JWKS_URI=http://keycloak:8080/realms/covoituraje/protocol/openid-connect/certs
       - REQUIRE_ROLE_EMPLOYEE=false
     ports:
@@ -99,7 +99,7 @@ services:
       - DATABASE_URL=jdbc:postgresql://db:5432/app
       - DATABASE_USER=app
       - DATABASE_PASSWORD=app
-      - OIDC_ISSUER_URI=http://keycloak:8080/realms/covoituraje
+      - OIDC_ISSUER_URI=http://localhost:8080/realms/covoituraje
       - OIDC_JWKS_URI=http://keycloak:8080/realms/covoituraje/protocol/openid-connect/certs
       - REQUIRE_ROLE_EMPLOYEE=false
       - TRIPS_SERVICE_URL=http://trips-service:8080
@@ -125,7 +125,7 @@ services:
       - DATABASE_URL=jdbc:postgresql://db:5432/app
       - DATABASE_USER=app
       - DATABASE_PASSWORD=app
-      - OIDC_ISSUER_URI=http://keycloak:8080/realms/covoituraje
+      - OIDC_ISSUER_URI=http://localhost:8080/realms/covoituraje
       - OIDC_JWKS_URI=http://keycloak:8080/realms/covoituraje/protocol/openid-connect/certs
       - REQUIRE_ROLE_EMPLOYEE=false
       - TRIPS_SERVICE_URL=http://trips-service:8080
