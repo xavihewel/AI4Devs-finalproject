@@ -9,9 +9,10 @@ services:
       POSTGRES_PASSWORD: app
       POSTGRES_DB: app
     ports:
-      - "5432:5432"
+      - "5434:5432"  # Puerto externo 5434 para evitar conflictos
     volumes:
       - db_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U app"]
       interval: 10s
@@ -47,6 +48,107 @@ services:
     ports:
       - "8025:8025"   # UI
       - "1025:1025"   # SMTP
+
+  # Servicios de desarrollo para microservicios
+  trips-service:
+    build:
+      context: ./Backend/trips-service
+      dockerfile: Dockerfile
+    container_name: covoituraje_trips_service
+    environment:
+      - DATABASE_URL=jdbc:postgresql://db:5432/app
+      - DATABASE_USER=app
+      - DATABASE_PASSWORD=app
+      - OIDC_ISSUER_URI=http://keycloak:8080/realms/covoituraje
+      - OIDC_JWKS_URI=http://keycloak:8080/realms/covoituraje/protocol/openid-connect/certs
+      - REQUIRE_ROLE_EMPLOYEE=false
+    ports:
+      - "8081:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - services
+
+  users-service:
+    build:
+      context: ./Backend/users-service
+      dockerfile: Dockerfile
+    container_name: covoituraje_users_service
+    environment:
+      - DATABASE_URL=jdbc:postgresql://db:5432/app
+      - DATABASE_USER=app
+      - DATABASE_PASSWORD=app
+      - OIDC_ISSUER_URI=http://keycloak:8080/realms/covoituraje
+      - OIDC_JWKS_URI=http://keycloak:8080/realms/covoituraje/protocol/openid-connect/certs
+      - REQUIRE_ROLE_EMPLOYEE=false
+    ports:
+      - "8082:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - services
+
+  booking-service:
+    build:
+      context: ./Backend/booking-service
+      dockerfile: Dockerfile
+    container_name: covoituraje_booking_service
+    environment:
+      - DATABASE_URL=jdbc:postgresql://db:5432/app
+      - DATABASE_USER=app
+      - DATABASE_PASSWORD=app
+      - OIDC_ISSUER_URI=http://keycloak:8080/realms/covoituraje
+      - OIDC_JWKS_URI=http://keycloak:8080/realms/covoituraje/protocol/openid-connect/certs
+      - REQUIRE_ROLE_EMPLOYEE=false
+    ports:
+      - "8083:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - services
+
+  matching-service:
+    build:
+      context: ./Backend/matching-service
+      dockerfile: Dockerfile
+    container_name: covoituraje_matching_service
+    environment:
+      - DATABASE_URL=jdbc:postgresql://db:5432/app
+      - DATABASE_USER=app
+      - DATABASE_PASSWORD=app
+      - OIDC_ISSUER_URI=http://keycloak:8080/realms/covoituraje
+      - OIDC_JWKS_URI=http://keycloak:8080/realms/covoituraje/protocol/openid-connect/certs
+      - REQUIRE_ROLE_EMPLOYEE=false
+    ports:
+      - "8084:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - services
+
+  # Frontend para desarrollo
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: covoituraje_frontend
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8081
+      - VITE_OIDC_ISSUER=http://localhost:8080/realms/covoituraje
+      - VITE_OIDC_CLIENT_ID=covoituraje-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - trips-service
+      - users-service
+      - booking-service
+      - matching-service
+    profiles:
+      - services
 
 volumes:
   db_data:

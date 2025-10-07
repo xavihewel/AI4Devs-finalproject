@@ -32,6 +32,8 @@
 - **Testcontainers**: PostgreSQL real para tests de integración con Docker.
 - **Business methods en entidades**: Lógica de negocio encapsulada en entidades JPA (reserveSeats, accept, confirm, etc.).
 - **Jakarta Bean Validation**: Validación de entrada en REST APIs.
+- **Docker-compose con profiles**: Infraestructura base siempre activa, microservicios opcionales para desarrollo.
+- **Scripts de automatización**: Setup completo, migraciones, configuración de Keycloak automatizados.
 - Redis para caché; Elastic/OpenSearch opcional; Keycloak como IdP en dev.
 - Observabilidad: logs estructurados, tracing OTEL, métricas clave.
 - Frontend usa Vite para dev/build; variables de entorno `VITE_*` para configuración OIDC y base URL.

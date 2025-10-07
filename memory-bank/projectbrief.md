@@ -38,6 +38,7 @@
   - Persistencia robusta con PostgreSQL + JPA
   - Cobertura de tests >80%
   - APIs REST bien documentadas
+  - Entorno de desarrollo completo con Docker
 
 ## Stakeholders
 - **Product:** Equipo de producto corporativo
@@ -54,7 +55,10 @@
 - **M3 (FASE 3):** Tests de integración ✅
   - Testcontainers configurado para todos los servicios
   - Cobertura completa de funcionalidad CRUD
-- **M4 (FASE 4):** Docker-compose para desarrollo
+- **M4 (FASE 4):** Docker-compose para desarrollo ✅
+  - Infraestructura completa (PostgreSQL, Redis, Keycloak, Mailhog)
+  - Microservicios dockerizados con scripts de automatización
+  - Documentación completa de setup local
 - **M5 (FASE 5):** Integraciones entre servicios
 
 ## Risks & Assumptions

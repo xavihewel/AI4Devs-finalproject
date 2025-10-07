@@ -78,6 +78,26 @@
 - Error: Método findAvailableTrips requería parámetro destinationSedeId
 - Error: AuthContext no configurado en tests unitarios de users-service
 
+### FASE 4: Docker-compose para desarrollo local
+- Intent: Configurar entorno de desarrollo completo con Docker para facilitar el desarrollo local.
+- Actions:
+  - Actualizar docker-compose.yml con infraestructura completa (PostgreSQL+PostGIS, Redis, Keycloak, Mailhog)
+  - Crear Dockerfiles multi-stage para todos los microservicios (trips, users, booking, matching, frontend)
+  - Implementar scripts de automatización: setup-dev.sh, dev-infra.sh, migrate.sh, setup-keycloak.sh
+  - Configurar variables de entorno en env.example
+  - Crear documentación completa en doc/setup/local.md con troubleshooting
+  - Configurar nginx para frontend con proxy API
+- Decisions:
+  - Puerto PostgreSQL cambiado a 5434 para evitar conflictos locales
+  - Profiles Docker para desarrollo opcional de microservicios
+  - Scripts de automatización para setup completo y paso a paso
+- Result: ✅ Completado - Entorno de desarrollo completo funcionando
+
+### Problemas resueltos durante FASE 4:
+- Error: Puerto 5433 ocupado por instalación local de PostgreSQL
+- Error: Configuración de Keycloak requiere tiempo de inicialización
+- Error: Docker-compose version obsoleta (warning eliminado)
+
 ### Patrones técnicos establecidos:
 - ThreadLocal AuthContext para propagación de userId
 - Business methods en entidades JPA para encapsular lógica de negocio
@@ -85,3 +105,5 @@
 - Schemas separados por servicio para aislamiento
 - RESOURCE_LOCAL transactions para simplicidad del MVP
 - Jakarta Bean Validation para validación de entrada en REST APIs
+- Docker-compose con profiles para desarrollo opcional
+- Scripts de automatización para setup completo y configuración de servicios
