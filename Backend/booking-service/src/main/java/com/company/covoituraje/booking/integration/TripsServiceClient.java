@@ -24,7 +24,7 @@ public class TripsServiceClient {
      */
     public TripDto getTripById(String tripId) throws ServiceIntegrationException {
         try {
-            String path = "/trips/" + tripId;
+            String path = "/api/trips/" + tripId;
             return httpClient.get(path, TripDto.class);
         } catch (ServiceIntegrationException e) {
             throw new ServiceIntegrationException("Error fetching trip with ID: " + tripId, e);

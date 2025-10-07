@@ -155,7 +155,7 @@ public class ServiceHttpClient {
     public boolean isServiceAvailable() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(baseUrl + "/health"))
+                    .uri(URI.create(baseUrl + "/api/health"))
                     .timeout(Duration.ofSeconds(5))
                     .GET()
                     .build();
