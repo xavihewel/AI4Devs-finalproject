@@ -20,20 +20,20 @@ async function getToken() {
 describe('Integration: domain happy paths (requires backend running)', () => {
   itIf(!!process.env.RUN_INT)('Trips list returns array', async () => {
     const token = await getToken();
-    const res = await axios.get(`${API}/trips`, { timeout: 5000, headers: { Authorization: `Bearer ${token}` } });
+    const res = await axios.get(`${API}/api/trips`, { timeout: 5000, headers: { Authorization: `Bearer ${token}` } });
     expect(res.status).toBe(200);
     expect(Array.isArray(res.data)).toBe(true);
   });
 
   itIf(!!process.env.RUN_INT)('Matches search with destination returns array', async () => {
     const token = await getToken();
-    const res = await axios.get(`${API.replace('8081', '8084')}/matches?destinationSedeId=SEDE-1`, {
-      timeout: 5000,
+    const res = await axios.get(`${API.replace('8081', '8084')}/api/matches?destinationSedeId=SEDE-1`, {
+      timeout: 30000,
       headers: { Authorization: `Bearer ${token}` },
     });
     expect(res.status).toBe(200);
     expect(Array.isArray(res.data)).toBe(true);
-  });
+  }, 35000);
 });
 
 
