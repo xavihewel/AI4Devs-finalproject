@@ -22,5 +22,14 @@
 ## Dependencies
 - Maven: Jakarta EE API, JAX-RS, **JPA/Hibernate IMPLEMENTADO**, PostgreSQL driver, **Flyway**, JUnit5, Mockito, **Testcontainers**.
 - **DependencyManagement centralizado** en parent POM para versiones consistentes.
+- **ThreadLocal AuthContext**: Para propagación de userId en todos los servicios.
+- **Jakarta Bean Validation**: Para validación de entrada en REST APIs.
 - Frontend: React, react-router-dom, keycloak-js, axios, Vite, Vitest, Testing Library.
 - Infra: Docker, docker-compose; PostgreSQL con PostGIS; opcional Keycloak como IdP de dev.
+
+## Implementation Status
+- **✅ FASE 1**: Persistencia completa (PostgreSQL + JPA + Flyway + Seeds)
+- **✅ FASE 2**: APIs REST con JPA (repositorios reales, AuthFilter estandarizado, algoritmo de matching)
+- **✅ FASE 3**: Tests de integración (Testcontainers configurado, 23 tests pasando)
+- **🔄 FASE 4**: Docker-compose para desarrollo local (en progreso)
+- **⏳ FASE 5**: Integraciones entre servicios (pendiente)

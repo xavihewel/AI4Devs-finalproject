@@ -28,6 +28,10 @@
 - **Flyway para migraciones** con schemas separados por servicio (trips, users, bookings, matches).
 - **DependencyManagement centralizado** en parent POM para versiones consistentes.
 - **RESOURCE_LOCAL transactions** para simplificar MVP sin CDI completo.
+- **ThreadLocal AuthContext**: Patrón estándar para propagación de userId en todos los servicios.
+- **Testcontainers**: PostgreSQL real para tests de integración con Docker.
+- **Business methods en entidades**: Lógica de negocio encapsulada en entidades JPA (reserveSeats, accept, confirm, etc.).
+- **Jakarta Bean Validation**: Validación de entrada en REST APIs.
 - Redis para caché; Elastic/OpenSearch opcional; Keycloak como IdP en dev.
 - Observabilidad: logs estructurados, tracing OTEL, métricas clave.
 - Frontend usa Vite para dev/build; variables de entorno `VITE_*` para configuración OIDC y base URL.

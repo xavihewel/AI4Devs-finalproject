@@ -1,26 +1,39 @@
 # Active Context
 
 ## Current Focus
-- **FASE 1 COMPLETADA**: Persistencia con PostgreSQL + JPA + Flyway implementada en todos los servicios.
-- Migraciones probadas exitosamente: 4 servicios, 8 migraciones, 20 registros seed.
-- Transición de repositorios in-memory a JPA con entidades reales.
+- **FASES 1, 2 y 3 COMPLETADAS**: Backend completamente funcional con persistencia real, APIs REST con JPA, y tests de integración robustos.
+- **Preparando FASE 4**: Docker-compose completo para desarrollo local.
 
 ## Recent Changes
-- **Backend Parent POM**: Actualizado con dependencyManagement centralizado para JPA/Hibernate, PostgreSQL, Flyway, Testcontainers.
-- **Docker Compose**: PostgreSQL configurado en puerto 5433 con PostGIS.
-- **Migraciones Flyway**: Creadas para todos los servicios (trips, users, bookings, matches) con schemas separados.
-- **Entidades JPA**: Implementadas `Trip`, `User`, `Booking`, `Match` con anotaciones completas.
-- **Repositorios JPA**: Reemplazados repositorios in-memory con `TripRepository`, `UserRepository`, `BookingRepository`, `MatchRepository`.
-- **Seeds realistas**: 5 registros por tabla con datos coherentes entre servicios.
-- **Configuración JPA**: `persistence.xml` y `JpaConfig` para cada servicio con conexión a PostgreSQL.
+### FASE 2 - APIs REST con JPA ✅
+- **Recursos REST actualizados**: Todos los servicios migrados de repositorios in-memory a JPA real
+- **AuthFilter estandarizado**: ThreadLocal AuthContext implementado en todos los servicios para propagación de userId
+- **Algoritmo de matching real**: Implementado con scoring 0.0-1.0 basado en destino, tiempo, origen y disponibilidad de asientos
+- **Validaciones REST**: Implementadas usando Jakarta Bean Validation
+- **DTOs actualizados**: `BookingDto` incluye `seatsRequested`, `MatchDto` incluye campos detallados
+
+### FASE 3 - Tests de integración ✅
+- **Testcontainers configurado**: PostgreSQL + PostGIS para tests de integración con Docker
+- **Tests de integración implementados**: Para todos los servicios con cobertura completa
+  - trips-service: 4 tests (save/find, findByDestination, findAvailable, updateSeats)
+  - users-service: 5 tests (save/find, findBySede, findByRole, update, findById)
+  - booking-service: 6 tests (save/find, findByPassenger, findByTrip, findByStatus, updateStatus, findById)
+  - matching-service: 8 tests (save/find, findByTrip, findByPassenger, findByDriver, findByStatus, findHighScore, findByTripAndPassenger, updateStatus)
+- **Schemas separados**: Cada servicio con su propio schema en tests
+- **Configuración dinámica**: EntityManager configurado dinámicamente para cada test
 
 ## Next Steps
-- **FASE 2**: Actualizar recursos REST para usar JPA en lugar de in-memory.
-- **FASE 3**: Tests de integración con Testcontainers.
-- **FASE 4**: Configurar docker-compose completo para desarrollo local.
-- **FASE 5**: Integraciones entre servicios usando datos reales.
+- **FASE 4**: Docker-compose completo para desarrollo local
+  - Configurar servicios de desarrollo (Keycloak, Mailhog, etc.)
+  - Scripts de inicialización y seeding
+  - Documentación de setup local
+- **FASE 5**: Integraciones reales entre servicios
+  - Matching service integrado con trips service
+  - Booking service integrado con trips y users services
 
 ## Decisions & Considerations
-- Tests de recursos devolviendo DTOs directamente para evitar `RuntimeDelegate`.
-- Mantener OpenAPI como contrato guía; verificar campos clave en tests.
-- Frontend usa Vite, react-router-dom, keycloak-js y axios; las variables se leen como `VITE_*` y el cliente adjunta automáticamente `Authorization: Bearer` a las llamadas.
+- **ThreadLocal AuthContext**: Patrón estándar para manejo de contexto de usuario en todos los servicios
+- **Testcontainers**: Uso de PostgreSQL real en tests para verificar funcionalidad completa
+- **Transacciones manuales**: RESOURCE_LOCAL para simplicidad del MVP
+- **Business methods**: Implementados en entidades JPA para lógica de negocio (reserveSeats, accept, confirm, etc.)
+- **Validaciones**: Jakarta Bean Validation para validación de entrada en REST APIs
