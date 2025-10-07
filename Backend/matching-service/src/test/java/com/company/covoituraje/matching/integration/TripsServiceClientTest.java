@@ -83,8 +83,9 @@ class TripsServiceClientTest {
             () -> client.getAvailableTrips(destinationSedeId)
         );
         
-        assertTrue(exception.getMessage().contains("Error fetching available trips"));
-        assertTrue(exception.getMessage().contains("Service unavailable"));
+        assertTrue(exception.getMessage().contains("Error fetching available trips for destination"));
+        assertTrue(exception.getMessage().contains("SEDE-1"));
+        assertTrue(exception.getCause().getMessage().contains("Service unavailable"));
     }
     
     private TripDto createMockTripDto(String id, String driverId, String destinationSedeId, int seatsFree) {

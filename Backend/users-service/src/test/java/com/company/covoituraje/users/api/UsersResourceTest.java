@@ -1,17 +1,32 @@
 package com.company.covoituraje.users.api;
 
+import com.company.covoituraje.users.domain.User;
+import com.company.covoituraje.users.infrastructure.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UsersResourceTest {
 
+    private UsersResource resource;
+    private UserRepository repository;
+
+    @BeforeEach
+    void setUp() {
+        resource = new UsersResource();
+        repository = new UserRepository();
+        
+        // Always create a fresh test user to avoid test interference
+        User testUser = new User("user-001", "Ana García", "ana.garcia@company.com", "SEDE-1", "EMPLOYEE");
+        repository.save(testUser);
+    }
+
     @Test
     void getMe_returnsDefaultUser() {
         // Set user context
         UsersResource.AuthContext.setUserId("user-001");
         try {
-            UsersResource resource = new UsersResource();
             UserDto body = resource.getMe();
             assertNotNull(body);
             assertEquals("user-001", body.id);
@@ -26,10 +41,11 @@ class UsersResourceTest {
         // Set user context
         UsersResource.AuthContext.setUserId("user-001");
         try {
-            UsersResource resource = new UsersResource();
             UserDto update = new UserDto();
             update.name = "Updated Name";
             update.sedeId = "SEDE-2";
+            update.email = "ana.garcia@company.com";
+            
             UserDto body = resource.updateMe(update);
             assertEquals("Updated Name", body.name);
             assertEquals("SEDE-2", body.sedeId);

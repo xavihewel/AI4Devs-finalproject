@@ -1,0 +1,117 @@
+import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+import { MatchesService } from './matches';
+import { api } from './client';
+import type { MatchDto } from '../types/api';
+
+// Mock axios - inline to avoid hoisting issues
+jest.mock('./client', () => ({
+  api: {
+    get: jest.fn(),
+  },
+}));
+
+describe('MatchesService', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('findMatches', () => {
+    it('should find matches with all parameters', async () => {
+      const mockMatches: MatchDto[] = [
+        {
+          id: '1',
+          tripId: 'trip1',
+          driverId: 'driver1',
+          origin: '40.4168,-3.7038',
+          destinationSedeId: 'SEDE-1',
+          dateTime: '2024-01-01T08:00:00Z',
+          seatsFree: 2,
+          score: 0.85,
+          reasons: ['Ubicación cercana', 'Horario compatible'],
+        },
+      ];
+
+      (api.get as any).mockResolvedValue({ data: mockMatches });
+
+      const params = {
+        destinationSedeId: 'SEDE-1',
+        time: '08:30',
+        origin: '40.4168,-3.7038',
+      };
+
+      const result = await MatchesService.findMatches(params);
+
+      expect((api.get as any)).toHaveBeenCalledWith(
+        '/matches?destinationSedeId=SEDE-1&time=08%3A30&origin=40.4168%2C-3.7038'
+      );
+      expect(result).toEqual(mockMatches);
+    });
+
+    it('should find matches with only destination', async () => {
+      const mockMatches: MatchDto[] = [];
+
+      (api.get as any).mockResolvedValue({ data: mockMatches });
+
+      const params = {
+        destinationSedeId: 'SEDE-1',
+      };
+
+      const result = await MatchesService.findMatches(params);
+
+      expect((api.get as any)).toHaveBeenCalledWith('/matches?destinationSedeId=SEDE-1');
+      expect(result).toEqual(mockMatches);
+    });
+
+    it('should find matches with destination and time', async () => {
+      const mockMatches: MatchDto[] = [];
+
+      (api.get as any).mockResolvedValue({ data: mockMatches });
+
+      const params = {
+        destinationSedeId: 'SEDE-1',
+        time: '09:00',
+      };
+
+      const result = await MatchesService.findMatches(params);
+
+      expect((api.get as any)).toHaveBeenCalledWith('/matches?destinationSedeId=SEDE-1&time=09%3A00');
+      expect(result).toEqual(mockMatches);
+    });
+  });
+
+  describe('getMyMatches', () => {
+    it('should fetch user matches', async () => {
+      const mockMatches: MatchDto[] = [];
+
+      (api.get as any).mockResolvedValue({ data: mockMatches });
+
+      const result = await MatchesService.getMyMatches();
+
+      expect((api.get as any)).toHaveBeenCalledWith('/matches/my-matches');
+      expect(result).toEqual(mockMatches);
+    });
+  });
+
+  describe('getMatchById', () => {
+    it('should fetch match by id', async () => {
+      const mockMatch: MatchDto = {
+        id: '1',
+        tripId: 'trip1',
+        driverId: 'driver1',
+        origin: '40.4168,-3.7038',
+        destinationSedeId: 'SEDE-1',
+        dateTime: '2024-01-01T08:00:00Z',
+        seatsFree: 2,
+        score: 0.85,
+        reasons: ['Ubicación cercana'],
+      };
+
+      (api.get as any).mockResolvedValue({ data: mockMatch });
+
+      const result = await MatchesService.getMatchById('1');
+
+      expect((api.get as any)).toHaveBeenCalledWith('/matches/1');
+      expect(result).toEqual(mockMatch);
+    });
+  });
+});

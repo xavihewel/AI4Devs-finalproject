@@ -29,7 +29,7 @@ class BookingValidationServiceTest {
     void validateTripAvailability_ShouldPassWhenTripHasEnoughSeats() throws Exception {
         // Arrange
         BookingValidationService service = new BookingValidationService(tripsServiceClient, usersServiceClient);
-        String tripId = "trip1";
+        String tripId = "550e8400-e29b-41d4-a716-446655440001"; // Valid UUID
         int seatsRequested = 2;
         
         when(tripsServiceClient.hasAvailableSeats(tripId, seatsRequested)).thenReturn(true);
@@ -44,7 +44,7 @@ class BookingValidationServiceTest {
     void validateTripAvailability_ShouldFailWhenTripHasInsufficientSeats() throws Exception {
         // Arrange
         BookingValidationService service = new BookingValidationService(tripsServiceClient, usersServiceClient);
-        String tripId = "trip1";
+        String tripId = "550e8400-e29b-41d4-a716-446655440001"; // Valid UUID
         int seatsRequested = 3;
         
         when(tripsServiceClient.hasAvailableSeats(tripId, seatsRequested)).thenReturn(false);
@@ -63,7 +63,7 @@ class BookingValidationServiceTest {
     void validateTripAvailability_ShouldFailWhenServiceException() throws Exception {
         // Arrange
         BookingValidationService service = new BookingValidationService(tripsServiceClient, usersServiceClient);
-        String tripId = "trip1";
+        String tripId = "550e8400-e29b-41d4-a716-446655440001"; // Valid UUID
         int seatsRequested = 2;
         
         when(tripsServiceClient.hasAvailableSeats(tripId, seatsRequested))
@@ -112,7 +112,7 @@ class BookingValidationServiceTest {
     }
     
     @Test
-    void validateTripAvailability_ShouldFailForInvalidTripIdFormat() {
+    void validateTripAvailability_ShouldFailForInvalidTripIdFormat() throws Exception {
         // Arrange
         BookingValidationService service = new BookingValidationService(tripsServiceClient, usersServiceClient);
         String invalidTripId = "invalid-uuid";

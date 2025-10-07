@@ -1,28 +1,68 @@
 import { render, screen } from '@testing-library/react';
-import { vi } from 'vitest';
 import Home from './Home';
 import { AuthProvider } from '../auth/AuthProvider';
 
-vi.mock('../auth/keycloak', () => {
+jest.mock('../auth/keycloak', () => {
   return {
     getKeycloak: () => ({
       token: undefined,
-      init: vi.fn().mockResolvedValue(false),
-      login: vi.fn(),
-      logout: vi.fn(),
-      updateToken: vi.fn().mockResolvedValue(false),
+      init: jest.fn().mockResolvedValue(false),
+      login: jest.fn(),
+      logout: jest.fn(),
+      updateToken: jest.fn().mockResolvedValue(false),
     }),
   };
 });
 
 describe('Home', () => {
-  it('renders welcome title', () => {
+  it('renders hero section with title', () => {
     render(
       <AuthProvider>
         <Home />
       </AuthProvider>
     );
-    expect(screen.getByText(/Bienvenido a Covoituraje/i)).toBeInTheDocument();
+    expect(screen.getByText(/Covoituraje/i)).toBeInTheDocument();
+  });
+
+  it('renders main tagline', () => {
+    render(
+      <AuthProvider>
+        <Home />
+      </AuthProvider>
+    );
+    expect(screen.getByText(/Comparte viajes corporativos y reduce costos de manera inteligente/i)).toBeInTheDocument();
+  });
+
+  it('renders features section', () => {
+    render(
+      <AuthProvider>
+        <Home />
+      </AuthProvider>
+    );
+    expect(screen.getByText(/Comparte tu Viaje/i)).toBeInTheDocument();
+    expect(screen.getByText(/Encuentra Matches/i)).toBeInTheDocument();
+    expect(screen.getByText(/Ahorra Costos/i)).toBeInTheDocument();
+  });
+
+  it('renders how it works section', () => {
+    render(
+      <AuthProvider>
+        <Home />
+      </AuthProvider>
+    );
+    expect(screen.getByText(/¿Cómo funciona?/i)).toBeInTheDocument();
+    expect(screen.getByText(/Crea tu Viaje/i)).toBeInTheDocument();
+    expect(screen.getByText(/Busca Matches/i)).toBeInTheDocument();
+    expect(screen.getByText(/Reserva y Viaja/i)).toBeInTheDocument();
+  });
+
+  it('shows login button when not authenticated', () => {
+    render(
+      <AuthProvider>
+        <Home />
+      </AuthProvider>
+    );
+    expect(screen.getByText(/Comenzar Ahora/i)).toBeInTheDocument();
   });
 });
 
