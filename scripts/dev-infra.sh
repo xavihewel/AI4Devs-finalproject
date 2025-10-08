@@ -3,6 +3,14 @@
 # Script para levantar solo la infraestructura de desarrollo
 # Incluye: PostgreSQL, Redis, Keycloak, Mailhog
 
+# Obtener directorio del script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Verificar y arrancar Docker si es necesario
+source "${SCRIPT_DIR}/lib/docker-check.sh"
+check_and_start_docker || exit 1
+
+echo ""
 echo "🚀 Levantando infraestructura de desarrollo..."
 
 # Levantar solo los servicios de infraestructura

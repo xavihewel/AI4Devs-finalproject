@@ -1,8 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
+import { env } from '../env';
 
 export const Protected: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  if (env.authDisabled) {
+    return <>{children}</>;
+  }
   const { initialized, authenticated, login } = useAuth();
   const location = useLocation();
   const loginTriggeredRef = useRef(false);

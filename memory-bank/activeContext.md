@@ -30,3 +30,4 @@
 - **Scripts interactivos**: `start-frontend.sh` ofrece levantar microservicios si no están corriendo.
 - **Dual mode frontend**: Docker para producción-like, local (Vite) para desarrollo rápido con hot reload.
 - **Verificación en capas**: `verify-infra.sh` para infraestructura base, `verify-all.sh` para sistema completo.
+ - **Autenticación en producción**: El bypass de auth (`AUTH_DISABLED=true`) es solo para desarrollo/test. En producción debe estar desactivado (`AUTH_DISABLED=false`) y la validación JWT debe permanecer activa (incluyendo `REQUIRE_ROLE_EMPLOYEE` según políticas).

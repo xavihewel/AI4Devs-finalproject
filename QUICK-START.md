@@ -62,6 +62,31 @@ Ejecuta tests End-to-End con Cypress. Menú interactivo para elegir qué tests e
 ./scripts/run-e2e-tests.sh
 ```
 
+### 🐳 `./scripts/check-docker.sh`
+Verifica si Docker está corriendo y lo arranca automáticamente si está apagado.
+```bash
+./scripts/check-docker.sh
+```
+
+## 🐳 Verificación Automática de Docker
+
+Todos los scripts ahora **verifican automáticamente** si Docker está corriendo:
+- ✅ Si Docker está corriendo → continúa normalmente
+- ⚠️ Si Docker no está corriendo → intenta arrancarlo automáticamente
+- ⏳ Espera hasta 60 segundos a que Docker arranque
+- ❌ Si no puede arrancar → muestra mensaje de error claro
+
+**Sistemas soportados:**
+- 🍎 **macOS**: Abre Docker Desktop automáticamente
+- 🐧 **Linux**: Usa `systemctl` o `service`
+- 🪟 **Windows**: Requiere arranque manual
+
+**Script standalone:**
+```bash
+# Verificar/arrancar Docker manualmente
+./scripts/check-docker.sh
+```
+
 ## 🧪 Testing E2E con Cypress
 
 ### Scripts de Testing

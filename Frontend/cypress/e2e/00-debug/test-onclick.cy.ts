@@ -20,3 +20,4 @@ describe('Test OnClick Handler', () => {
     cy.url().should('not.equal', 'http://localhost:3000/')
   })
 })
+

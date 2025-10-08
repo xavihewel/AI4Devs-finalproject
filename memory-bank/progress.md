@@ -21,6 +21,7 @@
 - **Observabilidad avanzada**: Métricas, tracing distribuido, agregación de logs.
 - **API Gateway**: Implementar gateway con routing path-based para unificar acceso.
 - **CI/CD**: Pipeline de integración y despliegue continuo con Cypress.
+ - **Producción: Autenticación habilitada**: Confirmar que `AUTH_DISABLED=false` y que la validación JWT esté activa en todos los servicios para despliegues a producción (y roles según `REQUIRE_ROLE_EMPLOYEE`).
 
 ## Current Status
 - ✅ Sistema completamente funcional y arrancable con un solo comando (`start-all-services.sh`)

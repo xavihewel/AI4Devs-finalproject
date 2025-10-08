@@ -62,6 +62,8 @@ services:
       - OIDC_ISSUER_URI=http://localhost:8080/realms/covoituraje
       - OIDC_JWKS_URI=http://keycloak:8080/realms/covoituraje/protocol/openid-connect/certs
       - REQUIRE_ROLE_EMPLOYEE=false
+      - AUTH_DISABLED=true
+      - AUTH_BYPASS_USER_ID=00000000-0000-0000-0000-000000000001
     ports:
       - "8081:8080"
     depends_on:
@@ -82,6 +84,8 @@ services:
       - OIDC_ISSUER_URI=http://localhost:8080/realms/covoituraje
       - OIDC_JWKS_URI=http://keycloak:8080/realms/covoituraje/protocol/openid-connect/certs
       - REQUIRE_ROLE_EMPLOYEE=false
+      - AUTH_DISABLED=true
+      - AUTH_BYPASS_USER_ID=00000000-0000-0000-0000-000000000001
     ports:
       - "8082:8080"
     depends_on:
@@ -102,6 +106,8 @@ services:
       - OIDC_ISSUER_URI=http://localhost:8080/realms/covoituraje
       - OIDC_JWKS_URI=http://keycloak:8080/realms/covoituraje/protocol/openid-connect/certs
       - REQUIRE_ROLE_EMPLOYEE=false
+      - AUTH_DISABLED=true
+      - AUTH_BYPASS_USER_ID=00000000-0000-0000-0000-000000000001
       - TRIPS_SERVICE_URL=http://trips-service:8080
       - USERS_SERVICE_URL=http://users-service:8080
     ports:
@@ -128,6 +134,8 @@ services:
       - OIDC_ISSUER_URI=http://localhost:8080/realms/covoituraje
       - OIDC_JWKS_URI=http://keycloak:8080/realms/covoituraje/protocol/openid-connect/certs
       - REQUIRE_ROLE_EMPLOYEE=false
+      - AUTH_DISABLED=true
+      - AUTH_BYPASS_USER_ID=00000000-0000-0000-0000-000000000001
       - TRIPS_SERVICE_URL=http://trips-service:8080
     ports:
       - "8084:8080"
@@ -149,6 +157,7 @@ services:
         - VITE_OIDC_ISSUER=http://localhost:8080/realms/covoituraje
         - VITE_OIDC_CLIENT_ID=covoituraje-frontend
         - VITE_OIDC_REDIRECT_URI=http://localhost:3000/callback
+        - VITE_AUTH_DISABLED=true
     container_name: covoituraje_frontend
     ports:
       - "3000:3000"

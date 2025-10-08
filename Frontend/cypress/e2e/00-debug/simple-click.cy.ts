@@ -39,3 +39,4 @@ describe('Simple Click Test', () => {
     })
   })
 })
+

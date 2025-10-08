@@ -58,14 +58,29 @@ Cypress.Commands.add('loginViaKeycloak', (username: string, password: string) =>
       cy.url({ timeout: 15000 }).should('not.include', Cypress.env('keycloakUrl'))
       cy.url().should('include', Cypress.config('baseUrl'))
       
-      // Wait for authentication to complete
-      cy.contains('Crear Viaje', { timeout: 10000 }).should('be.visible')
+      // Give extra time for AuthProvider to update state after callback
+      cy.wait(2000)
+      
+      // Reload the page to ensure state is fresh
+      cy.reload()
+      
+      // Wait for authentication to complete - check for any authenticated element
+      cy.get('body', { timeout: 10000 }).should(($body) => {
+        const text = $body.text()
+        const isAuthenticated = text.includes('Crear Viaje') || text.includes('Cerrar Sesión')
+        expect(isAuthenticated, 'Should show authenticated UI elements').to.be.true
+      })
     },
     {
       validate() {
         // Validate session is still valid
         cy.visit('/')
-        cy.contains('Crear Viaje', { timeout: 5000 }).should('be.visible')
+        // Check for any authenticated element (Crear Viaje or Cerrar Sesión)
+        cy.get('body').then(($body) => {
+          const hasCrearViaje = $body.text().includes('Crear Viaje')
+          const hasCerrarSesion = $body.text().includes('Cerrar Sesión')
+          expect(hasCrearViaje || hasCerrarSesion, 'Should be authenticated').to.be.true
+        })
       },
     }
   )

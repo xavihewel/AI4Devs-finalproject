@@ -4,6 +4,9 @@
 
 set -e  # Salir si cualquier comando falla
 
+# Obtener directorio del script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 echo "🚀 Configurando entorno de desarrollo completo para Covoituraje Corporativo..."
 echo ""
 
@@ -15,6 +18,10 @@ check_dependencies() {
         echo "❌ Docker no está instalado"
         exit 1
     fi
+    
+    # Verificar y arrancar Docker si es necesario
+    source "${SCRIPT_DIR}/lib/docker-check.sh"
+    check_and_start_docker || exit 1
     
     if ! command -v docker-compose &> /dev/null; then
         echo "❌ Docker Compose no está instalado"

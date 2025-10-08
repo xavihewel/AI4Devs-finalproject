@@ -15,6 +15,7 @@ import com.company.covoituraje.auth.AuthUtils;
 public class AuthFilter implements ContainerRequestFilter {
     private final JwtValidator jwtValidator;
     private final boolean requireEmployeeRole;
+    private final boolean authDisabled;
 
     public AuthFilter() {
         String issuer = System.getenv("OIDC_ISSUER_URI");
@@ -22,18 +23,21 @@ public class AuthFilter implements ContainerRequestFilter {
         this.jwtValidator = new JwtValidator(issuer, jwks);
         String require = System.getenv("REQUIRE_ROLE_EMPLOYEE");
         this.requireEmployeeRole = "true".equalsIgnoreCase(require);
+        this.authDisabled = "true".equalsIgnoreCase(System.getenv("AUTH_DISABLED"));
     }
 
     // Injectable constructor for tests
     public AuthFilter(JwtValidator jwtValidator) {
         this.jwtValidator = jwtValidator;
         this.requireEmployeeRole = false;
+        this.authDisabled = false;
     }
 
     // Injectable constructor for tests with role flag
     public AuthFilter(JwtValidator jwtValidator, boolean requireEmployeeRole) {
         this.jwtValidator = jwtValidator;
         this.requireEmployeeRole = requireEmployeeRole;
+        this.authDisabled = false;
     }
 
     @Override
@@ -47,6 +51,12 @@ public class AuthFilter implements ContainerRequestFilter {
         var uriInfo = requestContext.getUriInfo();
         String path = uriInfo != null ? uriInfo.getPath() : null;
         if (path != null && (path.equals("health") || path.equals("/health") || path.equals("api/health"))) {
+            return;
+        }
+        // Dev/test bypass
+        if (authDisabled) {
+            String devUser = System.getenv().getOrDefault("AUTH_BYPASS_USER_ID", "dev-user");
+            UsersResource.AuthContext.setUserId(devUser);
             return;
         }
         String auth = requestContext.getHeaderString("Authorization");

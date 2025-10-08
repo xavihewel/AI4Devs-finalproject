@@ -2,6 +2,17 @@
 
 # Script para verificar el estado de la infraestructura
 
+# Obtener directorio del script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Verificar Docker (sin intentar arrancarlo, solo informar)
+if ! docker ps &>/dev/null; then
+    echo "❌ Docker no está corriendo"
+    echo "💡 Inicia Docker Desktop e intenta de nuevo"
+    echo "   O ejecuta: ${SCRIPT_DIR}/lib/docker-check.sh"
+    exit 1
+fi
+
 echo "🔍 Verificando estado de la infraestructura..."
 echo ""
 
