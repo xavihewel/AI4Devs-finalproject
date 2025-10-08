@@ -20,7 +20,7 @@ echo "✅ PostgreSQL está listo"
 
 # Esperar a que Keycloak esté listo
 echo "🔐 Esperando Keycloak..."
-until curl -f http://localhost:8080/health/ready 2>/dev/null; do
+until curl -f -s http://localhost:8080/realms/master 2>/dev/null | grep -q "realm"; do
   echo "Keycloak no está listo aún..."
   sleep 5
 done

@@ -196,3 +196,114 @@
   - Keycloak: crear cliente `backend-api` y mapper de audiencia en `covoituraje-frontend`; alinear `OIDC_ISSUER_URI` a localhost.
   - Health OK en 8081–8084; tests de salud pasan; flujos Trips/Matches aún con 401/timeout puntuales.
 - Result: Backend desplegado localmente con rutas unificadas y auth en marcha; pendiente estabilizar `/api/trips` para completar P4.
+
+## 2025-10-08
+
+### DevOps: Automatización Completa y Scripts de Verificación ✅
+- Intent: Mejorar Developer Experience con scripts completos de automatización, verificación y arranque de servicios.
+
+#### Fase 1: Fix Keycloak y Scripts de Verificación
+- Problem: Keycloak no arrancaba correctamente - scripts usaban endpoint `/health/ready` que no existe en Keycloak 24.0.
+- Actions:
+  - Corregir `scripts/dev-infra.sh`: cambiar endpoint de `/health/ready` a `/realms/master`
+  - Corregir `scripts/setup-keycloak.sh`: mismo fix de endpoint
+  - Actualizar `doc/setup/local.md`: documentar endpoint correcto
+  - Crear `scripts/verify-infra.sh`: verificación rápida de infraestructura (PostgreSQL, Keycloak, Redis, Mailhog)
+  - Crear `scripts/verify-all.sh`: verificación completa del sistema (infra + microservicios + frontend)
+- Decisions:
+  - Verificación en capas: `verify-infra.sh` para check rápido, `verify-all.sh` para diagnóstico completo
+  - Estados visuales claros: ✅ OK, ⚠️ Arrancando, ⏸️ No iniciado, ❌ Error
+  - Organización por secciones: Infraestructura, Microservicios, Frontend
+- Result: ✅ Keycloak arranca correctamente, sistema de verificación operativo
+
+#### Fase 2: Scripts de Frontend y Arranque
+- Problem: Frontend no arrancaba automáticamente, no había scripts dedicados para frontend.
+- Actions:
+  - Crear `scripts/start-frontend.sh`: Frontend en Docker + Nginx (puerto 3000)
+    - Verifica infraestructura antes de arrancar
+    - Detecta microservicios activos
+    - Ofrece interactivamente levantar microservicios si no están corriendo
+    - Espera y verifica que frontend arranca correctamente
+  - Crear `scripts/start-frontend-dev.sh`: Frontend local con Vite (puerto 5173)
+    - Verifica Node.js instalado
+    - Instala dependencias npm si es necesario
+    - Crea `.env.local` automáticamente
+    - Hot reload para desarrollo rápido
+  - Crear `scripts/start-all-services.sh`: Sistema completo
+    - Levanta infraestructura si no está corriendo
+    - Levanta todos los microservicios (trips, users, booking, matching)
+    - Levanta frontend
+    - Ejecuta verificación completa
+    - Muestra URLs y credenciales al final
+- Decisions:
+  - Dual mode frontend: Docker (producción-like) vs Local (desarrollo con hot reload)
+  - Scripts interactivos con confirmaciones para mejor UX
+  - Validaciones previas de dependencias y estado del sistema
+  - Mensajes claros y visuales con emojis para mejor legibilidad
+- Result: ✅ 3 nuevos scripts de frontend operativos, sistema arrancable con un solo comando
+
+#### Fase 3: Documentación
+- Actions:
+  - Actualizar `QUICK-START.md`:
+    - Documentar todos los scripts nuevos
+    - Añadir sección "Trabajar con el Frontend" con 3 opciones
+    - Comparativa de ventajas/desventajas de cada modo
+    - Tabla comparativa de scripts de verificación
+  - Crear `doc/setup/frontend-setup.md`: Guía completa de frontend
+    - Descripción detallada de cada script
+    - 4 flujos de trabajo: primera vez, desarrollo diario, testing, demos
+    - Configuración y variables de entorno
+    - Troubleshooting específico para cada modo
+    - Comandos útiles y tips
+  - Crear `doc/setup/verificacion-sistema.md`: Guía del sistema de verificación
+    - Explicación de cada script de verificación
+    - Estados de servicios y qué hacer en cada caso
+    - Flujos de trabajo típicos (inicio del día, debug, demos)
+    - Tips con alias útiles, watch mode, logs
+    - Troubleshooting completo
+- Result: ✅ Documentación completa y clara para desarrolladores
+
+### Resumen de Scripts Creados (Total: 9)
+**Setup e Infraestructura:**
+- `dev-infra.sh` - Levanta solo infraestructura base (actualizado con fix Keycloak)
+- `setup-dev.sh` - Setup completo inicial (actualizado)
+- `setup-keycloak.sh` - Configura Keycloak (actualizado con fix)
+- `migrate.sh` - Ejecuta migraciones de BD
+
+**Verificación:**
+- `verify-infra.sh` - Verifica infraestructura (NUEVO)
+- `verify-all.sh` - Verifica sistema completo (NUEVO)
+
+**Frontend:**
+- `start-frontend.sh` - Frontend en Docker (NUEVO)
+- `start-frontend-dev.sh` - Frontend local con hot reload (NUEVO)
+- `start-all-services.sh` - Levanta todo el sistema (NUEVO)
+
+### Patrones Establecidos:
+- **Verificación en capas**: Infraestructura base vs sistema completo
+- **Frontend dual mode**: Docker para producción-like, local para desarrollo
+- **Scripts interactivos**: Confirmaciones y validaciones para mejor UX
+- **Mensajes visuales**: Emojis y estados claros (✅ ⚠️ ⏸️ ❌)
+- **Documentación exhaustiva**: Guías para cada flujo de trabajo
+- **Developer Experience first**: Optimizado para desarrollo diario vs demos vs primera vez
+
+### Archivos Modificados/Creados:
+**Scripts (9 total):**
+- Modificados: `dev-infra.sh`, `setup-keycloak.sh`
+- Nuevos: `verify-infra.sh`, `verify-all.sh`, `start-frontend.sh`, `start-frontend-dev.sh`, `start-all-services.sh`
+
+**Documentación:**
+- Modificados: `QUICK-START.md`, `doc/setup/local.md`
+- Nuevos: `doc/setup/frontend-setup.md`, `doc/setup/verificacion-sistema.md`
+
+**Memory Bank:**
+- Actualizados: `activeContext.md`, `progress.md`, `systemPatterns.md`, `prompts_xvb.md`
+
+### Impact:
+- ✅ Developer Experience dramaticamente mejorado
+- ✅ Sistema completamente arrancable con un comando
+- ✅ Verificación automática del estado del sistema
+- ✅ Frontend con hot reload para desarrollo rápido
+- ✅ Documentación clara y completa
+- ✅ Scripts interactivos y amigables
+- ✅ Reducción significativa de tiempo de setup y troubleshooting

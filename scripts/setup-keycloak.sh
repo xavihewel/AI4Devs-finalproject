@@ -5,7 +5,7 @@
 echo "🔐 Configurando Keycloak..."
 
 # Verificar que Keycloak esté ejecutándose
-if ! curl -f http://localhost:8080/health/ready > /dev/null 2>&1; then
+if ! curl -f -s http://localhost:8080/realms/master > /dev/null 2>&1; then
     echo "❌ Keycloak no está ejecutándose. Ejecuta primero: ./scripts/dev-infra.sh"
     exit 1
 fi

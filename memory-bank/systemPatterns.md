@@ -33,13 +33,19 @@
 - **Business methods en entidades**: Lógica de negocio encapsulada en entidades JPA (reserveSeats, accept, confirm, etc.).
 - **Jakarta Bean Validation**: Validación de entrada en REST APIs.
 - **Docker-compose con profiles**: Infraestructura base siempre activa, microservicios opcionales para desarrollo.
-- **Scripts de automatización**: Setup completo, migraciones, configuración de Keycloak automatizados.
+- **Scripts de automatización completos**:
+  - Setup: `setup-dev.sh` (completo), `dev-infra.sh` (solo infra), `setup-keycloak.sh`, `migrate.sh`
+  - Verificación: `verify-infra.sh` (rápido), `verify-all.sh` (completo con frontend)
+  - Frontend: `start-frontend.sh` (Docker), `start-frontend-dev.sh` (local hot reload), `start-all-services.sh` (todo)
+  - Scripts interactivos con validaciones y mensajes claros
 - **Integraciones entre servicios**: ServiceHttpClient para comunicación HTTP con manejo de errores y timeouts.
 - **DTOs compartidos**: Tipos estandarizados para comunicación entre microservicios.
 - **Health checks**: Endpoints /health para monitoreo de disponibilidad de servicios.
+- **Verificación en capas**: Infraestructura base (verify-infra) vs sistema completo (verify-all).
 - Redis para caché; Elastic/OpenSearch opcional; Keycloak como IdP en dev.
 - Observabilidad: logs estructurados, tracing OTEL, métricas clave.
 - **Frontend moderno**: React 19 + TypeScript + Vite + Tailwind CSS para UI consistente.
+- **Frontend dual mode**: Docker + Nginx (producción-like) vs Local + Vite (desarrollo con hot reload).
 - **Componentes reutilizables**: Biblioteca de UI con Button, Card, Input, LoadingSpinner.
 - **Servicios API**: Clases dedicadas para cada microservicio con tipos estrictos.
 - **Layout responsive**: Navbar con autenticación, Layout consistente en todas las páginas.

@@ -165,8 +165,8 @@ docker-compose logs db
 
 ### Keycloak no responde
 ```bash
-# Verificar health check
-curl http://localhost:8080/health/ready
+# Verificar que Keycloak responde
+curl http://localhost:8080/realms/master
 
 # Reiniciar Keycloak
 docker-compose restart keycloak
