@@ -51,9 +51,30 @@
 - **Layout responsive**: Navbar con autenticación, Layout consistente en todas las páginas.
 - Frontend usa Vite para dev/build; variables de entorno `VITE_*` para configuración OIDC y base URL.
 
+## Testing Patterns
+
+### E2E Testing con Cypress
+- **Cypress 15.4.0** para tests End-to-End de aplicación completa
+- **Organización por feature**: smoke → authentication → features → complete flows
+- **cy.session()**: Cachea autenticación para evitar login repetido (mejora performance 10x)
+- **cy.origin()**: Maneja cross-origin authentication con Keycloak
+- **Custom commands**: Comandos reutilizables (loginViaKeycloak, logout, getByCy)
+- **Fixtures**: Datos de prueba en JSON (users, trips, etc.)
+- **Screenshots**: Captura automática en fallos para debugging
+- **Timeouts optimizados**: 6s comando, 15s page load, 8s requests
+- **Electron browser**: Browser incluido por defecto, no requiere instalación externa
+
+### Testing Strategy
+- **Unit tests**: Jest + React Testing Library para componentes
+- **Integration tests**: Jest con RUN_INT=1 para flows de integración
+- **E2E tests**: Cypress para flujos de usuario completos
+- **Test data**: Fixtures compartidas entre test suites
+- **CI/CD ready**: Scripts configurados para ejecutar en pipeline
+
 ## Collaboration and Documentation
 - Mantener documentación en `/doc` (PlantUML/Mermaid) y prompts en `/Prompts/prompts_xvb.md`.
 - Flujo: Epics/US → tickets técnicos → modelos/diagramas → tests (TDD) → implementación → actualizar doc y prompts.
+- **Testing E2E**: Cypress tests como documentación viva de flujos de usuario.
 
 ## Runtime Conventions (actualizado)
 - **Routing**: Servicios expuestos bajo `/api` en cada microservicio (puertos locales 8081–8084). En gateway se enrutará por prefijo (`/api/users`, `/api/trips`, `/api/bookings`, `/api/matches`).

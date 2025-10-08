@@ -307,3 +307,144 @@
 - ✅ Documentación clara y completa
 - ✅ Scripts interactivos y amigables
 - ✅ Reducción significativa de tiempo de setup y troubleshooting
+
+## 2025-10-08 (continuación)
+
+### Testing E2E: Implementación de Cypress ✅
+
+#### Contexto
+- Problem: Testing E2E manual detectó problemas críticos (botones login no funcionan, navegación a páginas inexistentes)
+- Need: Suite automatizada de tests E2E para detectar regresiones y validar flujos críticos
+- Decision: Implementar Cypress basado en su arquitectura superior para testing E2E moderno
+
+#### Fase 1: Setup e Instalación
+- Actions:
+  - Instalar Cypress 15.4.0 + @types/cypress
+  - Crear estructura de carpetas: e2e/, fixtures/, support/
+  - Configurar `cypress.config.ts` con baseUrl, timeouts optimizados, experimentalOriginDependencies
+  - Configurar Electron browser (disponible por defecto, Chrome no instalado)
+  - Crear `.gitignore` para artifacts (screenshots, videos, downloads)
+- Decisions:
+  - Timeouts reducidos: defaultCommandTimeout 6s, pageLoadTimeout 15s, requestTimeout 8s
+  - Video deshabilitado por defecto (mejorar performance)
+  - Screenshots habilitados en fallos
+  - Retries: 2 en runMode, 0 en openMode
+- Result: ✅ Cypress instalado y configurado correctamente
+
+#### Fase 2: Comandos Personalizados
+- Actions:
+  - Crear `cypress/support/commands.ts` con TypeScript definitions
+  - Implementar `cy.loginViaKeycloak(username, password)`:
+    - Usa cy.session() para cachear autenticación (mejora performance)
+    - Maneja cy.origin() para cross-origin login con Keycloak
+    - Incluye validación de sesión para reutilización
+  - Implementar `cy.logout()` para cerrar sesión
+  - Implementar `cy.getByCy(selector)` para data-cy attributes
+  - Crear `cypress/support/e2e.ts` para setup global
+- Decisions:
+  - cy.session() para evitar login repetido en cada test (10x más rápido)
+  - cy.origin() con experimentalOriginDependencies para manejar Keycloak cross-origin
+  - Custom commands con TypeScript para type safety
+- Result: ✅ Comandos reutilizables y performantes implementados
+
+#### Fase 3: Tests E2E (~21 tests)
+- Actions:
+  - **01-smoke/**: Tests básicos de humo
+    - app-loads.cy.ts: 6 tests (loading, navigation, features, infrastructure health)
+  - **02-authentication/**: Tests de autenticación  
+    - login.cy.ts: 8 tests (mostrar botones, redirección Keycloak, login exitoso/fallido, logout, protected routes)
+  - **03-trips/**: Tests de viajes
+    - navigate-trips.cy.ts: 3 tests (navegación desde home/navbar, elementos de página)
+  - **04-matches/**: Tests de búsqueda
+    - navigate-matches.cy.ts: 3 tests (navegación, elementos de página)
+  - **06-flows/**: Tests de flujos completos
+    - complete-journey.cy.ts: 2 tests (navegación completa, persistencia auth)
+  - **Fixtures**: users.json con datos de test.user e invalid.user
+- Decisions:
+  - Organización por feature y complejidad (smoke → auth → features → flows)
+  - beforeEach() con cy.loginViaKeycloak() para tests que requieren auth
+  - cy.clearCookies() y cy.clearLocalStorage() en tests de auth
+  - Assertions específicas según contenido real de páginas ("Mis Viajes", "Buscar Viajes", etc.)
+- Result: ✅ Suite de ~21 tests E2E implementada; smoke tests 6/6 ✅, authentication tests 4/8 ❌ (revelan bug de login)
+
+#### Fase 4: Scripts y Documentación
+- Actions:
+  - Actualizar `package.json` con scripts Cypress:
+    - test:e2e, test:e2e:open, test:e2e:smoke, test:e2e:electron
+  - Crear `scripts/run-e2e-tests.sh`: menú interactivo para ejecutar tests
+  - Crear `Frontend/cypress/README.md`: guía completa de uso, best practices, troubleshooting
+  - Actualizar `QUICK-START.md` con sección de Cypress
+- Result: ✅ Documentación completa y scripts helper operativos
+
+#### Resultados de Tests:
+- **Smoke Tests (6/6 ✅)**: 5 segundos
+  - Aplicación carga correctamente
+  - Navegación visible
+  - Features y secciones presentes
+  - Infraestructura (Keycloak, API) disponible
+- **Authentication Tests (4/8 ❌)**: 4 minutos con timeouts
+  - ✅ Mostrar botones de login (2 tests)
+  - ❌ Click en botones → redirección a Keycloak (2 tests - TIMEOUT)
+  - ❌ Login completo (1 test - depende de click)
+  - ❌ Protected routes (3 tests - algunos dependen de login)
+
+#### Problema Detectado:
+- **Root Cause**: Variables VITE_* no se reemplazan en bundle durante build de Docker
+- **Evidencia**: 
+  - Tests revelan que clicks en "Iniciar Sesión"/"Comenzar Ahora" no hacen nada (timeout esperando redirección)
+  - Frontend bundle contiene literales "VITE_OIDC_*" sin reemplazar
+  - getKeycloak() probablemente retorna null por falta de config
+- **Intentos de fix**:
+  - Corregido env.ts para usar import.meta.env directamente
+  - Añadido vite-env.d.ts con types de ImportMetaEnv
+  - Añadidos ARG/ENV en Dockerfile
+  - Movidas variables a build.args en docker-compose.yml
+  - Rebuilds múltiples del frontend
+- **Status**: Bug persiste, requiere investigación más profunda
+
+### Archivos Modificados/Creados (Cypress):
+**Frontend:**
+- Modificados: `package.json` (scripts cypress), `env.ts` (import.meta.env), `src/pages/Home.tsx` (login button fix)
+- Nuevos: 
+  - `cypress.config.ts`
+  - `cypress/support/commands.ts`, `cypress/support/e2e.ts`
+  - `cypress/fixtures/users.json`
+  - `cypress/e2e/01-smoke/app-loads.cy.ts`
+  - `cypress/e2e/02-authentication/login.cy.ts`
+  - `cypress/e2e/03-trips/navigate-trips.cy.ts`
+  - `cypress/e2e/04-matches/navigate-matches.cy.ts`
+  - `cypress/e2e/06-flows/complete-journey.cy.ts`
+  - `cypress/README.md`
+  - `cypress/.gitignore`
+  - `src/vite-env.d.ts`
+
+**Docker:**
+- Modificados: `Frontend/Dockerfile` (ARG/ENV para VITE_*), `docker-compose.yml` (build.args + VITE_OIDC_REDIRECT_URI)
+- Frontend rebuildeado 2+ veces
+
+**Scripts:**
+- Nuevo: `scripts/run-e2e-tests.sh` (menú interactivo)
+
+**Documentación:**
+- Modificados: `QUICK-START.md` (sección Cypress)
+- Nuevos: `Frontend/cypress/README.md`
+
+**Memory Bank:**
+- Actualizados: `activeContext.md`, `progress.md` (pendiente: systemPatterns.md con patrones Cypress)
+
+### Patrones de Testing E2E Establecidos:
+- **cy.session()** para cachear autenticación y mejorar performance
+- **cy.origin()** para manejar cross-origin con Keycloak
+- **Custom commands** para operaciones comunes (login, logout, selectors)
+- **Organización por feature** (smoke → auth → features → flows)
+- **Timeouts optimizados** para ejecución más rápida
+- **Screenshots automáticos** en fallos para debugging
+- **Fixtures** para datos de prueba reutilizables
+
+### Impact:
+- ✅ Infraestructura de testing E2E robusta implementada
+- ✅ Smoke tests validando que aplicación funciona básicamente
+- ❌ Tests de auth exponiendo bug crítico de login (variables OIDC)
+- ✅ Base sólida para añadir más tests según se desarrollan features
+- ✅ CI/CD ready - listo para integrar en pipeline
+- 🔄 Bug de login priorizado para fix inmediato

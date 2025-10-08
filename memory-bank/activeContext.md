@@ -1,23 +1,27 @@
 # Active Context
 
 ## Current Focus
-- **DevOps & Scripts**: Sistema completo de scripts de automatización implementado. Infraestructura, verificación y arranque de servicios completamente automatizados.
-- **Backend**: Migrado a WAR + Payara Micro (JDK17) en `trips`, `users`, `booking`, `matching`; todos con `@ApplicationPath("/api")` y `HealthResource`. `persistence.xml` en `RESOURCE_LOCAL`; `hbm2ddl=update` en `trips/booking/matching`.
-- **Infra local**: `docker-compose.yml` con PostgreSQL (5434), Keycloak (8080), Mailhog (8025), microservicios: trips 8081, users 8082, booking 8083, matching 8084. `OIDC_ISSUER_URI` alineado a `http://localhost:8080/realms/covoituraje`.
-- **Auth**: Filtro permite `/api/health` sin token en todos. JWT validado contra JWKS de Keycloak; `aud` incluye `backend-api` mediante mapper.
-- **Frontend**: Dual mode disponible - Docker (producción-like) y local dev (Vite hot reload). Scripts de arranque automatizados para ambos modos.
+- **Testing E2E con Cypress**: Suite de tests E2E implementada. Smoke tests funcionando, tests de autenticación revelando bug crítico en login.
+- **Frontend OIDC Bug**: Botones de login no funcionan - variables VITE_* no se reemplazan correctamente en build. Investigando solución.
+- **DevOps & Scripts**: Sistema completo de scripts de automatización implementado (10 scripts totales incluyendo run-e2e-tests.sh).
+- **Backend**: Migrado a WAR + Payara Micro (JDK17) en `trips`, `users`, `booking`, `matching`; todos con `@ApplicationPath("/api")` y `HealthResource`.
+- **Infra local**: `docker-compose.yml` con PostgreSQL (5434), Keycloak (8080), Mailhog (8025), microservicios operativos.
 
 ## Recent Changes
-- **Scripts de verificación**: Creados `verify-infra.sh` (infraestructura) y `verify-all.sh` (sistema completo con microservicios y frontend).
-- **Scripts de frontend**: Creados `start-frontend.sh` (Docker), `start-frontend-dev.sh` (local con hot reload), `start-all-services.sh` (sistema completo).
-- **Fix Keycloak**: Corregido endpoint de verificación de `/health/ready` (no existe) a `/realms/master` en `dev-infra.sh` y `setup-keycloak.sh`.
-- **Documentación**: Actualizado `QUICK-START.md` con comparativas de scripts; creado `doc/setup/frontend-setup.md` y `doc/setup/verificacion-sistema.md`.
-- **Developer Experience**: Flujos de trabajo optimizados para desarrollo diario vs demos vs primera vez.
+- **Cypress E2E Setup**: Cypress 15.4.0 instalado con ~21 tests E2E organizados en suites (smoke, authentication, navigation, flows).
+- **Custom Commands**: `cy.loginViaKeycloak()`, `cy.logout()`, `cy.getByCy()` con cy.session() para performance.
+- **Tests Results**: Smoke tests (6/6 ✅), Authentication tests (4/8 ❌ por bug de login).
+- **Frontend env.ts**: Corregido para usar `import.meta.env.VITE_*` directamente en lugar de eval trick.
+- **Frontend Dockerfile**: Añadidos ARG/ENV para variables VITE_* en build time.
+- **docker-compose.yml**: Variables OIDC movidas a `build.args` y añadida `VITE_OIDC_REDIRECT_URI`.
+- **Scripts actualizados**: NPM scripts para Cypress (test:e2e, test:e2e:smoke, etc.) usando Electron browser.
+- **Documentación Cypress**: README completo en `Frontend/cypress/README.md` con guías y best practices.
 
 ## Next Steps (immediate)
-- **Testing end-to-end**: Validar flujos completos con todos los servicios levantados usando `start-all-services.sh`.
-- **Frontend development**: Usar `start-frontend-dev.sh` para desarrollo con hot reload.
-- **Monitoring**: Considerar agregar health checks más sofisticados y dashboard de estado.
+- **FIX CRÍTICO**: Resolver por qué variables VITE_* no se están inyectando correctamente en el bundle del frontend.
+- **Debugging**: Verificar bundle compilado para confirmar si variables están o no reemplazadas.
+- **Rebuild frontend**: Con configuración correcta de variables de entorno.
+- **Re-run tests**: Después del fix, ejecutar suite completa de Cypress para validar.
 
 ## Decisions & Considerations
 - **Ruta base común**: `/api` para todos; enrutamiento por path para distinguir servicios.

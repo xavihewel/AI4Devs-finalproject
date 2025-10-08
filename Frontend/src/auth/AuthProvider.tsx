@@ -50,9 +50,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
+    // Determine initialization strategy based on current path
+    // If we're on /callback, we need to process the authorization code
+    const isCallback = window.location.pathname === '/callback';
+    const hasAuthCode = window.location.search.includes('code=');
+    
     keycloak
       .init({
-        onLoad: 'check-sso',
+        // Use 'login-required' when on callback to process the authorization code
+        // Use 'check-sso' otherwise to check for existing session
+        onLoad: isCallback && hasAuthCode ? 'login-required' : 'check-sso',
         pkceMethod: 'S256',
         checkLoginIframe: false,
         silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
