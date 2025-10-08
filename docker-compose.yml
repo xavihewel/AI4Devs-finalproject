@@ -64,6 +64,7 @@ services:
       - REQUIRE_ROLE_EMPLOYEE=false
       - AUTH_DISABLED=true
       - AUTH_BYPASS_USER_ID=user-001
+      - ALLOWED_ORIGINS=http://localhost:5173
     ports:
       - "8081:8080"
     depends_on:
@@ -86,6 +87,7 @@ services:
       - REQUIRE_ROLE_EMPLOYEE=false
       - AUTH_DISABLED=true
       - AUTH_BYPASS_USER_ID=user-001
+      - ALLOWED_ORIGINS=http://localhost:5173
     ports:
       - "8082:8080"
     depends_on:
@@ -110,6 +112,7 @@ services:
       - AUTH_BYPASS_USER_ID=00000000-0000-0000-0000-000000000001
       - TRIPS_SERVICE_URL=http://trips-service:8080
       - USERS_SERVICE_URL=http://users-service:8080
+      - ALLOWED_ORIGINS=http://localhost:5173
     ports:
       - "8083:8080"
     depends_on:
@@ -137,6 +140,7 @@ services:
       - AUTH_DISABLED=true
       - AUTH_BYPASS_USER_ID=00000000-0000-0000-0000-000000000001
       - TRIPS_SERVICE_URL=http://trips-service:8080
+      - ALLOWED_ORIGINS=http://localhost:5173
     ports:
       - "8084:8080"
     depends_on:

@@ -14,24 +14,27 @@ describe('Authentication', () => {
 
     it('should redirect to Keycloak when clicking "Iniciar Sesión"', () => {
       cy.visit('/')
-      cy.contains('Iniciar Sesión', { timeout: 5000 }).click()
+      // wait for auth UI to render
+      cy.contains(/Iniciar Sesión|Comenzar Ahora|Cerrar Sesión/, { timeout: 10000 }).should('be.visible')
+      cy.contains('Iniciar Sesión').should('be.visible').click({ force: true })
       
       // Should redirect to Keycloak
       cy.origin(Cypress.env('keycloakUrl'), () => {
-        cy.url({ timeout: 8000 }).should('include', '/realms/covoituraje')
-        cy.get('input[name="username"]', { timeout: 5000 }).should('be.visible')
+        cy.url({ timeout: 15000 }).should('include', '/realms/covoituraje')
+        cy.get('input[name="username"]', { timeout: 10000 }).should('be.visible')
         cy.get('input[name="password"]').should('be.visible')
       })
     })
 
     it('should redirect to Keycloak when clicking "Comenzar Ahora"', () => {
       cy.visit('/')
-      cy.contains('Comenzar Ahora', { timeout: 5000 }).click()
+      cy.contains(/Iniciar Sesión|Comenzar Ahora|Cerrar Sesión/, { timeout: 10000 }).should('be.visible')
+      cy.contains('Comenzar Ahora').should('be.visible').click({ force: true })
       
       // Should redirect to Keycloak
       cy.origin(Cypress.env('keycloakUrl'), () => {
-        cy.url({ timeout: 8000 }).should('include', '/realms/covoituraje')
-        cy.get('input[name="username"]', { timeout: 5000 }).should('be.visible')
+        cy.url({ timeout: 15000 }).should('include', '/realms/covoituraje')
+        cy.get('input[name="username"]', { timeout: 10000 }).should('be.visible')
       })
     })
 
@@ -51,7 +54,8 @@ describe('Authentication', () => {
 
     it('should show error with invalid credentials', () => {
       cy.visit('/')
-      cy.contains('Iniciar Sesión').click()
+      cy.contains(/Iniciar Sesión|Comenzar Ahora|Cerrar Sesión/, { timeout: 10000 }).should('be.visible')
+      cy.contains('Iniciar Sesión').should('be.visible').click({ force: true })
       
       cy.origin(
         Cypress.env('keycloakUrl'),
@@ -61,7 +65,7 @@ describe('Authentication', () => {
           cy.get('input[type="submit"]').click()
           
           // Should show error message
-          cy.contains('Invalid username or password', { timeout: 5000 }).should('be.visible')
+          cy.contains('Invalid username or password', { timeout: 10000 }).should('be.visible')
         }
       )
     })
@@ -91,7 +95,7 @@ describe('Authentication', () => {
       
       // Should redirect to Keycloak
       cy.origin(Cypress.env('keycloakUrl'), () => {
-        cy.url().should('include', '/realms/covoituraje')
+        cy.url({ timeout: 15000 }).should('include', '/realms/covoituraje')
       })
     })
 

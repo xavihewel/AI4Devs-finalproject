@@ -66,7 +66,10 @@ if [ ! -f ".env.local" ]; then
     echo "⚙️  Creando .env.local..."
     cat > .env.local << 'EOF'
 # Configuración local para desarrollo
-VITE_API_BASE_URL=http://localhost:8081
+VITE_USERS_API_BASE_URL=http://localhost:8082/api
+VITE_TRIPS_API_BASE_URL=http://localhost:8081/api
+VITE_BOOKING_API_BASE_URL=http://localhost:8083/api
+VITE_MATCHING_API_BASE_URL=http://localhost:8084/api
 VITE_OIDC_ISSUER=http://localhost:8080/realms/covoituraje
 VITE_OIDC_CLIENT_ID=covoituraje-frontend
 EOF

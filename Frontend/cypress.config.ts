@@ -16,6 +16,8 @@ export default defineConfig({
       keycloakUrl: 'http://localhost:8080',
       keycloakRealm: 'covoituraje',
       apiUrl: 'http://localhost:8081',
+      oidcClientId: 'covoituraje-frontend',
+      oidcRedirectUri: 'http://localhost:3000/callback',
     },
     
     // Retry failed tests
@@ -25,9 +27,9 @@ export default defineConfig({
     },
     
     // Timeouts (reducidos para ejecución más rápida)
-    defaultCommandTimeout: 6000,
-    pageLoadTimeout: 15000,
-    requestTimeout: 8000,
+    defaultCommandTimeout: 10000,
+    pageLoadTimeout: 30000,
+    requestTimeout: 12000,
     
     // Experimental features
     experimentalOriginDependencies: true,

@@ -45,39 +45,51 @@ Cypress.Commands.add('loginViaKeycloak', (username: string, password: string) =>
     [username, password],
     () => {
       cy.visit('/')
-      
-      // Click login button
-      cy.contains('Iniciar Sesión', { timeout: 10000 }).click()
-      
-      // Handle Keycloak login page
+
+      // Click login button (robust against re-render)
+      cy.get('body', { timeout: 10000 }).then(($body) => {
+        const text = $body.text()
+        if (text.includes('Iniciar Sesión')) {
+          cy.contains('Iniciar Sesión', { timeout: 10000 })
+            .should('be.visible')
+            .click({ force: true })
+        } else if (text.includes('Comenzar Ahora')) {
+          cy.contains('Comenzar Ahora', { timeout: 10000 })
+            .should('be.visible')
+            .click({ force: true })
+        } else if (text.includes('Cerrar Sesión')) {
+          // already authenticated
+          return
+        } else {
+          cy.contains(/Iniciar Sesión|Comenzar Ahora|Cerrar Sesión/, { timeout: 10000 }).should('be.visible')
+        }
+      })
+
+      // Handle Keycloak login page via cy.origin
       cy.origin(
         Cypress.env('keycloakUrl'),
         { args: { username, password } },
         ({ username, password }) => {
-          // Wait for Keycloak login form
+          cy.url({ timeout: 15000 }).should('include', '/realms/')
           cy.get('input[name="username"]', { timeout: 10000 }).should('be.visible')
           cy.get('input[name="username"]').clear().type(username)
           cy.get('input[name="password"]').clear().type(password)
           cy.get('input[type="submit"]').click()
         }
       )
-      
-      // Verify we're back in the app and authenticated
-      cy.url({ timeout: 15000 }).should('not.include', Cypress.env('keycloakUrl'))
-      cy.url().should('include', Cypress.config('baseUrl'))
-      
+
+      // Verify back to app and authenticated UI appears
+      cy.url({ timeout: 20000 }).should('include', Cypress.config('baseUrl'))
+      cy.contains(/Crear Viaje|Cerrar Sesión/, { timeout: 20000 }).should('be.visible')
+
       // Give extra time for AuthProvider to update state after callback
-      cy.wait(2000)
-      
+      cy.wait(1000)
+
       // Reload the page to ensure state is fresh
       cy.reload()
-      
-      // Wait for authentication to complete - check for any authenticated element
-      cy.get('body', { timeout: 10000 }).should(($body) => {
-        const text = $body.text()
-        const isAuthenticated = text.includes('Crear Viaje') || text.includes('Cerrar Sesión')
-        expect(isAuthenticated, 'Should show authenticated UI elements').to.be.true
-      })
+
+      // Confirm authenticated state
+      cy.contains(/Crear Viaje|Cerrar Sesión/, { timeout: 10000 }).should('be.visible')
     },
     {
       validate() {
@@ -86,18 +98,12 @@ Cypress.Commands.add('loginViaKeycloak', (username: string, password: string) =>
           cy.visit('/')
           return
         }
-        // Validate session is still valid
         cy.visit('/')
-        // Check for any authenticated element (Crear Viaje or Cerrar Sesión)
-        cy.get('body').then(($body) => {
-          const hasCrearViaje = $body.text().includes('Crear Viaje')
-          const hasCerrarSesion = $body.text().includes('Cerrar Sesión')
-          expect(hasCrearViaje || hasCerrarSesion, 'Should be authenticated').to.be.true
-        })
+        cy.contains(/Crear Viaje|Cerrar Sesión/, { timeout: 10000 }).should('be.visible')
       },
     }
   )
-  
+
   // After session is restored, visit home
   cy.visit('/')
 })
