@@ -24,7 +24,7 @@ export default function Trips() {
   const loadTrips = async () => {
     try {
       setLoading(true);
-      const data = await TripsService.getMyTrips();
+      const data = await TripsService.getAllTrips();
       setTrips(data);
     } catch (error) {
       console.error('Error loading trips:', error);
@@ -37,7 +37,11 @@ export default function Trips() {
     e.preventDefault();
     try {
       setCreating(true);
-      await TripsService.createTrip(formData);
+      const payload: TripCreateDto = {
+        ...formData,
+        dateTime: new Date(formData.dateTime).toISOString(),
+      };
+      await TripsService.createTrip(payload);
       setShowCreateForm(false);
       setFormData({
         origin: { lat: 0, lng: 0 },

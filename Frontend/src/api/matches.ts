@@ -1,4 +1,6 @@
-import { api } from './client';
+import axios from 'axios';
+import { getKeycloak } from '../auth/keycloak';
+import { env } from '../env';
 import type { MatchDto } from '../types/api';
 
 export interface MatchSearchParams {
@@ -6,6 +8,24 @@ export interface MatchSearchParams {
   time?: string;
   origin?: string;
 }
+
+const matchesApi = axios.create({
+  baseURL: env.matchingApiBaseUrl,
+});
+
+matchesApi.interceptors.request.use(async (config) => {
+  const keycloak = getKeycloak();
+  if (keycloak) {
+    try {
+      await keycloak.updateToken(5);
+    } catch (_) {}
+    const token = keycloak.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
 
 export class MatchesService {
   /**
@@ -24,7 +44,7 @@ export class MatchesService {
       searchParams.append('origin', params.origin);
     }
 
-    const response = await api.get<MatchDto[]>(`/matches?${searchParams.toString()}`);
+    const response = await matchesApi.get<MatchDto[]>(`/matches?${searchParams.toString()}`);
     return response.data;
   }
 
@@ -32,7 +52,7 @@ export class MatchesService {
    * Get matches for the current user
    */
   static async getMyMatches(): Promise<MatchDto[]> {
-    const response = await api.get<MatchDto[]>('/matches/my-matches');
+    const response = await matchesApi.get<MatchDto[]>('/matches/my-matches');
     return response.data;
   }
 
@@ -40,7 +60,7 @@ export class MatchesService {
    * Get a specific match by ID
    */
   static async getMatchById(id: string): Promise<MatchDto> {
-    const response = await api.get<MatchDto>(`/matches/${id}`);
+    const response = await matchesApi.get<MatchDto>(`/matches/${id}`);
     return response.data;
   }
 }

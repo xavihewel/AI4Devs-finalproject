@@ -33,6 +33,14 @@ declare global {
  * This caches the authentication state
  */
 Cypress.Commands.add('loginViaKeycloak', (username: string, password: string) => {
+  const isBypass = Cypress.env('authDisabled') === true || Cypress.env('authDisabled') === 'true'
+  if (isBypass) {
+    // In bypass mode, there is no real Keycloak session; just ensure app is loaded
+    cy.visit('/')
+    cy.wait(500)
+    return
+  }
+
   cy.session(
     [username, password],
     () => {
@@ -73,6 +81,11 @@ Cypress.Commands.add('loginViaKeycloak', (username: string, password: string) =>
     },
     {
       validate() {
+        const isBypassValidate = Cypress.env('authDisabled') === true || Cypress.env('authDisabled') === 'true'
+        if (isBypassValidate) {
+          cy.visit('/')
+          return
+        }
         // Validate session is still valid
         cy.visit('/')
         // Check for any authenticated element (Crear Viaje or Cerrar Sesión)

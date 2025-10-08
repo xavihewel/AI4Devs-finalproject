@@ -32,6 +32,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     initStartedRef.current = true;
 
+    // Bypass auth: treat as authenticated for UI/tests when enabled
+    if (env.authDisabled) {
+      setInitialized(true);
+      setAuthenticated(true);
+      setToken(undefined);
+      return;
+    }
+
     let refreshHandle: number | undefined;
     const keycloak = getKeycloak();
     if (!keycloak) {
@@ -99,6 +107,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       },
       logout: () => {
+        if (env.authDisabled) {
+          setAuthenticated(false);
+          setToken(undefined);
+          return;
+        }
         const kc = getKeycloak();
         if (kc) kc.logout({ redirectUri: window.location.origin });
       },

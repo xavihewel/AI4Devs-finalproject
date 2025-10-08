@@ -16,7 +16,9 @@
     "test:e2e": "cypress run --browser electron --headless",
     "test:e2e:open": "cypress open",
     "test:e2e:electron": "cypress run --browser electron --headless",
-    "test:e2e:smoke": "cypress run --spec 'cypress/e2e/01-smoke/**/*' --browser electron --headless"
+    "test:e2e:smoke": "cypress run --spec 'cypress/e2e/01-smoke/**/*' --browser electron --headless",
+    "test:e2e:bypass": "CYPRESS_authDisabled=true cypress run --spec 'cypress/e2e/01-smoke/**/*' --browser electron --headless",
+    "test:e2e:bypass:all": "CYPRESS_authDisabled=true cypress run --browser electron --headless --spec 'cypress/e2e/{01-smoke,03-trips,04-matches,05-bookings,06-flows}/**/*'"
   },
   "keywords": [],
   "author": "",

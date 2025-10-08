@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { getKeycloak } from '../auth/keycloak';
+import { env } from '../env';
 import type { UserDto, UserUpdateDto } from '../types/api';
 
-// Users service runs on port 8082
+// Users service base URL from env
 const usersApi = axios.create({
-  baseURL: 'http://localhost:8082/api',
+  baseURL: env.usersApiBaseUrl,
 });
 
 // Add auth interceptor for users API

@@ -9,6 +9,7 @@ export default function Profile() {
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState<boolean>(false);
   const [user, setUser] = useState<UserDto | null>(null);
 
   const [name, setName] = useState<string>('');
@@ -35,10 +36,12 @@ export default function Profile() {
     if (!canSave) return;
     setSaving(true);
     setError(null);
+    setSaved(false);
     const payload: UserUpdateDto = { name, email, sedeId };
     try {
       const updated = await UsersService.updateCurrentUser(payload);
       setUser(updated);
+      setSaved(true);
     } catch (e: any) {
       setError(String(e?.message ?? e));
     } finally {
@@ -79,6 +82,7 @@ export default function Profile() {
         <Button onClick={onSave} disabled={!canSave || saving}>
           {saving ? 'Guardando…' : 'Guardar cambios'}
         </Button>
+        {saved && <span style={{ color: 'green', alignSelf: 'center' }}>Cambios guardados</span>}
       </div>
     </div>
   );
