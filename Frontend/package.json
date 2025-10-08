@@ -10,7 +10,13 @@
     "test": "npx jest",
     "test:watch": "npx jest --watch",
     "test:coverage": "npx jest --coverage",
-    "test:int": "RUN_INT=1 npx jest src/integration --runInBand"
+    "test:int": "RUN_INT=1 npx jest src/integration --runInBand",
+    "cypress": "cypress open",
+    "cypress:headless": "cypress run",
+    "test:e2e": "cypress run --browser electron --headless",
+    "test:e2e:open": "cypress open",
+    "test:e2e:electron": "cypress run --browser electron --headless",
+    "test:e2e:smoke": "cypress run --spec 'cypress/e2e/01-smoke/**/*' --browser electron --headless"
   },
   "keywords": [],
   "author": "",

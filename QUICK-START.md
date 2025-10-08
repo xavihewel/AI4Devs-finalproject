@@ -56,6 +56,50 @@ Levanta todo el sistema completo: infraestructura + microservicios + frontend.
 ./scripts/start-all-services.sh
 ```
 
+### 🧪 `./scripts/run-e2e-tests.sh`
+Ejecuta tests End-to-End con Cypress. Menú interactivo para elegir qué tests ejecutar.
+```bash
+./scripts/run-e2e-tests.sh
+```
+
+## 🧪 Testing E2E con Cypress
+
+### Scripts de Testing
+
+```bash
+cd Frontend
+
+# Abrir Cypress Test Runner (interactivo, recomendado)
+npm run test:e2e:open
+
+# Ejecutar todos los tests (headless)
+npm run test:e2e
+
+# Ejecutar solo smoke tests (rápido)
+npm run test:e2e:smoke
+
+# Ejecutar en Chrome específicamente
+npm run test:e2e:chrome
+```
+
+### Documentación Completa
+
+Ver `Frontend/cypress/README.md` para:
+- Cómo escribir tests
+- Comandos personalizados
+- Best practices
+- Debugging
+- CI/CD integration
+
+### Tests Disponibles
+
+- ✅ **Smoke Tests**: Verificación básica de la aplicación
+- ✅ **Authentication**: Login/logout con Keycloak
+- ✅ **Navigation**: Navegación entre páginas
+- ✅ **Complete Flows**: Flujos de usuario completos
+
+Total: ~21 tests E2E implementados
+
 ## 🔄 Reseteo Completo del Sistema
 
 ### Opción 1: Reseteo Simple (Recomendado)

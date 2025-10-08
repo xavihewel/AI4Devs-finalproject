@@ -1,0 +1,106 @@
+describe('Authentication', () => {
+  beforeEach(() => {
+    // Clear session before each test
+    cy.clearCookies()
+    cy.clearLocalStorage()
+  })
+
+  describe('Login Flow', () => {
+    it('should show login button when not authenticated', () => {
+      cy.visit('/')
+      cy.contains('Iniciar Sesión').should('be.visible')
+      cy.contains('Comenzar Ahora').should('be.visible')
+    })
+
+    it('should redirect to Keycloak when clicking "Iniciar Sesión"', () => {
+      cy.visit('/')
+      cy.contains('Iniciar Sesión', { timeout: 5000 }).click()
+      
+      // Should redirect to Keycloak
+      cy.origin(Cypress.env('keycloakUrl'), () => {
+        cy.url({ timeout: 8000 }).should('include', '/realms/covoituraje')
+        cy.get('input[name="username"]', { timeout: 5000 }).should('be.visible')
+        cy.get('input[name="password"]').should('be.visible')
+      })
+    })
+
+    it('should redirect to Keycloak when clicking "Comenzar Ahora"', () => {
+      cy.visit('/')
+      cy.contains('Comenzar Ahora', { timeout: 5000 }).click()
+      
+      // Should redirect to Keycloak
+      cy.origin(Cypress.env('keycloakUrl'), () => {
+        cy.url({ timeout: 8000 }).should('include', '/realms/covoituraje')
+        cy.get('input[name="username"]', { timeout: 5000 }).should('be.visible')
+      })
+    })
+
+    it('should login successfully with valid credentials', () => {
+      cy.loginViaKeycloak('test.user', 'password123')
+      
+      // Should see authenticated user options
+      cy.contains('Crear Viaje').should('be.visible')
+      cy.contains('Buscar Viajes').should('be.visible')
+      cy.contains('Mi Perfil').should('be.visible')
+      cy.contains('Cerrar Sesión').should('be.visible')
+      
+      // Should NOT see login buttons
+      cy.contains('Iniciar Sesión').should('not.exist')
+      cy.contains('Comenzar Ahora').should('not.exist')
+    })
+
+    it('should show error with invalid credentials', () => {
+      cy.visit('/')
+      cy.contains('Iniciar Sesión').click()
+      
+      cy.origin(
+        Cypress.env('keycloakUrl'),
+        () => {
+          cy.get('input[name="username"]').type('invalid.user')
+          cy.get('input[name="password"]').type('wrongpassword')
+          cy.get('input[type="submit"]').click()
+          
+          // Should show error message
+          cy.contains('Invalid username or password', { timeout: 5000 }).should('be.visible')
+        }
+      )
+    })
+  })
+
+  describe('Logout Flow', () => {
+    beforeEach(() => {
+      cy.loginViaKeycloak('test.user', 'password123')
+    })
+
+    it('should logout successfully', () => {
+      cy.logout()
+      
+      // Should see login buttons again
+      cy.contains('Iniciar Sesión').should('be.visible')
+      cy.contains('Comenzar Ahora').should('be.visible')
+      
+      // Should NOT see authenticated options
+      cy.contains('Mi Perfil').should('not.exist')
+      cy.contains('Cerrar Sesión').should('not.exist')
+    })
+  })
+
+  describe('Protected Routes', () => {
+    it('should redirect to login when accessing /trips without auth', () => {
+      cy.visit('/trips')
+      
+      // Should redirect to Keycloak
+      cy.origin(Cypress.env('keycloakUrl'), () => {
+        cy.url().should('include', '/realms/covoituraje')
+      })
+    })
+
+    it('should access /trips when authenticated', () => {
+      cy.loginViaKeycloak('test.user', 'password123')
+      cy.visit('/trips')
+      
+      // Should see trips page
+      cy.contains('Mis Viajes').should('be.visible')
+    })
+  })
+})

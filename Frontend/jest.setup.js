@@ -10,6 +10,17 @@ if (typeof global.TextEncoder === 'undefined') {
 // Ensure test env
 process.env.NODE_ENV = 'test';
 
+// Mock env.ts to avoid import.meta issues
+jest.mock('./src/env', () => ({
+  env: {
+    appName: 'bonÀreaGo',
+    oidcIssuer: 'http://localhost:8080/realms/covoituraje',
+    oidcClientId: 'covoituraje-frontend',
+    oidcRedirectUri: 'http://localhost:5173',
+    apiBaseUrl: 'http://localhost:8081',
+  }
+}));
+
 // Mock ESM-only keycloak-js to avoid transform issues in Jest
 jest.mock('keycloak-js', () => {
   return function Keycloak() {
