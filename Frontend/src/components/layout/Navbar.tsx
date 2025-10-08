@@ -28,9 +28,16 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center space-x-8">
             <Link
               to="/"
-              className="flex items-center text-xl font-bold text-primary-600"
+              className="flex items-center space-x-3 group"
             >
-              🚗 Covoituraje
+              <img 
+                src="/logo.png" 
+                alt="bonÀreaGo" 
+                className="h-10 w-auto transition-transform duration-200 group-hover:scale-105"
+              />
+              <span className="text-xl font-bold text-gray-800 group-hover:text-primary-600 transition-colors duration-200">
+                bonÀreaGo
+              </span>
             </Link>
             
             <div className="hidden md:flex space-x-6">

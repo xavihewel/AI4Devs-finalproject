@@ -1,7 +1,7 @@
 # Project Brief
 
 ## Purpose
-**Covoituraje Corporativo** - Una plataforma de carpooling corporativo que conecta empleados para compartir viajes diarios a sus lugares de trabajo, optimizando costos de transporte y reduciendo la huella de carbono de la empresa.
+**bonÀreaGo** - Una plataforma de compartición de viajes corporativos que conecta empleados para compartir viajes diarios a sus lugares de trabajo, optimizando costos de transporte y reduciendo la huella de carbono de la empresa.
 
 ## Scope
 - **In scope:**

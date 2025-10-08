@@ -21,7 +21,7 @@ describe('Home', () => {
         <Home />
       </AuthProvider>
     );
-    expect(screen.getByText(/Covoituraje/i)).toBeInTheDocument();
+    expect(screen.getByText(/bonÀreaGo/i)).toBeInTheDocument();
   });
 
   it('renders main tagline', () => {
@@ -30,7 +30,7 @@ describe('Home', () => {
         <Home />
       </AuthProvider>
     );
-    expect(screen.getByText(/Comparte viajes corporativos y reduce costos de manera inteligente/i)).toBeInTheDocument();
+    expect(screen.getByText(/Tu plataforma corporativa para compartir viajes/i)).toBeInTheDocument();
   });
 
   it('renders features section', () => {

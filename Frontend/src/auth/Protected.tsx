@@ -1,20 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
 
 export const Protected: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { initialized, authenticated, login } = useAuth();
   const location = useLocation();
+  const loginTriggeredRef = useRef(false);
 
-  if (!initialized) return null;
-  if (!authenticated) {
-    // Trigger login after mount; do not render a Navigate here to avoid redirect loops
-    useEffect(() => {
+  useEffect(() => {
+    // Only trigger login once when not authenticated
+    if (initialized && !authenticated && !loginTriggeredRef.current) {
+      loginTriggeredRef.current = true;
       login();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }
+  }, [initialized, authenticated, login]);
+
+  if (!initialized) {
+    return <div className="flex items-center justify-center min-h-screen">Cargando...</div>;
+  }
+  
+  if (!authenticated) {
     return null;
   }
+  
   return <>{children}</>;
 };
 

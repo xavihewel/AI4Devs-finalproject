@@ -23,8 +23,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [initialized, setInitialized] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const [token, setToken] = useState<string | undefined>(undefined);
+  const initStartedRef = React.useRef(false);
 
   useEffect(() => {
+    // Prevent double initialization in React StrictMode
+    if (initStartedRef.current) {
+      return;
+    }
+    initStartedRef.current = true;
+
     let refreshHandle: number | undefined;
     const keycloak = getKeycloak();
     if (!keycloak) {
@@ -34,12 +41,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setToken(undefined);
       return;
     }
+
+    // Check if already initialized
+    if (keycloak.authenticated !== undefined) {
+      setInitialized(true);
+      setAuthenticated(keycloak.authenticated);
+      setToken(keycloak.token ?? undefined);
+      return;
+    }
+
     keycloak
       .init({
         onLoad: 'check-sso',
         pkceMethod: 'S256',
         checkLoginIframe: false,
-        redirectUri: env.oidcRedirectUri,
+        silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
       })
       .then((auth) => {
         setInitialized(true);
@@ -53,7 +69,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           refreshHandle = window.setInterval(schedule, 30000);
         }
       })
-      .catch(() => setInitialized(true));
+      .catch((err) => {
+        console.error('Keycloak init error:', err);
+        setInitialized(true);
+      });
 
     return () => {
       if (refreshHandle) window.clearInterval(refreshHandle);
@@ -67,7 +86,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       token,
       login: () => {
         const kc = getKeycloak();
-        if (kc) kc.login({ redirectUri: env.oidcRedirectUri });
+        if (kc) {
+          const redirectUri = env.oidcRedirectUri || window.location.origin;
+          kc.login({ redirectUri });
+        }
       },
       logout: () => {
         const kc = getKeycloak();

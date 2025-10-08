@@ -36,6 +36,12 @@ public class AuthFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
+        // Allow OPTIONS requests (CORS preflight) to pass without authentication
+        String method = requestContext.getMethod();
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            return;
+        }
+        
         var uriInfo = requestContext.getUriInfo();
         String path = uriInfo != null ? uriInfo.getPath() : null;
         if (path != null && (path.equals("health") || path.equals("/health") || path.equals("api/health"))) {

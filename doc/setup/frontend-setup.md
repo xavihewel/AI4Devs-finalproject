@@ -2,7 +2,7 @@
 
 ## Resumen
 
-El frontend de Covoituraje es una aplicación React construida con Vite que se puede ejecutar de dos formas:
+El frontend de bonÀreaGo es una aplicación React construida con Vite que se puede ejecutar de dos formas:
 
 1. **Docker + Nginx** (producción-like)
 2. **Local con Vite** (desarrollo rápido con hot reload)

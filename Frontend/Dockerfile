@@ -13,6 +13,18 @@ RUN npm install
 # Copiar código fuente
 COPY . .
 
+# Variables de entorno para el build de Vite
+ARG VITE_API_BASE_URL
+ARG VITE_OIDC_ISSUER
+ARG VITE_OIDC_CLIENT_ID
+ARG VITE_OIDC_REDIRECT_URI
+
+# Exportar variables para que Vite las use durante el build
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ENV VITE_OIDC_ISSUER=$VITE_OIDC_ISSUER
+ENV VITE_OIDC_CLIENT_ID=$VITE_OIDC_CLIENT_ID
+ENV VITE_OIDC_REDIRECT_URI=$VITE_OIDC_REDIRECT_URI
+
 # Construir la aplicación
 RUN npm run build
 

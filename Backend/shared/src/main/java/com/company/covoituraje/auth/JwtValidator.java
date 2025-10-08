@@ -25,11 +25,15 @@ public class JwtValidator {
 
     public JwtValidator(String issuer, String jwksUri) {
         this.expectedIssuer = Objects.requireNonNull(issuer, "issuer");
+        System.out.println("[JwtValidator] Initializing with issuer: " + issuer + ", JWKS URI: " + jwksUri);
         try {
             URL url = new URL(jwksUri);
-            DefaultResourceRetriever retriever = new DefaultResourceRetriever(2000, 2000);
+            // Increase timeout to 10 seconds for Docker networking
+            DefaultResourceRetriever retriever = new DefaultResourceRetriever(10000, 10000);
             this.jwkSource = new RemoteJWKSet<>(url, retriever);
+            System.out.println("[JwtValidator] Successfully initialized RemoteJWKSet");
         } catch (MalformedURLException e) {
+            System.err.println("[JwtValidator] Invalid JWKS URI: " + jwksUri);
             throw new IllegalArgumentException("Invalid JWKS URI", e);
         }
     }
@@ -62,23 +66,31 @@ public class JwtValidator {
         }
 
         String iss = claims.getIssuer();
+        System.out.println("[JwtValidator] Token issuer: " + iss + ", Expected: " + expectedIssuer);
         if (!expectedIssuer.equals(iss)) {
+            System.err.println("[JwtValidator] Issuer mismatch!");
             throw new JwtValidationException("Invalid issuer");
         }
         Instant now = Instant.now();
         if (claims.getExpirationTime() == null || claims.getExpirationTime().toInstant().isBefore(now)) {
+            System.err.println("[JwtValidator] Token expired");
             throw new JwtValidationException("Token expired");
         }
         if (claims.getNotBeforeTime() != null && claims.getNotBeforeTime().toInstant().isAfter(now)) {
+            System.err.println("[JwtValidator] Token not before in future");
             throw new JwtValidationException("Token not before in future");
         }
         if (claims.getSubject() == null || claims.getSubject().isBlank()) {
+            System.err.println("[JwtValidator] Missing sub claim");
             throw new JwtValidationException("Missing sub claim");
         }
         List<String> aud = claims.getAudience();
+        System.out.println("[JwtValidator] Token audience: " + aud);
         if (aud == null || aud.stream().noneMatch("backend-api"::equals)) {
+            System.err.println("[JwtValidator] Invalid audience - backend-api not found in: " + aud);
             throw new JwtValidationException("Invalid audience");
         }
+        System.out.println("[JwtValidator] Token validation successful");
     }
 }
 

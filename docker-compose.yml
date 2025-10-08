@@ -144,11 +144,12 @@ services:
     build:
       context: ./Frontend
       dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=http://localhost:8081
+        - VITE_OIDC_ISSUER=http://localhost:8080/realms/covoituraje
+        - VITE_OIDC_CLIENT_ID=covoituraje-frontend
+        - VITE_OIDC_REDIRECT_URI=http://localhost:3000/callback
     container_name: covoituraje_frontend
-    environment:
-      - VITE_API_BASE_URL=http://localhost:8081
-      - VITE_OIDC_ISSUER=http://localhost:8080/realms/covoituraje
-      - VITE_OIDC_CLIENT_ID=covoituraje-frontend
     ports:
       - "3000:3000"
     depends_on:
