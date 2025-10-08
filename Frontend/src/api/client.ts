@@ -19,10 +19,7 @@ api.interceptors.request.use(async (config) => {
     }
     const token = keycloak.token;
     if (token) {
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${token}`,
-      };
+      config.headers.Authorization = `Bearer ${token}`;
     }
   }
   return config;

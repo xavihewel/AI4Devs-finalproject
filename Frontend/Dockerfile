@@ -1,5 +1,5 @@
 # Multi-stage Dockerfile para Frontend
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 # Establecer directorio de trabajo
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instalar dependencias
-RUN npm ci
+RUN npm install
 
 # Copiar código fuente
 COPY . .

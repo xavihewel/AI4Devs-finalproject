@@ -40,7 +40,7 @@ public class AuthFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) {
         var uriInfo = requestContext.getUriInfo();
         String path = uriInfo != null ? uriInfo.getPath() : null;
-        if (path != null && (path.equals("health") || path.equals("/health"))) {
+        if (path != null && (path.equals("health") || path.equals("/health") || path.equals("api/health"))) {
             return;
         }
         String auth = requestContext.getHeaderString("Authorization");
@@ -69,9 +69,6 @@ public class AuthFilter implements ContainerRequestFilter {
             
         } catch (JwtValidationException e) {
             requestContext.abortWith(Response.status(401).build());
-        } finally {
-            // Clean up thread local in finally block
-            UsersResource.AuthContext.clear();
         }
     }
 }
