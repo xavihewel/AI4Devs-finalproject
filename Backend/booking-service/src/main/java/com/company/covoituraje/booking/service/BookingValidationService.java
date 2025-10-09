@@ -46,6 +46,9 @@ public class BookingValidationService {
             if (!usersServiceClient.userExists(userId)) {
                 throw new BookingValidationException("User not found");
             }
+        } catch (BookingValidationException e) {
+            // Re-throw our own validation exceptions
+            throw e;
         } catch (Exception e) {
             throw new BookingValidationException("Error checking if user exists: " + e.getMessage());
         }

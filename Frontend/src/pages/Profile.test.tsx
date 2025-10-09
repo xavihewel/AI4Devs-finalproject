@@ -18,7 +18,7 @@ describe('Profile page', () => {
   });
 
   it('loads and displays user profile', async () => {
-    UsersService.getCurrentUser.mockResolvedValueOnce({
+    const mockUser = {
       id: 'u1',
       name: 'Alice',
       email: 'alice@example.com',
@@ -26,10 +26,14 @@ describe('Profile page', () => {
       role: 'EMPLOYEE',
       createdAt: '',
       updatedAt: '',
-    });
+    };
+    
+    UsersService.getCurrentUser.mockResolvedValueOnce(mockUser);
+    
     await act(async () => {
       render(<Profile />);
     });
+    
     expect(await screen.findByDisplayValue('Alice')).toBeInTheDocument();
     expect(screen.getByDisplayValue('alice@example.com')).toBeInTheDocument();
     expect(screen.getByDisplayValue('SEDE-1')).toBeInTheDocument();

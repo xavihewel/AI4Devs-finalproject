@@ -33,3 +33,9 @@ jest.mock('keycloak-js', () => {
     };
   };
 });
+
+// Mock window.confirm for tests
+Object.defineProperty(window, 'confirm', {
+  value: jest.fn(() => true),
+  writable: true
+});

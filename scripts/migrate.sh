@@ -11,7 +11,7 @@ if ! docker exec covoituraje_db pg_isready -U app > /dev/null 2>&1; then
 fi
 
 # Ejecutar migraciones para cada servicio
-services=("trips-service" "users-service" "booking-service" "matching-service")
+services=("trips-service" "users-service" "booking-service" "matching-service" "notification-service")
 
 for service in "${services[@]}"; do
     echo "📦 Ejecutando migraciones para $service..."
@@ -37,3 +37,4 @@ echo "📊 trips (trips-service)"
 echo "👥 users (users-service)"
 echo "📋 bookings (booking-service)"
 echo "🔗 matches (matching-service)"
+echo "🔔 notifications (notification-service)"

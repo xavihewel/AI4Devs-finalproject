@@ -4,7 +4,11 @@ import { MatchesService } from '../api/matches';
 import type { MatchDto } from '../types/api';
 
 // Mock the API service
-jest.mock('../api/matches');
+jest.mock('../api/matches', () => ({
+  MatchesService: {
+    findMatches: jest.fn(),
+  },
+}));
 
 describe('Matches', () => {
   const mockMatches: MatchDto[] = [
@@ -26,12 +30,14 @@ describe('Matches', () => {
   });
 
   it('renders matches page title', () => {
+    (MatchesService.findMatches as jest.Mock).mockResolvedValue([]);
     render(<Matches />);
     
     expect(screen.getAllByText('Buscar Viajes')[0]).toBeInTheDocument();
   });
 
   it('renders search form', () => {
+    (MatchesService.findMatches as jest.Mock).mockResolvedValue([]);
     render(<Matches />);
     
     expect(screen.getByLabelText('Destino')).toBeInTheDocument();
@@ -41,6 +47,7 @@ describe('Matches', () => {
   });
 
   it('shows initial state message', () => {
+    (MatchesService.findMatches as jest.Mock).mockResolvedValue([]);
     render(<Matches />);
     
     expect(screen.getByText('Busca tu viaje ideal')).toBeInTheDocument();
@@ -48,7 +55,7 @@ describe('Matches', () => {
   });
 
   it('performs search when form is submitted', async () => {
-    jest.mocked(MatchesService.findMatches).mockResolvedValue(mockMatches);
+    (MatchesService.findMatches as jest.Mock).mockResolvedValue(mockMatches);
     
     render(<Matches />);
     
@@ -70,13 +77,14 @@ describe('Matches', () => {
   });
 
   it('shows disabled submit when no destination selected', () => {
+    (MatchesService.findMatches as jest.Mock).mockResolvedValue([]);
     render(<Matches />);
     const submit = screen.getAllByText('Buscar Viajes')[1].closest('button');
     expect(submit).toBeDisabled();
   });
 
   it('displays search results', async () => {
-    jest.mocked(MatchesService.findMatches).mockResolvedValue(mockMatches);
+    (MatchesService.findMatches as jest.Mock).mockResolvedValue(mockMatches);
     
     render(<Matches />);
     
@@ -96,7 +104,7 @@ describe('Matches', () => {
   });
 
   it('shows score badges with correct colors', async () => {
-    jest.mocked(MatchesService.findMatches).mockResolvedValue(mockMatches);
+    (MatchesService.findMatches as jest.Mock).mockResolvedValue(mockMatches);
     
     render(<Matches />);
     
@@ -111,7 +119,7 @@ describe('Matches', () => {
   });
 
   it('shows no results message when no matches found', async () => {
-    jest.mocked(MatchesService.findMatches).mockResolvedValue([]);
+    (MatchesService.findMatches as jest.Mock).mockResolvedValue([]);
     
     render(<Matches />);
     
@@ -126,7 +134,7 @@ describe('Matches', () => {
   });
 
   it('clears search when clear button is clicked', async () => {
-    jest.mocked(MatchesService.findMatches).mockResolvedValue([]);
+    (MatchesService.findMatches as jest.Mock).mockResolvedValue([]);
     
     render(<Matches />);
     
@@ -147,7 +155,7 @@ describe('Matches', () => {
   });
 
   it('handles search button loading state', async () => {
-    jest.mocked(MatchesService.findMatches).mockImplementation(() => new Promise(() => {})); // Never resolves
+    (MatchesService.findMatches as jest.Mock).mockImplementation(() => new Promise(() => {})); // Never resolves
     
     render(<Matches />);
     
@@ -161,7 +169,7 @@ describe('Matches', () => {
   });
 
   it('shows alert on API error', async () => {
-    jest.mocked(MatchesService.findMatches).mockRejectedValue(new Error('network'));
+    (MatchesService.findMatches as jest.Mock).mockRejectedValue(new Error('network'));
     const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
 
     render(<Matches />);

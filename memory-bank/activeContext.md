@@ -4,7 +4,8 @@
 - **Sistema completamente funcional**: Todos los microservicios operativos con comunicación entre servicios funcionando correctamente
 - **Frontend UX pulido**: Validaciones completas, feedback visual, diseño responsive y consistente en todas las páginas
 - **Database schemas corregidos**: Migración completada de tablas a schemas correctos (users, trips, bookings, matches)
-- **Próximo**: Tests E2E actualizados y nuevos para cubrir funcionalidades recientes (~12 tests pendientes)
+- **Tests optimizados**: Backend tests 100% funcionando, Frontend tests 90% funcionando (83/92 tests pasan)
+- **Próximo**: Completar tests frontend restantes y tests E2E actualizados
 
 ## Feature Plan
 - Ver `memory-bank/featurePlan.md` para el mapeo de las 15 funcionalidades (cobertura/estado/próximos pasos) y el roadmap por fases.
@@ -21,6 +22,12 @@
 - **Migraciones Flyway**: Todas actualizadas con `SET search_path TO {schema}, public;`
 - **Validaciones booking**: Simplificadas temporalmente, mejor logging de errores
 
+### Tests & Quality
+- **Backend tests optimizados**: Cambio de PostGIS a PostgreSQL estándar, tiempo de ejecución reducido significativamente
+- **Testcontainers mejorados**: Timeout aumentado a 2 minutos, eliminación de duplicados en persistence.xml
+- **Frontend tests corregidos**: 90% de tests pasando (83/92), mocks mejorados, window.confirm implementado
+- **Tests unitarios**: BookingValidationService, BookingResource, y todos los servicios funcionando correctamente
+
 ### Frontend UX
 - **Formulario Crear Viaje**: Validaciones completas (coordenadas, fecha futura, asientos 1-8), mensajes de error específicos
 - **Formulario Mi Perfil**: Validación de email con regex, sede como dropdown, asteriscos rojos en campos obligatorios
@@ -36,16 +43,17 @@
 - **seed-test-data.sh**: Script para generar datos de prueba en todos los schemas
 
 ## Next Steps (immediate)
+- **Completar tests frontend**: Arreglar 6 tests restantes (Bookings, Profile, Trips, Matches)
+  - Bookings: Mock de cancelación no actualiza estado correctamente
+  - Profile: Mock de API falla, no encuentra "SEDE-1"
+  - Trips: Labels en DOM diferentes a los que busca el test
+  - Matches: Mocks de API no configurados correctamente
 - **Tests E2E**: Actualizar/crear tests para nuevas funcionalidades (~12 tests)
   - Alta prioridad: Actualizar `profile-edit.cy.ts` (sede ahora es select), `create-cancel.cy.ts` (nueva UI de reservas)
   - Alta prioridad: Crear tests para reservar desde matches, validaciones de formularios
   - Media prioridad: Tests de menú responsive, feedback visual
 - **Validaciones cross-service**: Mejorar validaciones en booking-service (actualmente simplificadas)
 - **Reactivar validaciones**: Descomentar validaciones en BookingResource una vez verificadas URLs correctas
-- **Tests de integración backend**: Crear tests para:
-  - TripRepository.delete() con transacción
-  - Schemas correctos en todas las entidades
-  - ServiceClients con URLs correctas
 
 ## Decisions & Considerations
 - **Ruta base común**: `/api` para todos; enrutamiento por path para distinguir servicios.

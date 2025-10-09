@@ -1,24 +1,42 @@
 package com.company.covoituraje.notification.repository;
 
 import com.company.covoituraje.notification.domain.NotificationSubscription;
+import com.company.covoituraje.notification.infrastructure.JpaConfig;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
 public class NotificationSubscriptionRepository {
     
-    @PersistenceContext
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
+    
+    public NotificationSubscriptionRepository() {
+        this.entityManager = JpaConfig.createEntityManager();
+    }
+    
+    public NotificationSubscriptionRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
     
     public NotificationSubscription save(NotificationSubscription subscription) {
-        if (subscription.getId() == null) {
-            entityManager.persist(subscription);
-        } else {
-            subscription = entityManager.merge(subscription);
+        EntityTransaction tx = entityManager.getTransaction();
+        try {
+            tx.begin();
+            if (subscription.getId() == null) {
+                entityManager.persist(subscription);
+            } else {
+                subscription = entityManager.merge(subscription);
+            }
+            tx.commit();
+            return subscription;
+        } catch (Exception e) {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            throw e;
         }
-        return subscription;
     }
     
     public Optional<NotificationSubscription> findByUserIdAndEndpoint(String userId, String endpoint) {
@@ -43,10 +61,20 @@ public class NotificationSubscriptionRepository {
     }
     
     public void delete(NotificationSubscription subscription) {
-        if (entityManager.contains(subscription)) {
-            entityManager.remove(subscription);
-        } else {
-            entityManager.remove(entityManager.merge(subscription));
+        EntityTransaction tx = entityManager.getTransaction();
+        try {
+            tx.begin();
+            if (entityManager.contains(subscription)) {
+                entityManager.remove(subscription);
+            } else {
+                entityManager.remove(entityManager.merge(subscription));
+            }
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            throw e;
         }
     }
 }

@@ -103,6 +103,16 @@ else
     echo "⏸️  No iniciado"
 fi
 
+# Verificar notification-service
+echo -n "🔔 Notification Service: "
+if curl -f -s http://localhost:8085/api/health &>/dev/null || curl -f -s http://localhost:8085/api/notifications &>/dev/null; then
+    echo "✅ OK (puerto 8085)"
+elif docker ps | grep -q covoituraje_notification_service; then
+    echo "⚠️  Arrancando... (puerto 8085)"
+else
+    echo "⏸️  No iniciado"
+fi
+
 echo ""
 
 # ============================================

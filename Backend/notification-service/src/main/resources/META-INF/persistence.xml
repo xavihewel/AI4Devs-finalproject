@@ -22,6 +22,7 @@
             <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.default_schema" value="notifications"/>
             
             <!-- Connection pool -->
             <property name="hibernate.connection.pool_size" value="5"/>
