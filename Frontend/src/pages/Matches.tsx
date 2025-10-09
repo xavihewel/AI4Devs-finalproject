@@ -38,7 +38,6 @@ export default function Matches() {
         .filter(booking => booking.status !== 'CANCELLED')
         .map(booking => booking.tripId);
       setBookedTrips(new Set(tripIds));
-      console.log('[Matches] Loaded booked trips:', tripIds);
     } catch (error) {
       console.error('Error loading bookings:', error);
       // No mostrar error al usuario, simplemente no marcar viajes

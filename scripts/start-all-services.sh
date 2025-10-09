@@ -39,13 +39,15 @@ echo "   • trips-service (puerto 8081)"
 echo "   • users-service (puerto 8082)"
 echo "   • booking-service (puerto 8083)"
 echo "   • matching-service (puerto 8084)"
+echo "   • notification-service (puerto 8085)"
 echo ""
 
 docker-compose --profile services up -d \
     trips-service \
     users-service \
     booking-service \
-    matching-service
+    matching-service \
+    notification-service
 
 echo ""
 echo "⏳ Esperando a que los microservicios arranquen (30 segundos)..."
@@ -75,10 +77,11 @@ echo "🌐 FRONTEND:"
 echo "   👉 http://localhost:3000"
 echo ""
 echo "🔧 MICROSERVICIOS:"
-echo "   • Trips:    http://localhost:8081/api/trips"
-echo "   • Users:    http://localhost:8082/api/users"
-echo "   • Bookings: http://localhost:8083/api/bookings"
-echo "   • Matches:  http://localhost:8084/api/matches"
+echo "   • Trips:         http://localhost:8081/api/trips"
+echo "   • Users:         http://localhost:8082/api/users"
+echo "   • Bookings:      http://localhost:8083/api/bookings"
+echo "   • Matches:       http://localhost:8084/api/matches"
+echo "   • Notifications: http://localhost:8085/api/notifications"
 echo ""
 echo "🔐 KEYCLOAK:"
 echo "   • Admin: http://localhost:8080 (admin/admin)"

@@ -74,9 +74,7 @@ public class BookingResource {
         // Cross-service validations
         try {
             // Validate user exists
-            if (!validationService.validateUserExists(currentUser)) {
-                throw new BadRequestException("User not found: " + currentUser);
-            }
+            validationService.validateUserExists(currentUser);
             
             // Validate trip availability
             validationService.validateTripAvailability(request.tripId, request.seatsRequested);

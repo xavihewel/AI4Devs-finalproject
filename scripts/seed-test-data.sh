@@ -153,6 +153,8 @@ UNION ALL
 SELECT 'bookings.bookings', COUNT(*) FROM bookings.bookings
 UNION ALL
 SELECT 'matches.matches', COUNT(*) FROM matches.matches
+UNION ALL
+SELECT 'notifications.notification_subscriptions', COUNT(*) FROM notifications.notification_subscriptions
 ORDER BY tabla;
 EOF
 
@@ -174,5 +176,8 @@ echo "  • 2 reservas de prueba (1 confirmada, 1 pendiente)"
 echo ""
 echo -e "${YELLOW}Matches:${NC}"
 echo "  • 3 matches con diferentes scores de compatibilidad"
+echo ""
+echo -e "${YELLOW}Notificaciones:${NC}"
+echo "  • 3 suscripciones de notificaciones push (2 activas, 1 inactiva)"
 echo ""
 

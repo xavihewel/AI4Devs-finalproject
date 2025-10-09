@@ -19,11 +19,21 @@ describe('Trips Edit & Delete', () => {
 
     cy.contains('Viaje a SEDE-1', { timeout: 8000 }).should('be.visible')
 
-    cy.get('[data-cy^="edit-trip-"]').first().click()
-    cy.contains('Viaje a SEDE-1').should('exist')
+    // Botón ahora dice "+1 Asiento" en lugar de "Editar"
+    cy.contains('button', '+1 Asiento').first().click()
+    
+    // Verificar mensaje de éxito
+    cy.contains('Asientos actualizados', { timeout: 8000 }).should('be.visible')
+
+    // Eliminar viaje (ahora pide confirmación)
+    cy.window().then((win) => {
+      cy.stub(win, 'confirm').returns(true)
+    })
 
     cy.get('[data-cy^="delete-trip-"]').first().click()
-    cy.get('body').should('not.contain', 'Error')
+    
+    // Verificar mensaje de éxito
+    cy.contains('Viaje cancelado exitosamente', { timeout: 8000 }).should('be.visible')
   })
 })
 

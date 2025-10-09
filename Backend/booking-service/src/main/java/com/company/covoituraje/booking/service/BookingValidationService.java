@@ -41,12 +41,13 @@ public class BookingValidationService {
     /**
      * Valida que un usuario existe
      */
-    public boolean validateUserExists(String userId) {
+    public void validateUserExists(String userId) throws BookingValidationException {
         try {
-            return usersServiceClient.userExists(userId);
+            if (!usersServiceClient.userExists(userId)) {
+                throw new BookingValidationException("User not found");
+            }
         } catch (Exception e) {
-            System.err.println("Error checking if user exists: " + e.getMessage());
-            return false;
+            throw new BookingValidationException("Error checking if user exists: " + e.getMessage());
         }
     }
     

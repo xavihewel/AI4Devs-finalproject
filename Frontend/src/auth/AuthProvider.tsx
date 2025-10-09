@@ -33,12 +33,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initStartedRef.current = true;
 
     // Bypass auth: treat as authenticated for UI/tests when enabled
-    if (env.authDisabled) {
-      setInitialized(true);
-      setAuthenticated(true);
-      setToken(undefined);
-      return;
-    }
+    // DISABLED: Reactivating real authentication
+    // if (env.authDisabled) {
+    //   setInitialized(true);
+    //   setAuthenticated(true);
+    //   setToken(undefined);
+    //   return;
+    // }
 
     let refreshHandle: number | undefined;
     const keycloak = getKeycloak();

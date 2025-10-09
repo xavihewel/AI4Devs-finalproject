@@ -48,6 +48,10 @@ services:
     ports:
       - "8025:8025"   # UI
       - "1025:1025"   # SMTP
+    environment:
+      # SMTP configuration for notifications
+      MH_SMTP_BIND_ADDR: 0.0.0.0:1025
+      MH_UI_BIND_ADDR: 0.0.0.0:8025
 
   # Servicios de desarrollo para microservicios
   trips-service:
@@ -65,6 +69,10 @@ services:
       - AUTH_DISABLED=true
       - AUTH_BYPASS_USER_ID=user-001
       - ALLOWED_ORIGINS=http://localhost:5173
+      # VAPID Keys for Push Notifications
+      - VAPID_PUBLIC_KEY=BHW9bFosH5N-wdRkQLPnZt8yB4-YJ_7Ol-BHr-wNiD4ADNky1D01Sbd7O7DEDJyugJNs3JCCgfv7Pu3g-o8ZydA
+      - VAPID_PRIVATE_KEY=cS7i2NUlX_oa589_Nl7OAJE7vSNj3UfTYkb8gSgZy54
+      - VAPID_SUBJECT=mailto:admin@covoituraje.com
     ports:
       - "8081:8080"
     depends_on:
@@ -88,6 +96,10 @@ services:
       - AUTH_DISABLED=true
       - AUTH_BYPASS_USER_ID=user-001
       - ALLOWED_ORIGINS=http://localhost:5173
+      # VAPID Keys for Push Notifications
+      - VAPID_PUBLIC_KEY=BHW9bFosH5N-wdRkQLPnZt8yB4-YJ_7Ol-BHr-wNiD4ADNky1D01Sbd7O7DEDJyugJNs3JCCgfv7Pu3g-o8ZydA
+      - VAPID_PRIVATE_KEY=cS7i2NUlX_oa589_Nl7OAJE7vSNj3UfTYkb8gSgZy54
+      - VAPID_SUBJECT=mailto:admin@covoituraje.com
     ports:
       - "8082:8080"
     depends_on:
@@ -174,6 +186,40 @@ services:
       - users-service
       - booking-service
       - matching-service
+      - notification-service
+    profiles:
+      - services
+
+  notification-service:
+    build:
+      context: ./Backend
+      dockerfile: notification-service/Dockerfile
+    container_name: covoituraje_notification_service
+    environment:
+      - DATABASE_URL=jdbc:postgresql://db:5432/app
+      - DATABASE_USER=app
+      - DATABASE_PASSWORD=app
+      - OIDC_ISSUER_URI=http://localhost:8080/realms/covoituraje
+      - OIDC_JWKS_URI=http://keycloak:8080/realms/covoituraje/protocol/openid-connect/certs
+      - REQUIRE_ROLE_EMPLOYEE=false
+      - AUTH_DISABLED=true
+      - AUTH_BYPASS_USER_ID=user-001
+      - ALLOWED_ORIGINS=http://localhost:5173
+      # VAPID Keys for Push Notifications
+      - VAPID_PUBLIC_KEY=BHW9bFosH5N-wdRkQLPnZt8yB4-YJ_7Ol-BHr-wNiD4ADNky1D01Sbd7O7DEDJyugJNs3JCCgfv7Pu3g-o8ZydA
+      - VAPID_PRIVATE_KEY=cS7i2NUlX_oa589_Nl7OAJE7vSNj3UfTYkb8gSgZy54
+      - VAPID_SUBJECT=mailto:admin@covoituraje.com
+      # SMTP Configuration
+      - SMTP_HOST=mailhog
+      - SMTP_PORT=1025
+      - SMTP_USER=
+      - SMTP_PASSWORD=
+      - FROM_EMAIL=noreply@covoituraje.com
+    ports:
+      - "8085:8080"
+    depends_on:
+      db:
+        condition: service_healthy
     profiles:
       - services
 
