@@ -72,17 +72,25 @@ public class BookingResource {
         }
 
         // Cross-service validations
-        // TEMPORALMENTE COMENTADO PARA DEBUG
-        /*
         try {
-            validationService.validateUserExists(currentUser);
+            // Validate user exists
+            if (!validationService.validateUserExists(currentUser)) {
+                throw new BadRequestException("User not found: " + currentUser);
+            }
+            
+            // Validate trip availability
             validationService.validateTripAvailability(request.tripId, request.seatsRequested);
+            
             // TODO: Add driver validation when trips-service provides driver info
             // validationService.validateUserIsNotDriver(request.tripId, currentUser);
         } catch (BookingValidationException e) {
+            System.err.println("Booking validation error: " + e.getMessage());
             throw new BadRequestException("Validation failed: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Unexpected error during validation: " + e.getMessage());
+            e.printStackTrace();
+            throw new BadRequestException("Error validating booking: " + e.getMessage());
         }
-        */
 
         // Create booking
         Booking booking = new Booking(tripId, currentUser, request.seatsRequested, "PENDING");

@@ -23,8 +23,9 @@ export default function Profile() {
   const [schedule, setSchedule] = useState<string>('');
 
   const showMessage = (type: 'success' | 'error', text: string) => {
+    console.log(`[Profile] Showing ${type} message:`, text);
     setMessage({ type, text });
-    setTimeout(() => setMessage(null), 3000);
+    setTimeout(() => setMessage(null), 5000); // Aumentado a 5 segundos
   };
 
   const validateForm = (): FormErrors => {
@@ -77,6 +78,7 @@ export default function Profile() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('[Profile] handleSubmit called');
     
     // Marcar todos los campos como "touched"
     setTouched({
@@ -88,6 +90,7 @@ export default function Profile() {
     // Validar formulario
     const errors = validateForm();
     setFormErrors(errors);
+    console.log('[Profile] Validation errors:', errors);
 
     // Si hay errores, no enviar
     if (Object.keys(errors).length > 0) {
@@ -97,12 +100,14 @@ export default function Profile() {
 
     try {
       setSaving(true);
+      console.log('[Profile] Sending update with payload:', { name, email, sedeId });
       const payload: UserUpdateDto = { name, email, sedeId };
       const updated = await UsersService.updateCurrentUser(payload);
+      console.log('[Profile] Update successful:', updated);
       setUser(updated);
       showMessage('success', '¡Perfil actualizado exitosamente!');
     } catch (e: any) {
-      console.error('Error updating user:', e);
+      console.error('[Profile] Error updating user:', e);
       const errorMsg = e?.response?.data?.message || e?.message || 'Error al actualizar el perfil';
       showMessage('error', errorMsg);
     } finally {

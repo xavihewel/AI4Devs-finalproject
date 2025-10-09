@@ -24,6 +24,29 @@ export default function Matches() {
     setTimeout(() => setMessage(null), 4000);
   };
 
+  // Cargar reservas existentes al montar el componente
+  useEffect(() => {
+    loadExistingBookings();
+  }, []);
+
+  const loadExistingBookings = async () => {
+    try {
+      setLoadingBookings(true);
+      const bookings = await BookingsService.getMyBookings();
+      // Extraer los tripIds de las reservas activas (no canceladas)
+      const tripIds = bookings
+        .filter(booking => booking.status !== 'CANCELLED')
+        .map(booking => booking.tripId);
+      setBookedTrips(new Set(tripIds));
+      console.log('[Matches] Loaded booked trips:', tripIds);
+    } catch (error) {
+      console.error('Error loading bookings:', error);
+      // No mostrar error al usuario, simplemente no marcar viajes
+    } finally {
+      setLoadingBookings(false);
+    }
+  };
+
   const sedeOptions = [
     { value: '', label: 'Seleccionar destino...' },
     { value: 'SEDE-1', label: 'Sede Madrid Centro' },
@@ -84,7 +107,8 @@ export default function Matches() {
       // Marcar el viaje como reservado
       setBookedTrips(prev => new Set(prev).add(match.tripId));
       
-      showMessage('success', `¡Reserva creada exitosamente! ${seats} asiento(s) reservado(s)`);
+      showMessage('success', `¡Reserva creada exitosamente! ${seats} asiento(s) reservado(s). Ve a "Reservas" para ver tu reserva.`);
+      
       // Recargar búsqueda para actualizar asientos disponibles
       await handleSearch({ preventDefault: () => {} } as React.FormEvent);
     } catch (error: any) {

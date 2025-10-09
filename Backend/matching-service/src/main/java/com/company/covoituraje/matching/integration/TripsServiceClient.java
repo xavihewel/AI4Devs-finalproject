@@ -27,7 +27,7 @@ public class TripsServiceClient {
      */
     public List<TripDto> getAvailableTrips(String destinationSedeId) throws ServiceIntegrationException {
         try {
-            String path = "/api/trips?destinationSedeId=" + destinationSedeId;
+            String path = "/trips?destinationSedeId=" + destinationSedeId;
             TripDto[] trips = httpClient.get(path, TripDto[].class);
             return Arrays.asList(trips);
         } catch (ServiceIntegrationException e) {
@@ -40,7 +40,7 @@ public class TripsServiceClient {
      */
     public TripDto getTripById(String tripId) throws ServiceIntegrationException {
         try {
-            String path = "/api/trips/" + tripId;
+            String path = "/trips/" + tripId;
             return httpClient.get(path, TripDto.class);
         } catch (ServiceIntegrationException e) {
             throw new ServiceIntegrationException("Error fetching trip with ID: " + tripId, e);
@@ -52,7 +52,7 @@ public class TripsServiceClient {
      */
     public List<TripDto> getAllTrips() throws ServiceIntegrationException {
         try {
-            TripDto[] trips = httpClient.get("/api/trips", TripDto[].class);
+            TripDto[] trips = httpClient.get("/trips", TripDto[].class);
             return Arrays.asList(trips);
         } catch (ServiceIntegrationException e) {
             throw new ServiceIntegrationException("Error fetching all trips", e);
