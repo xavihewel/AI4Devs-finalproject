@@ -30,21 +30,22 @@ public class BookingResource {
     
     public BookingResource() {
         this.repository = new BookingRepository();
-        
-        // Get service URLs from environment variables
         String tripsServiceUrl = System.getenv("TRIPS_SERVICE_URL");
         if (tripsServiceUrl == null || tripsServiceUrl.isBlank()) {
-            tripsServiceUrl = "http://localhost:8081"; // Default fallback
+            tripsServiceUrl = "http://localhost:8081";
         }
-        
         String usersServiceUrl = System.getenv("USERS_SERVICE_URL");
         if (usersServiceUrl == null || usersServiceUrl.isBlank()) {
-            usersServiceUrl = "http://localhost:8082"; // Default fallback
+            usersServiceUrl = "http://localhost:8082";
         }
-        
         TripsServiceClient tripsServiceClient = new TripsServiceClient(tripsServiceUrl);
         UsersServiceClient usersServiceClient = new UsersServiceClient(usersServiceUrl);
         this.validationService = new BookingValidationService(tripsServiceClient, usersServiceClient);
+    }
+
+    public BookingResource(BookingRepository repository, BookingValidationService validationService) {
+        this.repository = repository;
+        this.validationService = validationService;
     }
 
     @POST
@@ -98,6 +99,38 @@ public class BookingResource {
         return bookings.stream()
                 .map(this::mapToDto)
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+    }
+
+    @GET
+    @Path("/mine")
+    public List<BookingDto> listMineFiltered(@QueryParam("from") String from,
+                                             @QueryParam("to") String to) {
+        String currentUser = AuthContext.getUserId();
+        if (currentUser == null || currentUser.isBlank()) {
+            throw new BadRequestException("User ID is required");
+        }
+
+        java.time.OffsetDateTime fromDt = parseIsoDatetime(from);
+        java.time.OffsetDateTime toDt = parseIsoDatetime(to);
+        List<Booking> bookings;
+        if (fromDt != null && toDt != null) {
+            bookings = repository.findByPassengerIdAndCreatedAtBetween(currentUser, fromDt, toDt);
+        } else {
+            bookings = repository.findByPassengerId(currentUser);
+        }
+
+        return bookings.stream()
+                .map(this::mapToDto)
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+    }
+
+    private java.time.OffsetDateTime parseIsoDatetime(String iso) {
+        if (iso == null || iso.isBlank()) return null;
+        try {
+            return java.time.OffsetDateTime.parse(iso, java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @GET

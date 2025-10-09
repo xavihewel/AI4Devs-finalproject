@@ -51,6 +51,16 @@
 - **Layout responsive**: Navbar con autenticación, Layout consistente en todas las páginas.
 - Frontend usa Vite para dev/build; variables de entorno `VITE_*` para configuración OIDC y base URL.
 
+### CORS Policy (actualizado)
+- Filtro JAX-RS por servicio (`CorsFilter`) que:
+  - Lee `Origin` de la petición.
+  - Si el origen está permitido (`ALLOWED_ORIGINS`), responde con `Access-Control-Allow-Origin` igual al `Origin`.
+  - Añade `Vary: Origin` y `Access-Control-Allow-Credentials: true`.
+  - Expone métodos `GET, POST, PUT, DELETE, OPTIONS, HEAD`.
+  - `Access-Control-Allow-Headers`: eco de `Access-Control-Request-Headers` o `Origin, Content-Type, Accept, Authorization`.
+- `ALLOWED_ORIGINS` configurable por env (coma-separado), valor por defecto `http://localhost:5173`.
+- `docker-compose.yml` inyecta `ALLOWED_ORIGINS` en `trips/users/booking/matching` para que el frontend local funcione sin errores.
+
 ## Testing Patterns
 
 ### E2E Testing con Cypress

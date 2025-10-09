@@ -4,19 +4,18 @@ import com.company.covoituraje.trips.infrastructure.TripRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
-class TripsResourceTest {
+class TripsResourceMoreTest {
 
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
@@ -47,8 +46,7 @@ class TripsResourceTest {
         em = emf.createEntityManager();
         TripRepository repo = new TripRepository(em);
         resource = new TripsResource(repo);
-        // Set up test user context
-        TripsResource.AuthContext.setUserId("test-user-001");
+        TripsResource.AuthContext.setUserId("driver-1");
     }
 
     private void createSchema() {
@@ -61,29 +59,40 @@ class TripsResourceTest {
         }
     }
 
-    @Test
-    void post_createsTripAndReturnsEntity() {
-        TripCreateDto create = new TripCreateDto();
-        TripDto.Origin origin = new TripDto.Origin();
-        origin.lat = 40.4168;
-        origin.lng = -3.7038;
-        create.origin = origin;
-        create.destinationSedeId = "SEDE-1";
-        create.dateTime = "2025-10-06T08:30:00+00:00";
-        create.seatsTotal = 3;
+    @AfterEach
+    void tearDown() {
+        TripsResource.AuthContext.clear();
+    }
 
-        TripDto body = resource.create(create);
-        assertEquals("SEDE-1", body.destinationSedeId);
-        assertEquals(3, body.seatsTotal);
-        assertEquals(3, body.seatsFree);
-        assertNotNull(body.id);
-        assertEquals("test-user-001", body.driverId);
+    private TripCreateDto sampleCreate() {
+        TripCreateDto c = new TripCreateDto();
+        TripDto.Origin o = new TripDto.Origin();
+        o.lat = 1; o.lng = 2;
+        c.origin = o;
+        c.destinationSedeId = "SEDE-1";
+        c.dateTime = "2025-01-01T08:00:00Z";
+        c.seatsTotal = 2;
+        return c;
     }
 
     @Test
-    void get_returnsList() {
-        List<TripDto> list = resource.list("SEDE-1", "08:00", "09:00");
-        assertNotNull(list);
-        assertTrue(list.isEmpty());
+    void getById_notFound() {
+        assertThrows(jakarta.ws.rs.NotFoundException.class, () -> resource.getById("00000000-0000-0000-0000-000000000001"));
+    }
+
+    @Test
+    void update_forbidden_whenNotDriver() {
+        TripDto created = resource.create(sampleCreate());
+        TripsResource.AuthContext.setUserId("driver-2");
+        assertThrows(jakarta.ws.rs.ForbiddenException.class, () -> resource.update(created.id, sampleCreate()));
+    }
+
+    @Test
+    void delete_forbidden_whenNotDriver() {
+        TripDto created = resource.create(sampleCreate());
+        TripsResource.AuthContext.setUserId("driver-2");
+        assertThrows(jakarta.ws.rs.ForbiddenException.class, () -> resource.delete(created.id));
     }
 }
+
+

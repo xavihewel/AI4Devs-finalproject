@@ -25,7 +25,7 @@ export default function Trips() {
     try {
       setLoading(true);
       const data = await TripsService.getAllTrips();
-      setTrips(data);
+      setTrips(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error loading trips:', error);
     } finally {
@@ -161,29 +161,65 @@ export default function Trips() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {trips.map((trip) => (
+        {(trips ?? []).map((trip) => (
           <Card key={trip.id}>
             <CardContent>
               <div className="space-y-3">
                 <div className="flex justify-between items-start">
                   <h3 className="font-semibold text-lg">Viaje a {trip.destinationSedeId}</h3>
                   <span className="text-sm text-gray-500">
-                    {new Date(trip.dateTime).toLocaleDateString()}
+                    {(() => {
+                      const d = trip?.dateTime ? new Date(trip.dateTime) : new Date(0);
+                      return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+                    })()}
                   </span>
                 </div>
                 
                 <div className="space-y-2 text-sm text-gray-600">
-                  <p><strong>Origen:</strong> {trip.origin.lat.toFixed(4)}, {trip.origin.lng.toFixed(4)}</p>
+                  {(() => {
+                    const lat = typeof trip?.origin?.lat === 'number' ? trip.origin.lat : 0;
+                    const lng = typeof trip?.origin?.lng === 'number' ? trip.origin.lng : 0;
+                    return (
+                      <p><strong>Origen:</strong> {lat.toFixed(4)}, {lng.toFixed(4)}</p>
+                    );
+                  })()}
                   <p><strong>Destino:</strong> {trip.destinationSedeId}</p>
-                  <p><strong>Hora:</strong> {new Date(trip.dateTime).toLocaleTimeString()}</p>
-                  <p><strong>Asientos:</strong> {trip.seatsFree} / {trip.seatsTotal} disponibles</p>
+                  <p><strong>Hora:</strong> {(() => {
+                    const d = trip?.dateTime ? new Date(trip.dateTime) : new Date(0);
+                    return isNaN(d.getTime()) ? '' : d.toLocaleTimeString();
+                  })()}</p>
+                  <p><strong>Asientos:</strong> {(trip?.seatsFree ?? 0)} / {(trip?.seatsTotal ?? 0)} disponibles</p>
                 </div>
 
                 <div className="flex space-x-2">
-                  <Button variant="secondary" size="sm">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    data-cy={`edit-trip-${trip.id}`}
+                    onClick={async () => {
+                      try {
+                        await TripsService.updateTrip(trip.id, { seatsTotal: trip.seatsTotal + 1 });
+                        await loadTrips();
+                      } catch (e) {
+                        console.error('Error updating trip:', e);
+                      }
+                    }}
+                  >
                     Editar
                   </Button>
-                  <Button variant="danger" size="sm">
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    data-cy={`delete-trip-${trip.id}`}
+                    onClick={async () => {
+                      try {
+                        await TripsService.deleteTrip(trip.id);
+                        await loadTrips();
+                      } catch (e) {
+                        console.error('Error deleting trip:', e);
+                      }
+                    }}
+                  >
                     Cancelar
                   </Button>
                 </div>

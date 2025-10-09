@@ -15,6 +15,17 @@
 - Servicios locales: PostgreSQL, Redis; docker-compose recomendado para orquestación.
 - Documentación técnica en `/doc` con PlantUML y Mermaid; prompts en `/Prompts/prompts_xvb.md`.
 
+### CORS y Entornos (actualizado)
+- Backend expone CORS mediante `CorsFilter` por servicio que refleja el `Origin` permitido.
+- Variable de entorno `ALLOWED_ORIGINS` (coma-separado) controla orígenes permitidos; por defecto `http://localhost:5173`.
+- `docker-compose.yml` inyecta `ALLOWED_ORIGINS` en `trips/users/booking/matching` para desarrollo local.
+- Frontend modo dev (`Vite` en 5173): `scripts/start-frontend-dev.sh` genera `Frontend/.env.local` con:
+  - `VITE_USERS_API_BASE_URL=http://localhost:8082/api`
+  - `VITE_TRIPS_API_BASE_URL=http://localhost:8081/api`
+  - `VITE_BOOKING_API_BASE_URL=http://localhost:8083/api`
+  - `VITE_MATCHING_API_BASE_URL=http://localhost:8084/api`
+  - `VITE_OIDC_ISSUER` y `VITE_OIDC_CLIENT_ID`
+
 ## Constraints
 - DDD/TDD/SOLID como guía: pruebas antes de código funcional; límites de contexto claros; separación de capas.
 - Privacidad y cumplimiento (RGPD): almacenar zona aproximada; cifrado en tránsito/ reposo.

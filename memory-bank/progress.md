@@ -13,10 +13,19 @@
   - Testing: `run-e2e-tests.sh`
 - **Cypress E2E**: Suite de ~21 tests E2E implementada y organizada. Smoke tests (6/6 ✅) funcionando perfectamente.
 - **Documentación**: `QUICK-START.md`, `doc/setup/frontend-setup.md`, `doc/setup/verificacion-sistema.md`, `Frontend/cypress/README.md` completos.
+ - **CORS**: Política CORS corregida; `ALLOWED_ORIGINS` soportado y configurado en Docker para front local (`http://localhost:5173`).
+- **Tests backend (unidad/integración)**: Suite verde en `shared`, `auth-service`, `users-service`, `trips-service`, `booking-service`, `matching-service`.
+  - Recursos con DI habilitada (`UsersResource`, `TripsResource`, `BookingResource`, `MatchesResource`).
+  - `users` y `trips` usan Testcontainers para repos/recursos.
+  - `booking` usa Testcontainers + mocks de integraciones.
+  - `matching` usa DI y repositorio mockeado (sin DB) en unit tests, y test de integración con filtro por fecha.
+  - Añadido `AuthUtilsTest` en `shared`.
 
 ## What's Left
-- **FIX CRÍTICO Frontend Login**: Variables VITE_* no se inyectan correctamente en bundle - botones login/comenzar no funcionan.
+- **Revalidar Login**: Tras fix CORS, re-ejecutar tests de autenticación y confirmar que `/users/me` funciona desde FE local.
+- **Feature Plan**: Seguir `memory-bank/featurePlan.md` para priorizar Fase MVP → Fase 2 → Fase 3.
 - **Testing E2E completo**: Una vez arreglado login, completar suite de tests Cypress (authentication, trips, matches, bookings, flows).
+- **Auth JWKS remoto (tests)**: Añadir tests con WireMock para `JwtValidator` con JWKS HTTP (éxito, timeout, key miss, caché).
 - **Frontend features**: Completar todas las páginas (Bookings más robusta, Profile funcional, Admin).
 - **Observabilidad avanzada**: Métricas, tracing distribuido, agregación de logs.
 - **API Gateway**: Implementar gateway con routing path-based para unificar acceso.
@@ -26,13 +35,13 @@
 ## Current Status
 - ✅ Sistema completamente funcional y arrancable con un solo comando (`start-all-services.sh`)
 - ✅ Infraestructura automatizada con verificación en capas
-- ✅ Keycloak funcionando correctamente
+- ✅ Keycloak funcionando correctamente (verificado por scripts; revisar si no arranca en algunos entornos)
 - ✅ Cypress E2E instalado y configurado - smoke tests (6/6 ✅) pasando
-- ❌ Frontend login bloqueado - variables OIDC no compiladas correctamente en Docker build
-- 🔄 Investigando solución para inyección de variables en build time de Vite
+- 🔄 Frontend login: revalidación tras corrección de CORS y ajuste de `.env.local`
+- ✅ Backend unit/integration tests en verde con DI/Testcontainers.
 
 ## Known Issues
-- ❌ **CRÍTICO**: Botones "Iniciar Sesión" y "Comenzar Ahora" no funcionan - variables VITE_* no se reemplazan en build de Docker
+- ⚠️ Posibles diferencias entre modo Docker y modo Vite local para variables de entorno
 - ⚠️ Frontend en Docker requiere rebuild manual para ver cambios (usar modo dev local para desarrollo)
 - ⚠️ Microservicios tardan ~30s en arrancar completamente (normal para Payara Micro)
 - ⚠️ Tests E2E de authentication (4/8) fallan por problema de login - esperan timeouts largos

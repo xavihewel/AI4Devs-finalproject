@@ -23,3 +23,29 @@
 ## infra (repo raíz)
 - Ticket I1: docker-compose (PostgreSQL+PostGIS, Redis, Keycloak, Mailhog opcional)
 - Ticket I2: Scripts de migración/seeds y README de setup local
+
+## notifications (MVP dentro de booking-service o módulo simple)
+- Ticket N1: Configurar envío de email (SMTP/Mailhog) y plantilla de confirmación [tests]
+- Ticket N2: Web Push (VAPID): generación de claves y firma; utilidades de envío [tests]
+- Ticket N3: Disparo BookingConfirmed → orquestar email + push con reintentos básicos [tests]
+
+## users-service (suscripciones push)
+- Ticket U3: Endpoints `POST /users/me/push-subscriptions` y `DELETE /users/me/push-subscriptions/{id}` [tests]
+- Ticket U4: Persistir suscripción (endpoint, keys, expirationTime) asociada a usuario [tests]
+
+## booking-service (eventos)
+- Ticket B3: Publicar evento `BookingConfirmed` y llamar a notifications (email + push) [tests]
+- Ticket B4: Idempotencia en notificaciones por reserva (evitar duplicados) [tests]
+
+## frontend
+- Ticket FE1: Service Worker de notificaciones (registro, manejo de eventos ‘push’) [tests]
+- Ticket FE2: UI de Perfil: toggle de notificaciones (alta/baja suscripción, estado permisos) [tests]
+- Ticket FE3: Pantalla de Búsqueda/Matching: formulario filtros + resultados con score y CTA reservar [tests]
+
+## infra/config
+- Ticket I3: Variables VAPID (VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY) y wiring en FE/BE
+- Ticket I4: Config SMTP (Mailhog) y plantilla básica de correos
+
+## cypress e2e
+- Ticket E2E1: Flujo completo: login → crear viaje → buscar/matchear → reservar → notificación enviada (comprobar email en Mailhog)
+- Ticket E2E2: Suscripción push (smoke: alta/baja; si el runner lo permite)

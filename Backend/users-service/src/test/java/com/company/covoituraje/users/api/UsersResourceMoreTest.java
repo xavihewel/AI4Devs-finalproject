@@ -1,11 +1,13 @@
-package com.company.covoituraje.trips.api;
+package com.company.covoituraje.users.api;
 
-import com.company.covoituraje.trips.infrastructure.TripRepository;
+import com.company.covoituraje.users.domain.User;
+import com.company.covoituraje.users.infrastructure.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -16,7 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
-class TripsResourceTest {
+class UsersResourceMoreTest {
 
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
@@ -29,7 +31,8 @@ class TripsResourceTest {
     private EntityManagerFactory emf;
     private EntityManager em;
 
-    private TripsResource resource;
+    private UsersResource resource;
+    private UserRepository setupRepo;
 
     @BeforeEach
     void setUp() {
@@ -43,47 +46,55 @@ class TripsResourceTest {
         props.setProperty("hibernate.hbm2ddl.auto", "create");
         props.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
 
-        emf = Persistence.createEntityManagerFactory("trips-pu", props);
+        emf = Persistence.createEntityManagerFactory("users-pu", props);
         em = emf.createEntityManager();
-        TripRepository repo = new TripRepository(em);
-        resource = new TripsResource(repo);
-        // Set up test user context
-        TripsResource.AuthContext.setUserId("test-user-001");
+        setupRepo = new UserRepository(em);
+        resource = new UsersResource(setupRepo);
+
+        setupRepo.save(new User("user-1", "User 1", "u1@company.com", "SEDE-1", "EMPLOYEE"));
+        setupRepo.save(new User("user-2", "User 2", "u2@company.com", "SEDE-2", "EMPLOYEE"));
+        setupRepo.save(new User("user-3", "User 3", "u3@company.com", "SEDE-1", "ADMIN"));
     }
 
     private void createSchema() {
         try (var connection = postgres.createConnection("")) {
             try (var statement = connection.createStatement()) {
-                statement.execute("CREATE SCHEMA IF NOT EXISTS trips;");
+                statement.execute("CREATE SCHEMA IF NOT EXISTS users;");
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to create schema", e);
         }
     }
 
-    @Test
-    void post_createsTripAndReturnsEntity() {
-        TripCreateDto create = new TripCreateDto();
-        TripDto.Origin origin = new TripDto.Origin();
-        origin.lat = 40.4168;
-        origin.lng = -3.7038;
-        create.origin = origin;
-        create.destinationSedeId = "SEDE-1";
-        create.dateTime = "2025-10-06T08:30:00+00:00";
-        create.seatsTotal = 3;
-
-        TripDto body = resource.create(create);
-        assertEquals("SEDE-1", body.destinationSedeId);
-        assertEquals(3, body.seatsTotal);
-        assertEquals(3, body.seatsFree);
-        assertNotNull(body.id);
-        assertEquals("test-user-001", body.driverId);
+    @AfterEach
+    void tearDown() {
+        UsersResource.AuthContext.clear();
     }
 
     @Test
-    void get_returnsList() {
-        List<TripDto> list = resource.list("SEDE-1", "08:00", "09:00");
-        assertNotNull(list);
-        assertTrue(list.isEmpty());
+    void list_bySede_filters() {
+        List<UserDto> list = resource.list("SEDE-1", null);
+        assertEquals(2, list.size());
+        assertTrue(list.stream().allMatch(u -> "SEDE-1".equals(u.sedeId)));
+    }
+
+    @Test
+    void list_byRole_filters() {
+        List<UserDto> list = resource.list(null, "EMPLOYEE");
+        assertEquals(2, list.size());
+        assertTrue(list.stream().allMatch(u -> u.roles.contains("EMPLOYEE")));
+    }
+
+    @Test
+    void getById_notFound() {
+        assertThrows(jakarta.ws.rs.NotFoundException.class, () -> resource.getById("missing"));
+    }
+
+    @Test
+    void getMe_missingUserId_badRequest() {
+        UsersResource.AuthContext.clear();
+        assertThrows(jakarta.ws.rs.BadRequestException.class, () -> resource.getMe());
     }
 }
+
+

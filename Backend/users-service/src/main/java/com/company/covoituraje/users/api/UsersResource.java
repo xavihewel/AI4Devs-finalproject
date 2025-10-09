@@ -13,7 +13,15 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public class UsersResource {
 
-    private final UserRepository repository = new UserRepository();
+    private final UserRepository repository;
+
+    public UsersResource() {
+        this.repository = new UserRepository();
+    }
+
+    public UsersResource(UserRepository repository) {
+        this.repository = repository;
+    }
     
     static final class AuthContext {
         private static final ThreadLocal<String> USER_ID = new ThreadLocal<>();

@@ -1,10 +1,10 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Trips from './Trips';
-import { TripsService } from '../api/trips';
+import { TripsService } from '../api';
 import type { TripDto } from '../types/api';
 
-// Mock the API service
-jest.mock('../api/trips');
+// Mock the API service (mock the same module the component imports)
+jest.mock('../api');
 
 describe('Trips', () => {
   const mockTrips: TripDto[] = [
@@ -26,7 +26,7 @@ describe('Trips', () => {
   });
 
   it('renders trips page title', async () => {
-    jest.mocked(TripsService.getMyTrips).mockResolvedValue([]);
+    jest.mocked(TripsService.getAllTrips).mockResolvedValue([]);
     
     render(<Trips />);
     
@@ -36,7 +36,7 @@ describe('Trips', () => {
   });
 
   it('shows loading state initially', () => {
-    jest.mocked(TripsService.getMyTrips).mockImplementation(() => new Promise(() => {})); // Never resolves
+    jest.mocked(TripsService.getAllTrips).mockImplementation(() => new Promise(() => {})); // Never resolves
     
     render(<Trips />);
     
@@ -44,7 +44,7 @@ describe('Trips', () => {
   });
 
   it('displays trips when loaded', async () => {
-    jest.mocked(TripsService.getMyTrips).mockResolvedValue(mockTrips);
+    jest.mocked(TripsService.getAllTrips).mockResolvedValue(mockTrips);
     
     render(<Trips />);
     
@@ -55,7 +55,7 @@ describe('Trips', () => {
   });
 
   it('shows create trip button', async () => {
-    jest.mocked(TripsService.getMyTrips).mockResolvedValue([]);
+    jest.mocked(TripsService.getAllTrips).mockResolvedValue([]);
     
     render(<Trips />);
     
@@ -65,7 +65,7 @@ describe('Trips', () => {
   });
 
   it('shows create form when create button is clicked', async () => {
-    jest.mocked(TripsService.getMyTrips).mockResolvedValue([]);
+    jest.mocked(TripsService.getAllTrips).mockResolvedValue([]);
     
     render(<Trips />);
     
@@ -83,7 +83,7 @@ describe('Trips', () => {
   });
 
   it('shows empty state when no trips exist', async () => {
-    jest.mocked(TripsService.getMyTrips).mockResolvedValue([]);
+    jest.mocked(TripsService.getAllTrips).mockResolvedValue([]);
     
     render(<Trips />);
     
@@ -94,7 +94,7 @@ describe('Trips', () => {
   });
 
   it('submits form and creates trip', async () => {
-    jest.mocked(TripsService.getMyTrips).mockResolvedValue([]);
+    jest.mocked(TripsService.getAllTrips).mockResolvedValue([]);
     jest.mocked(TripsService.createTrip).mockResolvedValue(mockTrips[0]);
     
     render(<Trips />);
@@ -117,17 +117,19 @@ describe('Trips', () => {
     fireEvent.click(screen.getByText('Crear Viaje'));
     
     await waitFor(() => {
-      expect(TripsService.createTrip).toHaveBeenCalledWith({
-        origin: { lat: 40.4168, lng: -3.7038 },
-        destinationSedeId: 'SEDE-1',
-        dateTime: '2024-01-01T08:00',
-        seatsTotal: 4,
-      });
+      expect(TripsService.createTrip).toHaveBeenCalledWith(
+        expect.objectContaining({
+          origin: { lat: 40.4168, lng: -3.7038 },
+          destinationSedeId: 'SEDE-1',
+          dateTime: expect.stringMatching(/Z$/),
+          seatsTotal: 4,
+        })
+      );
     });
   });
 
   it('handles form cancellation', async () => {
-    jest.mocked(TripsService.getMyTrips).mockResolvedValue([]);
+    jest.mocked(TripsService.getAllTrips).mockResolvedValue([]);
     
     render(<Trips />);
     

@@ -1,17 +1,31 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals';
 import { TripsService } from './trips';
-import { api } from './client';
 import type { TripDto, TripCreateDto } from '../types/api';
+import axios from 'axios';
 
-// Mock axios - inline to avoid hoisting issues
-jest.mock('./client', () => ({
-  api: {
+// Mock axios.create used inside the service, expose a shared instance
+jest.mock('axios', () => {
+  const instance = {
     get: jest.fn(),
     post: jest.fn(),
     put: jest.fn(),
     delete: jest.fn(),
-  },
-}));
+    interceptors: {
+      request: {
+        use: jest.fn(),
+      },
+    },
+  };
+  return {
+    __esModule: true,
+    default: {
+      create: () => instance,
+      _instance: instance,
+    },
+    create: () => instance,
+    _instance: instance,
+  };
+});
 
 describe('TripsService', () => {
   beforeEach(() => {
@@ -34,16 +48,16 @@ describe('TripsService', () => {
         },
       ];
 
-      (api as any).get.mockResolvedValue({ data: mockTrips });
+      (axios as any)._instance.get.mockResolvedValue({ data: mockTrips });
 
       const result = await TripsService.getAllTrips();
 
-      expect((api as any).get).toHaveBeenCalledWith('/trips');
+      expect((axios as any)._instance.get).toHaveBeenCalledWith('/trips');
       expect(result).toEqual(mockTrips);
     });
 
     it('propagates API errors', async () => {
-      (api as any).get.mockRejectedValueOnce(new Error('Boom'));
+      (axios as any)._instance.get.mockRejectedValueOnce(new Error('Boom'));
       await expect(TripsService.getAllTrips()).rejects.toThrow('Boom');
     });
   });
@@ -53,11 +67,11 @@ describe('TripsService', () => {
       const mockTrips: TripDto[] = [];
       const destinationSedeId = 'SEDE-1';
 
-      (api as any).get.mockResolvedValue({ data: mockTrips });
+      (axios as any)._instance.get.mockResolvedValue({ data: mockTrips });
 
       const result = await TripsService.getTripsByDestination(destinationSedeId);
 
-      expect((api as any).get).toHaveBeenCalledWith(`/trips?destinationSedeId=${destinationSedeId}`);
+      expect((axios as any)._instance.get).toHaveBeenCalledWith(`/trips?destinationSedeId=${destinationSedeId}`);
       expect(result).toEqual(mockTrips);
     });
   });
@@ -76,11 +90,11 @@ describe('TripsService', () => {
         updatedAt: '2024-01-01T00:00:00Z',
       };
 
-      (api as any).get.mockResolvedValue({ data: mockTrip });
+      (axios as any)._instance.get.mockResolvedValue({ data: mockTrip });
 
       const result = await TripsService.getTripById('1');
 
-      expect((api as any).get).toHaveBeenCalledWith('/trips/1');
+      expect((axios as any)._instance.get).toHaveBeenCalledWith('/trips/1');
       expect(result).toEqual(mockTrip);
     });
   });
@@ -103,11 +117,11 @@ describe('TripsService', () => {
         updatedAt: '2024-01-01T00:00:00Z',
       };
 
-      (api as any).post.mockResolvedValue({ data: mockCreatedTrip });
+      (axios as any)._instance.post.mockResolvedValue({ data: mockCreatedTrip });
 
       const result = await TripsService.createTrip(tripData);
 
-      expect((api as any).post).toHaveBeenCalledWith('/trips', tripData);
+      expect((axios as any)._instance.post).toHaveBeenCalledWith('/trips', tripData);
       expect(result).toEqual(mockCreatedTrip);
     });
   });
@@ -127,22 +141,22 @@ describe('TripsService', () => {
         updatedAt: '2024-01-01T00:00:00Z',
       };
 
-      (api as any).put.mockResolvedValue({ data: mockUpdatedTrip });
+      (axios as any)._instance.put.mockResolvedValue({ data: mockUpdatedTrip });
 
       const result = await TripsService.updateTrip('1', updateData);
 
-      expect((api as any).put).toHaveBeenCalledWith('/trips/1', updateData);
+      expect((axios as any)._instance.put).toHaveBeenCalledWith('/trips/1', updateData);
       expect(result).toEqual(mockUpdatedTrip);
     });
   });
 
   describe('deleteTrip', () => {
     it('should delete a trip', async () => {
-      (api as any).delete.mockResolvedValue({});
+      (axios as any)._instance.delete.mockResolvedValue({});
 
       await TripsService.deleteTrip('1');
 
-      expect((api as any).delete).toHaveBeenCalledWith('/trips/1');
+      expect((axios as any)._instance.delete).toHaveBeenCalledWith('/trips/1');
     });
   });
 
@@ -150,11 +164,11 @@ describe('TripsService', () => {
     it('should fetch user trips', async () => {
       const mockTrips: TripDto[] = [];
 
-      (api as any).get.mockResolvedValue({ data: mockTrips });
+      (axios as any)._instance.get.mockResolvedValue({ data: mockTrips });
 
       const result = await TripsService.getMyTrips();
 
-      expect((api as any).get).toHaveBeenCalledWith('/trips/my-trips');
+      expect((axios as any)._instance.get).toHaveBeenCalledWith('/trips/my-trips');
       expect(result).toEqual(mockTrips);
     });
   });

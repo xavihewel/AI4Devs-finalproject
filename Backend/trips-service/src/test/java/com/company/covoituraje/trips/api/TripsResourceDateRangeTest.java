@@ -4,8 +4,8 @@ import com.company.covoituraje.trips.infrastructure.TripRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -16,7 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
-class TripsResourceTest {
+class TripsResourceDateRangeTest {
 
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
@@ -28,7 +28,6 @@ class TripsResourceTest {
 
     private EntityManagerFactory emf;
     private EntityManager em;
-
     private TripsResource resource;
 
     @BeforeEach
@@ -47,8 +46,12 @@ class TripsResourceTest {
         em = emf.createEntityManager();
         TripRepository repo = new TripRepository(em);
         resource = new TripsResource(repo);
-        // Set up test user context
-        TripsResource.AuthContext.setUserId("test-user-001");
+        TripsResource.AuthContext.setUserId("driver-1");
+
+        // Seed three trips at 08:00, 08:30, 09:30
+        seedTrip("SEDE-1", "2025-01-01T08:00:00Z");
+        seedTrip("SEDE-1", "2025-01-01T08:30:00Z");
+        seedTrip("SEDE-1", "2025-01-01T09:30:00Z");
     }
 
     private void createSchema() {
@@ -61,29 +64,52 @@ class TripsResourceTest {
         }
     }
 
-    @Test
-    void post_createsTripAndReturnsEntity() {
-        TripCreateDto create = new TripCreateDto();
-        TripDto.Origin origin = new TripDto.Origin();
-        origin.lat = 40.4168;
-        origin.lng = -3.7038;
-        create.origin = origin;
-        create.destinationSedeId = "SEDE-1";
-        create.dateTime = "2025-10-06T08:30:00+00:00";
-        create.seatsTotal = 3;
-
-        TripDto body = resource.create(create);
-        assertEquals("SEDE-1", body.destinationSedeId);
-        assertEquals(3, body.seatsTotal);
-        assertEquals(3, body.seatsFree);
-        assertNotNull(body.id);
-        assertEquals("test-user-001", body.driverId);
+    private void seedTrip(String sede, String iso) {
+        TripCreateDto c = new TripCreateDto();
+        TripDto.Origin o = new TripDto.Origin();
+        o.lat = 1; o.lng = 2;
+        c.origin = o;
+        c.destinationSedeId = sede;
+        c.dateTime = iso;
+        c.seatsTotal = 2;
+        resource.create(c);
     }
 
     @Test
-    void get_returnsList() {
+    void list_filtersByFromToRange() {
         List<TripDto> list = resource.list("SEDE-1", "08:00", "09:00");
-        assertNotNull(list);
-        assertTrue(list.isEmpty());
+        assertEquals(2, list.size());
+        assertTrue(list.stream().allMatch(t -> t.destinationSedeId.equals("SEDE-1")));
+    }
+
+    @Test
+    void list_filtersByFromOnly() {
+        List<TripDto> list = resource.list(null, "09:00", null);
+        assertEquals(1, list.size());
+        assertEquals("2025-01-01T09:30:00Z", list.get(0).dateTime);
+    }
+
+    @Test
+    void list_filtersByToOnly() {
+        List<TripDto> list = resource.list(null, null, "08:15");
+        assertEquals(1, list.size());
+        assertEquals("2025-01-01T08:00:00Z", list.get(0).dateTime);
+    }
+
+    @Test
+    void list_filtersByFullIsoDatetimeRange_withDestination() {
+        // add another day outside range
+        seedTrip("SEDE-1", "2025-01-02T08:30:00Z");
+        List<TripDto> list = resource.list("SEDE-1", "2025-01-01T08:15:00Z", "2025-01-01T09:00:00Z");
+        assertEquals(1, list.size());
+        assertEquals("2025-01-01T08:30:00Z", list.get(0).dateTime);
+    }
+
+    @Test
+    void list_filtersByFullIsoDatetimeRange_withoutDestination() {
+        List<TripDto> list = resource.list(null, "2025-01-01T08:00:00Z", "2025-01-01T08:30:00Z");
+        assertEquals(2, list.size());
     }
 }
+
+

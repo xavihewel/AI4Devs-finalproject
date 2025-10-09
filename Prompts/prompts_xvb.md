@@ -448,3 +448,23 @@
 - ✅ Base sólida para añadir más tests según se desarrollan features
 - ✅ CI/CD ready - listo para integrar en pipeline
 - 🔄 Bug de login priorizado para fix inmediato
+
+### 2025-10-08 (tarde) — CORS y Entorno Frontend
+- Intent: Corregir error CORS en `Mi Perfil` y alinear configuración de entorno local.
+- Actions:
+  - Actualizar `CorsFilter` en `users/trips/booking/matching` para reflejar `Origin`, añadir `Vary: Origin` y soportar `ALLOWED_ORIGINS`.
+  - Añadir `ALLOWED_ORIGINS=http://localhost:5173` en `env.example` y en `docker-compose.yml` para todos los servicios backend.
+  - Actualizar `scripts/start-frontend-dev.sh` para generar `Frontend/.env.local` con `VITE_*_API_BASE_URL` por servicio incluyendo `/api`.
+- Result:
+  - Frontend local (`http://localhost:5173`) autorizado por CORS con credenciales.
+  - Llamadas de FE a `/api/users/me` apuntan al servicio correcto (`8082/api`).
+  - Preparado para re-ejecutar tests de autenticación en Cypress.
+
+### 2025-10-08 (tarde-noche) — Plan actualizado + ER de datos
+- Intent: Alinear documentación de plan con preferencias aprobadas (push en MVP, búsqueda+matching misma iteración, mapas/reportes a Fase 2) y documentar modelo ER.
+- Actions:
+  - `doc/plan/epics.md`: añadida Epic 7 (Notificaciones email+push) y Epics de Fase 2 (Mapa, Historial, Confianza 1‑clic, Privacidad avanzada, Reportes RRHH).
+  - `doc/plan/user-stories.md`: añadidas US6 (suscripción push), US7 (notificación en BookingConfirmed), US8 (búsqueda con matching básico).
+  - `doc/plan/tickets.md`: añadidos tickets N1–N3 (email/push), U3–U4 (suscripciones), B3–B4 (eventos), FE1–FE3 (SW/Perfil/Matching UI), I3–I4 (VAPID/SMTP), E2E1–E2E2 (flujos).
+  - `doc/plan/er-model.md`: creado documento Mermaid ER con entidades USER, SEDE, VEHICLE, TRIP, BOOKING, RATING y relaciones clave.
+- Result: Plan reforzado y trazable; ER listo para alinear persistencia y contratos. Próximo: ejecutar implementación MVP con push + matching.

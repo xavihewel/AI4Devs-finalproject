@@ -4,6 +4,7 @@ import com.company.covoituraje.matching.domain.Match;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
+import java.time.OffsetDateTime;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -67,11 +68,31 @@ public class MatchRepository {
         return query.getResultList();
     }
 
+    public List<Match> findByPassengerIdAndCreatedAtBetween(String passengerId, OffsetDateTime from, OffsetDateTime to) {
+        TypedQuery<Match> query = entityManager.createQuery(
+            "SELECT m FROM Match m WHERE m.passengerId = :passengerId AND m.createdAt >= :from AND m.createdAt <= :to ORDER BY m.matchScore DESC",
+            Match.class);
+        query.setParameter("passengerId", passengerId);
+        query.setParameter("from", from);
+        query.setParameter("to", to);
+        return query.getResultList();
+    }
+
     public List<Match> findByDriverId(String driverId) {
         TypedQuery<Match> query = entityManager.createQuery(
             "SELECT m FROM Match m WHERE m.driverId = :driverId ORDER BY m.matchScore DESC", 
             Match.class);
         query.setParameter("driverId", driverId);
+        return query.getResultList();
+    }
+
+    public List<Match> findByDriverIdAndCreatedAtBetween(String driverId, OffsetDateTime from, OffsetDateTime to) {
+        TypedQuery<Match> query = entityManager.createQuery(
+            "SELECT m FROM Match m WHERE m.driverId = :driverId AND m.createdAt >= :from AND m.createdAt <= :to ORDER BY m.matchScore DESC",
+            Match.class);
+        query.setParameter("driverId", driverId);
+        query.setParameter("from", from);
+        query.setParameter("to", to);
         return query.getResultList();
     }
 

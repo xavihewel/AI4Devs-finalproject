@@ -14,6 +14,7 @@ import java.util.List;
 public class MatchesResource {
 
     private final MatchingService matchingService;
+    private final MatchRepository matchRepository;
     
     static final class AuthContext {
         private static final ThreadLocal<String> USER_ID = new ThreadLocal<>();
@@ -23,15 +24,19 @@ public class MatchesResource {
     }
 
     public MatchesResource() {
-        // Get trips service URL from environment variable
         String tripsServiceUrl = System.getenv("TRIPS_SERVICE_URL");
         if (tripsServiceUrl == null || tripsServiceUrl.isBlank()) {
-            tripsServiceUrl = "http://localhost:8081"; // Default fallback
+            tripsServiceUrl = "http://localhost:8081";
         }
-        
         MatchRepository matchRepository = new MatchRepository();
         TripsServiceClient tripsServiceClient = new TripsServiceClient(tripsServiceUrl);
         this.matchingService = new MatchingService(matchRepository, tripsServiceClient);
+        this.matchRepository = matchRepository;
+    }
+
+    public MatchesResource(MatchingService matchingService, MatchRepository matchRepository) {
+        this.matchingService = matchingService;
+        this.matchRepository = matchRepository;
     }
 
     @GET
@@ -65,15 +70,21 @@ public class MatchesResource {
 
     @GET
     @Path("/my-matches")
-    public List<MatchDto> getMyMatches() {
+    public List<MatchDto> getMyMatches(@QueryParam("from") String from,
+                                       @QueryParam("to") String to) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
             throw new BadRequestException("User ID is required");
         }
 
-        // Get matches from database for this user
-        MatchRepository repository = new MatchRepository();
-        List<com.company.covoituraje.matching.domain.Match> matches = repository.findByPassengerId(currentUser);
+        java.time.OffsetDateTime fromDt = parseIsoDatetime(from);
+        java.time.OffsetDateTime toDt = parseIsoDatetime(to);
+        List<com.company.covoituraje.matching.domain.Match> matches;
+        if (fromDt != null && toDt != null) {
+            matches = matchRepository.findByPassengerIdAndCreatedAtBetween(currentUser, fromDt, toDt);
+        } else {
+            matches = matchRepository.findByPassengerId(currentUser);
+        }
 
         return matches.stream()
                 .map(this::mapDomainToDto)
@@ -82,7 +93,9 @@ public class MatchesResource {
 
     @GET
     @Path("/driver/{driverId}")
-    public List<MatchDto> getDriverMatches(@PathParam("driverId") String driverId) {
+    public List<MatchDto> getDriverMatches(@PathParam("driverId") String driverId,
+                                           @QueryParam("from") String from,
+                                           @QueryParam("to") String to) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
             throw new BadRequestException("User ID is required");
@@ -94,8 +107,14 @@ public class MatchesResource {
             throw new ForbiddenException("Access denied");
         }
 
-        MatchRepository repository = new MatchRepository();
-        List<com.company.covoituraje.matching.domain.Match> matches = repository.findByDriverId(driverId);
+        java.time.OffsetDateTime fromDt = parseIsoDatetime(from);
+        java.time.OffsetDateTime toDt = parseIsoDatetime(to);
+        List<com.company.covoituraje.matching.domain.Match> matches;
+        if (fromDt != null && toDt != null) {
+            matches = matchRepository.findByDriverIdAndCreatedAtBetween(driverId, fromDt, toDt);
+        } else {
+            matches = matchRepository.findByDriverId(driverId);
+        }
 
         return matches.stream()
                 .map(this::mapDomainToDto)
@@ -122,5 +141,14 @@ public class MatchesResource {
         dto.score = match.getMatchScore().doubleValue();
         dto.status = match.getStatus();
         return dto;
+    }
+
+    private java.time.OffsetDateTime parseIsoDatetime(String iso) {
+        if (iso == null || iso.isBlank()) return null;
+        try {
+            return java.time.OffsetDateTime.parse(iso, java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.company.covoituraje.trips.domain.Trip;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,6 +56,25 @@ public class TripRepository {
             "SELECT t FROM Trip t WHERE t.destinationSedeId = :destinationSedeId ORDER BY t.dateTime ASC", 
             Trip.class);
         query.setParameter("destinationSedeId", destinationSedeId);
+        return query.getResultList();
+    }
+
+    public List<Trip> findByDateTimeBetween(OffsetDateTime from, OffsetDateTime to) {
+        TypedQuery<Trip> query = entityManager.createQuery(
+            "SELECT t FROM Trip t WHERE t.dateTime >= :from AND t.dateTime <= :to ORDER BY t.dateTime ASC",
+            Trip.class);
+        query.setParameter("from", from);
+        query.setParameter("to", to);
+        return query.getResultList();
+    }
+
+    public List<Trip> findByDestinationSedeIdAndDateTimeBetween(String destinationSedeId, OffsetDateTime from, OffsetDateTime to) {
+        TypedQuery<Trip> query = entityManager.createQuery(
+            "SELECT t FROM Trip t WHERE t.destinationSedeId = :destinationSedeId AND t.dateTime >= :from AND t.dateTime <= :to ORDER BY t.dateTime ASC",
+            Trip.class);
+        query.setParameter("destinationSedeId", destinationSedeId);
+        query.setParameter("from", from);
+        query.setParameter("to", to);
         return query.getResultList();
     }
 

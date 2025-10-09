@@ -1,14 +1,28 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals';
 import { MatchesService } from './matches';
-import { api } from './client';
 import type { MatchDto } from '../types/api';
+import axios from 'axios';
 
-// Mock axios - inline to avoid hoisting issues
-jest.mock('./client', () => ({
-  api: {
+// Mock axios.create used inside the service
+jest.mock('axios', () => {
+  const instance = {
     get: jest.fn(),
-  },
-}));
+    interceptors: {
+      request: {
+        use: jest.fn(),
+      },
+    },
+  };
+  return {
+    __esModule: true,
+    default: {
+      create: () => instance,
+      _instance: instance,
+    },
+    create: () => instance,
+    _instance: instance,
+  };
+});
 
 describe('MatchesService', () => {
   beforeEach(() => {
@@ -31,7 +45,7 @@ describe('MatchesService', () => {
         },
       ];
 
-      (api.get as any).mockResolvedValue({ data: mockMatches });
+      (axios as any)._instance.get.mockResolvedValue({ data: mockMatches });
 
       const params = {
         destinationSedeId: 'SEDE-1',
@@ -41,7 +55,7 @@ describe('MatchesService', () => {
 
       const result = await MatchesService.findMatches(params);
 
-      expect((api.get as any)).toHaveBeenCalledWith(
+      expect((axios as any)._instance.get).toHaveBeenCalledWith(
         '/matches?destinationSedeId=SEDE-1&time=08%3A30&origin=40.4168%2C-3.7038'
       );
       expect(result).toEqual(mockMatches);
@@ -50,7 +64,7 @@ describe('MatchesService', () => {
     it('should find matches with only destination', async () => {
       const mockMatches: MatchDto[] = [];
 
-      (api.get as any).mockResolvedValue({ data: mockMatches });
+      (axios as any)._instance.get.mockResolvedValue({ data: mockMatches });
 
       const params = {
         destinationSedeId: 'SEDE-1',
@@ -58,14 +72,14 @@ describe('MatchesService', () => {
 
       const result = await MatchesService.findMatches(params);
 
-      expect((api.get as any)).toHaveBeenCalledWith('/matches?destinationSedeId=SEDE-1');
+      expect((axios as any)._instance.get).toHaveBeenCalledWith('/matches?destinationSedeId=SEDE-1');
       expect(result).toEqual(mockMatches);
     });
 
     it('should find matches with destination and time', async () => {
       const mockMatches: MatchDto[] = [];
 
-      (api.get as any).mockResolvedValue({ data: mockMatches });
+      (axios as any)._instance.get.mockResolvedValue({ data: mockMatches });
 
       const params = {
         destinationSedeId: 'SEDE-1',
@@ -74,12 +88,12 @@ describe('MatchesService', () => {
 
       const result = await MatchesService.findMatches(params);
 
-      expect((api.get as any)).toHaveBeenCalledWith('/matches?destinationSedeId=SEDE-1&time=09%3A00');
+      expect((axios as any)._instance.get).toHaveBeenCalledWith('/matches?destinationSedeId=SEDE-1&time=09%3A00');
       expect(result).toEqual(mockMatches);
     });
 
     it('propagates API errors', async () => {
-      (api.get as any).mockRejectedValueOnce(new Error('Network Error'));
+      (axios as any)._instance.get.mockRejectedValueOnce(new Error('Network Error'));
       await expect(
         MatchesService.findMatches({ destinationSedeId: 'SEDE-1' })
       ).rejects.toThrow('Network Error');
@@ -90,11 +104,11 @@ describe('MatchesService', () => {
     it('should fetch user matches', async () => {
       const mockMatches: MatchDto[] = [];
 
-      (api.get as any).mockResolvedValue({ data: mockMatches });
+      (axios as any)._instance.get.mockResolvedValue({ data: mockMatches });
 
       const result = await MatchesService.getMyMatches();
 
-      expect((api.get as any)).toHaveBeenCalledWith('/matches/my-matches');
+      expect((axios as any)._instance.get).toHaveBeenCalledWith('/matches/my-matches');
       expect(result).toEqual(mockMatches);
     });
   });
@@ -113,11 +127,11 @@ describe('MatchesService', () => {
         reasons: ['Ubicación cercana'],
       };
 
-      (api.get as any).mockResolvedValue({ data: mockMatch });
+      (axios as any)._instance.get.mockResolvedValue({ data: mockMatch });
 
       const result = await MatchesService.getMatchById('1');
 
-      expect((api.get as any)).toHaveBeenCalledWith('/matches/1');
+      expect((axios as any)._instance.get).toHaveBeenCalledWith('/matches/1');
       expect(result).toEqual(mockMatch);
     });
   });

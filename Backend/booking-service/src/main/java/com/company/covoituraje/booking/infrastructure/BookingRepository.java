@@ -4,6 +4,7 @@ import com.company.covoituraje.booking.domain.Booking;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -63,6 +64,16 @@ public class BookingRepository {
             "SELECT b FROM Booking b WHERE b.passengerId = :passengerId ORDER BY b.createdAt DESC", 
             Booking.class);
         query.setParameter("passengerId", passengerId);
+        return query.getResultList();
+    }
+
+    public List<Booking> findByPassengerIdAndCreatedAtBetween(String passengerId, OffsetDateTime from, OffsetDateTime to) {
+        TypedQuery<Booking> query = entityManager.createQuery(
+            "SELECT b FROM Booking b WHERE b.passengerId = :passengerId AND b.createdAt >= :from AND b.createdAt <= :to ORDER BY b.createdAt DESC",
+            Booking.class);
+        query.setParameter("passengerId", passengerId);
+        query.setParameter("from", from);
+        query.setParameter("to", to);
         return query.getResultList();
     }
 
