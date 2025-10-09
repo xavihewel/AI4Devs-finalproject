@@ -1,3 +1,6 @@
+-- Set search path to trips schema
+SET search_path TO trips, public;
+
 -- Create trips table
 CREATE TABLE IF NOT EXISTS trips (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -6,7 +6,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "matches")
+@Table(name = "matches", schema = "matches")
 public class Match {
     
     @Id

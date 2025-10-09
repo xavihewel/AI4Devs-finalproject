@@ -1,3 +1,6 @@
+-- Set search path to users schema
+SET search_path TO users, public;
+
 -- Insert seed data for testing
 INSERT INTO users (id, name, email, sede_id, role) VALUES
     ('user-001', 'Ana García', 'ana.garcia@company.com', 'SEDE-1', 'EMPLOYEE'),

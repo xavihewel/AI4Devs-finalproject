@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { MatchesService } from '../api';
+import React, { useEffect, useState } from 'react';
+import { MatchesService, BookingsService } from '../api';
 import type { MatchDto } from '../types/api';
 import { Button, Card, CardContent, Input, Select, LoadingSpinner } from '../components/ui';
 
@@ -7,6 +7,10 @@ export default function Matches() {
   const [matches, setMatches] = useState<MatchDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [searching, setSearching] = useState(false);
+  const [bookingInProgress, setBookingInProgress] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [bookedTrips, setBookedTrips] = useState<Set<string>>(new Set());
+  const [loadingBookings, setLoadingBookings] = useState(true);
 
   // Search form state
   const [searchParams, setSearchParams] = useState({
@@ -14,6 +18,11 @@ export default function Matches() {
     time: '',
     origin: '',
   });
+
+  const showMessage = (type: 'success' | 'error', text: string) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage(null), 4000);
+  };
 
   const sedeOptions = [
     { value: '', label: 'Seleccionar destino...' },
@@ -48,6 +57,45 @@ export default function Matches() {
     }));
   };
 
+  const handleBooking = async (match: MatchDto) => {
+    const seatsToBook = prompt(`¿Cuántos asientos deseas reservar? (Disponibles: ${match.seatsFree})`);
+    
+    if (!seatsToBook) return; // Usuario canceló
+    
+    const seats = parseInt(seatsToBook, 10);
+    
+    if (isNaN(seats) || seats < 1) {
+      showMessage('error', 'Por favor ingresa un número válido de asientos');
+      return;
+    }
+    
+    if (seats > match.seatsFree) {
+      showMessage('error', `Solo hay ${match.seatsFree} asientos disponibles`);
+      return;
+    }
+    
+    try {
+      setBookingInProgress(match.tripId);
+      await BookingsService.createBooking({
+        tripId: match.tripId,
+        seatsRequested: seats
+      });
+      
+      // Marcar el viaje como reservado
+      setBookedTrips(prev => new Set(prev).add(match.tripId));
+      
+      showMessage('success', `¡Reserva creada exitosamente! ${seats} asiento(s) reservado(s)`);
+      // Recargar búsqueda para actualizar asientos disponibles
+      await handleSearch({ preventDefault: () => {} } as React.FormEvent);
+    } catch (error: any) {
+      console.error('Error creating booking:', error);
+      const errorMsg = error?.response?.data?.message || error?.message || 'Error al crear la reserva';
+      showMessage('error', errorMsg);
+    } finally {
+      setBookingInProgress(null);
+    }
+  };
+
   const getScoreColor = (score: number) => {
     if (score >= 0.8) return 'text-green-600 bg-green-100';
     if (score >= 0.6) return 'text-yellow-600 bg-yellow-100';
@@ -65,6 +113,12 @@ export default function Matches() {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-gray-900">Buscar Viajes</h1>
+
+      {message && (
+        <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>
+          <p className="font-medium">{message.text}</p>
+        </div>
+      )}
 
       {/* Search Form */}
       <Card>
@@ -130,12 +184,20 @@ export default function Matches() {
               <Card key={match.id}>
                 <CardContent>
                   <div className="space-y-4">
-                    {/* Score Badge */}
+                    {/* Score Badge and Booked Status */}
                     <div className="flex justify-between items-start">
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center flex-wrap gap-2">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getScoreColor(match.score)}`}>
                           {getScoreLabel(match.score)} ({Math.round(match.score * 100)}%)
                         </span>
+                        {bookedTrips.has(match.tripId) && (
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200 flex items-center gap-1">
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            Ya reservado
+                          </span>
+                        )}
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-gray-500">
@@ -179,12 +241,11 @@ export default function Matches() {
                       <Button
                         variant="primary"
                         className="w-full"
-                        onClick={() => {
-                          // TODO: Implement booking functionality
-                          alert(`Reservar viaje ${match.tripId}`);
-                        }}
+                        onClick={() => handleBooking(match)}
+                        disabled={bookingInProgress === match.tripId || match.seatsFree === 0}
+                        loading={bookingInProgress === match.tripId}
                       >
-                        Reservar Viaje
+                        {match.seatsFree === 0 ? 'Sin asientos disponibles' : 'Reservar Viaje'}
                       </Button>
                     </div>
                   </div>

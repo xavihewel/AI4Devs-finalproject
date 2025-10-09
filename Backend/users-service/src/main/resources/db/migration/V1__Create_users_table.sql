@@ -1,3 +1,6 @@
+-- Set search path to users schema
+SET search_path TO users, public;
+
 -- Create users table
 CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(255) PRIMARY KEY,

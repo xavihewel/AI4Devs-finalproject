@@ -67,7 +67,7 @@ class TripsResourceMoreTest {
     private TripCreateDto sampleCreate() {
         TripCreateDto c = new TripCreateDto();
         TripDto.Origin o = new TripDto.Origin();
-        o.lat = 1; o.lng = 2;
+        o.lat = 1.0; o.lng = 2.0;
         c.origin = o;
         c.destinationSedeId = "SEDE-1";
         c.dateTime = "2025-01-01T08:00:00Z";

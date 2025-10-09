@@ -95,6 +95,20 @@ public class TripRepository {
     }
 
     public void delete(Trip trip) {
-        entityManager.remove(trip);
+        EntityTransaction tx = entityManager.getTransaction();
+        try {
+            tx.begin();
+            // Ensure the entity is managed before removing
+            if (!entityManager.contains(trip)) {
+                trip = entityManager.merge(trip);
+            }
+            entityManager.remove(trip);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            throw e;
+        }
     }
 }

@@ -1,3 +1,6 @@
+-- Set search path to bookings schema
+SET search_path TO bookings, public;
+
 -- Create bookings table
 CREATE TABLE IF NOT EXISTS bookings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

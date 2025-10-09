@@ -110,8 +110,8 @@ services:
       - REQUIRE_ROLE_EMPLOYEE=false
       - AUTH_DISABLED=true
       - AUTH_BYPASS_USER_ID=user-001
-      - TRIPS_SERVICE_URL=http://trips-service:8080
-      - USERS_SERVICE_URL=http://users-service:8080
+      - TRIPS_SERVICE_URL=http://trips-service:8080/api
+      - USERS_SERVICE_URL=http://users-service:8080/api
       - ALLOWED_ORIGINS=http://localhost:5173
     ports:
       - "8083:8080"
@@ -139,7 +139,7 @@ services:
       - REQUIRE_ROLE_EMPLOYEE=false
       - AUTH_DISABLED=true
       - AUTH_BYPASS_USER_ID=user-001
-      - TRIPS_SERVICE_URL=http://trips-service:8080
+      - TRIPS_SERVICE_URL=http://trips-service:8080/api
       - ALLOWED_ORIGINS=http://localhost:5173
     ports:
       - "8084:8080"

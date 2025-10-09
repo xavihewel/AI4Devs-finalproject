@@ -1,3 +1,6 @@
+-- Set search path to matches schema
+SET search_path TO matches, public;
+
 -- Create matches table
 CREATE TABLE IF NOT EXISTS matches (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

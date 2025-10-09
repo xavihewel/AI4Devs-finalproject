@@ -1,3 +1,6 @@
+-- Set search path to trips schema
+SET search_path TO trips, public;
+
 -- Insert seed data for testing
 -- Note: origin uses "lat,lng" format to match Trip.origin usage
 INSERT INTO trips (id, driver_id, origin, destination_sede_id, date_time, seats_total, seats_free) VALUES

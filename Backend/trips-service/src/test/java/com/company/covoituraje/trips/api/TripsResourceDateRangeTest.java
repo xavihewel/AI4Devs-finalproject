@@ -67,7 +67,7 @@ class TripsResourceDateRangeTest {
     private void seedTrip(String sede, String iso) {
         TripCreateDto c = new TripCreateDto();
         TripDto.Origin o = new TripDto.Origin();
-        o.lat = 1; o.lng = 2;
+        o.lat = 1.0; o.lng = 2.0;
         c.origin = o;
         c.destinationSedeId = sede;
         c.dateTime = iso;

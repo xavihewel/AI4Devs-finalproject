@@ -10,7 +10,7 @@ public class TripDto {
     public int seatsFree;
 
     public static class Origin {
-        public double lat;
-        public double lng;
+        public Double lat;
+        public Double lng;
     }
 }

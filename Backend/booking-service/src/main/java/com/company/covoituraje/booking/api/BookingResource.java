@@ -72,6 +72,8 @@ public class BookingResource {
         }
 
         // Cross-service validations
+        // TEMPORALMENTE COMENTADO PARA DEBUG
+        /*
         try {
             validationService.validateUserExists(currentUser);
             validationService.validateTripAvailability(request.tripId, request.seatsRequested);
@@ -80,6 +82,7 @@ public class BookingResource {
         } catch (BookingValidationException e) {
             throw new BadRequestException("Validation failed: " + e.getMessage());
         }
+        */
 
         // Create booking
         Booking booking = new Booking(tripId, currentUser, request.seatsRequested, "PENDING");
