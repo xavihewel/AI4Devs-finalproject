@@ -30,7 +30,28 @@
 
 ## Recent Improvements (Octubre 2025)
 
-### Feature: Perfil de Usuario (Mejorado ✅)
+### Feature: Sistema de Confianza (Completado ✅)
+- ✅ **Backend TDD**:
+  - Entidad `Rating` con JPA, migración V3, repository y service
+  - API REST: `POST /ratings`, `GET /ratings/my-ratings`, `GET /ratings/user/{userId}`
+  - Endpoints de estadísticas: trust-score y trust-stats
+  - 15 tests unitarios pasando (RatingResource, RatingService, Rating domain)
+- ✅ **Frontend UI**:
+  - `TrustProfile.tsx`: Perfil de confianza con estadísticas y tags
+  - `RatingForm.tsx`: Formulario para crear valoraciones (thumbs up/down, tags, comentarios)
+  - `RatingsList.tsx`: Lista de valoraciones recibidas por usuario
+  - `TrustProfilePage.tsx`: Página completa de perfil de confianza
+  - Integración en `Matches.tsx`: botones "Ver Perfil" y "Valorar"
+- ✅ **Tests Frontend**:
+  - Tests unitarios para componentes de confianza
+  - Manejo de errores mejorado (404, 403, 5xx)
+  - Z-index corregido para modales sobre mapas
+- ⚠️ **CORS Issue Identificado**:
+  - Filtro CORS implementado pero users-service necesita redeploy
+  - Endpoint `/api/ratings` devuelve 404 - servicio no actualizado
+  - Configuración correcta: puerto 8082, filtros CORS aplicados
+
+### Feature: Perfil de Usuario (Anterior ✅)
 - ✅ **Validaciones Robustas**:
   - Tests unitarios para validaciones de campos obligatorios
   - Validación de formato email y longitud mínima de nombre
@@ -119,6 +140,8 @@
 - ✅ **seed-test-data.sh**: Script para generar datos de prueba en todos los schemas (5 users, 4 trips, 2 bookings, 3 matches)
 
 ## What's Left
+- **CORS Fix**: Redeploy users-service con nuevos endpoints de confianza
+- **Multi-idioma**: Implementar soporte para 6 idiomas (Catalán, Castellano, Rumano, Ucraniano, Inglés, Francés)
 - **Completar tests frontend**: Arreglar 6 tests restantes (Bookings, Profile, Trips, Matches) y añadir tests de suscripción push para alcanzar 100% de cobertura
 - **Testing E2E completo**: Suite de tests Cypress actualizada (authentication, trips, matches, bookings, notifications, flows) - 85% pasando, 4 tests menores por arreglar.
 - **Auth JWKS remoto (tests)**: Añadir tests con WireMock para `JwtValidator` con JWKS HTTP (éxito, timeout, key miss, caché).

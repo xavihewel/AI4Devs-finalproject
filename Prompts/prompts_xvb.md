@@ -597,3 +597,15 @@
   - Mapas solo cuando hay coordenadas válidas
 - Result: ✅ Build exitoso, tests pasando, mapas integrados en Trips/Matches
 - Next: Re-despliegue Docker para incluir nuevas dependencias
+
+### Feature: Sistema de Confianza (Completado) ✅
+- Intent: Implementar sistema de valoraciones y confianza entre usuarios
+- Actions:
+  - **Backend TDD**: Entidad Rating, migración V3, repository, service, API REST
+  - **Frontend UI**: TrustProfile, RatingForm, RatingsList, TrustProfilePage
+  - **Integración**: Botones "Ver Perfil" y "Valorar" en Matches.tsx
+  - **Tests**: 15 tests backend + tests frontend para componentes
+  - **CORS**: Filtro implementado pero users-service necesita redeploy
+- Decisions: TDD backend, UI modular, manejo de errores mejorado, z-index corregido
+- Result: ✅ Completado - Backend/frontend implementado, CORS issue identificado
+- Next: Redeploy users-service y continuar con plan (Multi-idioma o Notificaciones E2E)

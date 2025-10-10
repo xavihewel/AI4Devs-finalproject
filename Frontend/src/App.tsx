@@ -8,6 +8,7 @@ import Matches from './pages/Matches';
 import Bookings from './pages/Bookings';
 import Profile from './pages/Profile';
 import { History } from './pages/History';
+import { TrustProfilePage } from './pages/TrustProfile';
 import Callback from './pages/Callback';
 import NotFound from './pages/NotFound';
 
@@ -54,6 +55,14 @@ const App: React.FC = () => {
           element={
             <Protected>
               <History />
+            </Protected>
+          }
+        />
+        <Route
+          path="/trust/:userId"
+          element={
+            <Protected>
+              <TrustProfilePage />
             </Protected>
           }
         />

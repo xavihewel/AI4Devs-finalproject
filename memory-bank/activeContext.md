@@ -1,17 +1,37 @@
 # Active Context
 
 ## Current Focus
-- **Perfil de usuario**: Feature completado con mejoras de validaciones y UX.
-- **Validaciones**: Tests robustos para campos obligatorios, formato email, longitud mínima.
-- **E2E**: Tests Cypress para navegación, validaciones y funcionalidades del perfil.
-- **Próximo**: Siguiente feature del plan (Notificaciones E2E o Sistema de confianza).
+- **Sistema de confianza**: Feature completado con backend TDD, frontend UI y tests.
+- **CORS Issue**: Problema identificado - users-service necesita redeploy con nuevos endpoints.
+- **Próximo**: Resolver CORS y continuar con plan (Notificaciones E2E o Multi-idioma).
 
 ## Feature Plan
 - Ver `memory-bank/featurePlan.md` para el mapeo de las 15 funcionalidades (cobertura/estado/próximos pasos) y el roadmap por fases.
 
 ## Recent Changes (Octubre 10, 2025)
 
-### Feature: Perfil de Usuario (Mejorado ✅)
+### Feature: Sistema de Confianza (Completado ✅)
+- **Backend TDD**:
+  - Entidad `Rating` con JPA, migración V3, repository y service
+  - API REST: `POST /ratings`, `GET /ratings/my-ratings`, `GET /ratings/user/{userId}`
+  - Endpoints de estadísticas: trust-score y trust-stats
+  - 15 tests unitarios pasando (RatingResource, RatingService, Rating domain)
+- **Frontend UI**:
+  - `TrustProfile.tsx`: Perfil de confianza con estadísticas y tags
+  - `RatingForm.tsx`: Formulario para crear valoraciones (thumbs up/down, tags, comentarios)
+  - `RatingsList.tsx`: Lista de valoraciones recibidas por usuario
+  - `TrustProfilePage.tsx`: Página completa de perfil de confianza
+  - Integración en `Matches.tsx`: botones "Ver Perfil" y "Valorar"
+- **Tests Frontend**:
+  - Tests unitarios para componentes de confianza
+  - Manejo de errores mejorado (404, 403, 5xx)
+  - Z-index corregido para modales sobre mapas
+- **CORS Issue Identificado**:
+  - Filtro CORS implementado pero users-service necesita redeploy
+  - Endpoint `/api/ratings` devuelve 404 - servicio no actualizado
+  - Configuración correcta: puerto 8082, filtros CORS aplicados
+
+### Feature: Perfil de Usuario (Anterior ✅)
 - **Validaciones Robustas**:
   - Tests unitarios para validaciones de campos obligatorios
   - Validación de formato email y longitud mínima de nombre
@@ -80,9 +100,9 @@
 - **seed-test-data.sh**: Script para generar datos de prueba en todos los schemas
 
 ## Next Steps (immediate)
-- **Frontend**: Crear página History.tsx con filtros y estadísticas
-- **Tests**: Tests unitarios para History.tsx y E2E para navegación
-- **Documentación**: Actualizar OpenAPI y Memory Bank tras completar frontend
+- **CORS Fix**: Redeploy users-service con nuevos endpoints de confianza
+- **Multi-idioma**: Implementar soporte para 6 idiomas (Catalán, Castellano, Rumano, Ucraniano, Inglés, Francés)
+- **Plan Continuation**: Notificaciones E2E o siguiente feature del roadmap
 
 ## Decisions & Considerations
 - **Ruta base común**: `/api` para todos; enrutamiento por path para distinguir servicios.

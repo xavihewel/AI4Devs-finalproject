@@ -3,6 +3,8 @@ import { MatchesService, BookingsService } from '../api';
 import type { MatchDto } from '../types/api';
 import { Button, Card, CardContent, Input, Select, LoadingSpinner } from '../components/ui';
 import MapPreview from '../components/map/MapPreview';
+import { TrustProfile } from '../components/trust/TrustProfile';
+import { RatingForm } from '../components/trust/RatingForm';
 import { env } from '../env';
 
 export default function Matches() {
@@ -13,6 +15,10 @@ export default function Matches() {
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [bookedTrips, setBookedTrips] = useState<Set<string>>(new Set());
   const [loadingBookings, setLoadingBookings] = useState(true);
+  
+  // Trust system state
+  const [showTrustProfile, setShowTrustProfile] = useState<string | null>(null);
+  const [showRatingForm, setShowRatingForm] = useState<string | null>(null);
 
   // Search form state
   const [searchParams, setSearchParams] = useState({
@@ -294,6 +300,26 @@ export default function Matches() {
                             ? 'Ya reservado'
                             : 'Reservar Viaje'}
                       </Button>
+                      
+                      {/* Trust System Buttons */}
+                      <div className="flex space-x-2 mt-2">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => setShowTrustProfile(match.driverId)}
+                        >
+                          👤 Ver Perfil
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => setShowRatingForm(match.driverId)}
+                        >
+                          ⭐ Valorar
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -340,6 +366,55 @@ export default function Matches() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Trust Profile Modal */}
+      {showTrustProfile && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999] modal-overlay">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Perfil de Confianza</h2>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setShowTrustProfile(null)}
+                >
+                  ✕
+                </Button>
+              </div>
+              <TrustProfile userId={showTrustProfile} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rating Form Modal */}
+      {showRatingForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999] modal-overlay">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Valorar Usuario</h2>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setShowRatingForm(null)}
+                >
+                  ✕
+                </Button>
+              </div>
+              <RatingForm
+                ratedUserId={showRatingForm}
+                onSuccess={() => {
+                  setShowRatingForm(null);
+                  showMessage('success', 'Valoración enviada correctamente');
+                }}
+                onCancel={() => setShowRatingForm(null)}
+              />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
