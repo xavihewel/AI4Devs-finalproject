@@ -1,100 +1,136 @@
 package com.company.covoituraje.notification.service;
 
 import com.company.covoituraje.notification.domain.NotificationSubscription;
-import org.junit.jupiter.api.Test;
+import com.company.covoituraje.notification.repository.NotificationSubscriptionRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class NotificationServiceTest {
-    
+
     private NotificationService notificationService;
-    
+    private NotificationSubscriptionRepository subscriptionRepository;
+    private PushNotificationService pushNotificationService;
+    private EmailNotificationService emailNotificationService;
+
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         notificationService = new NotificationService();
+        subscriptionRepository = mock(NotificationSubscriptionRepository.class);
+        pushNotificationService = mock(PushNotificationService.class);
+        emailNotificationService = mock(EmailNotificationService.class);
+
+        // Inject mocks via reflection
+        var repoField = NotificationService.class.getDeclaredField("subscriptionRepository");
+        repoField.setAccessible(true);
+        repoField.set(notificationService, subscriptionRepository);
+
+        var pushField = NotificationService.class.getDeclaredField("pushNotificationService");
+        pushField.setAccessible(true);
+        pushField.set(notificationService, pushNotificationService);
+
+        var emailField = NotificationService.class.getDeclaredField("emailNotificationService");
+        emailField.setAccessible(true);
+        emailField.set(notificationService, emailNotificationService);
     }
-    
+
     @Test
     void shouldSubscribeUserToNotifications() {
-        // Given
         String userId = "user-001";
         String endpoint = "https://fcm.googleapis.com/fcm/send/example";
         String p256dhKey = "p256dh-key";
         String authKey = "auth-key";
-        
-        // When & Then
-        assertDoesNotThrow(() -> {
-            NotificationSubscription result = notificationService.subscribeUser(userId, endpoint, p256dhKey, authKey);
-            assertNotNull(result);
-        });
+
+        when(subscriptionRepository.findByUserIdAndEndpoint(userId, endpoint)).thenReturn(Optional.empty());
+        ArgumentCaptor<NotificationSubscription> subscriptionCaptor = ArgumentCaptor.forClass(NotificationSubscription.class);
+
+        NotificationSubscription result = notificationService.subscribeUser(userId, endpoint, p256dhKey, authKey);
+
+        assertNotNull(result);
+        verify(subscriptionRepository).save(subscriptionCaptor.capture());
+        NotificationSubscription saved = subscriptionCaptor.getValue();
+        assertEquals(userId, saved.getUserId());
+        assertEquals(endpoint, saved.getEndpoint());
+        assertEquals(p256dhKey, saved.getP256dhKey());
+        assertEquals(authKey, saved.getAuthKey());
+        assertTrue(saved.isActive());
     }
-    
+
     @Test
     void shouldUpdateExistingSubscription() {
-        // Given
         String userId = "user-001";
         String endpoint = "https://fcm.googleapis.com/fcm/send/example";
         String newP256dhKey = "new-p256dh-key";
         String newAuthKey = "new-auth-key";
-        
-        // When & Then
-        assertDoesNotThrow(() -> {
-            NotificationSubscription result = notificationService.subscribeUser(userId, endpoint, newP256dhKey, newAuthKey);
-            assertNotNull(result);
-        });
+
+        NotificationSubscription existing = new NotificationSubscription(userId, endpoint, "old", "old");
+        when(subscriptionRepository.findByUserIdAndEndpoint(userId, endpoint)).thenReturn(Optional.of(existing));
+
+        NotificationSubscription result = notificationService.subscribeUser(userId, endpoint, newP256dhKey, newAuthKey);
+
+        assertNotNull(result);
+        assertEquals(newP256dhKey, result.getP256dhKey());
+        assertEquals(newAuthKey, result.getAuthKey());
+        assertTrue(result.isActive());
+        verify(subscriptionRepository).save(existing);
     }
-    
+
     @Test
     void shouldUnsubscribeUser() {
-        // Given
         String userId = "user-001";
         String endpoint = "https://fcm.googleapis.com/fcm/send/example";
-        
-        // When & Then
-        assertDoesNotThrow(() -> {
-            notificationService.unsubscribeUser(userId, endpoint);
-        });
+        NotificationSubscription existing = new NotificationSubscription(userId, endpoint, "k", "a");
+        when(subscriptionRepository.findByUserIdAndEndpoint(userId, endpoint)).thenReturn(Optional.of(existing));
+
+        notificationService.unsubscribeUser(userId, endpoint);
+
+        assertFalse(existing.isActive());
+        verify(subscriptionRepository).save(existing);
     }
-    
+
     @Test
     void shouldSendPushNotificationToUser() {
-        // Given
         String userId = "user-001";
         String title = "Nueva reserva";
         String body = "Tu reserva ha sido confirmada";
-        
-        // When & Then
-        assertDoesNotThrow(() -> {
-            notificationService.sendPushNotification(userId, title, body);
-        });
+        NotificationSubscription s = new NotificationSubscription(userId, "https://e", "k", "a");
+        when(subscriptionRepository.findActiveByUserId(userId)).thenReturn(List.of(s));
+
+        notificationService.sendPushNotification(userId, title, body);
+
+        verify(pushNotificationService).sendNotification(s, title, body);
     }
-    
+
     @Test
     void shouldSendEmailNotification() {
-        // Given
         String userId = "user-001";
         String email = "user@example.com";
         String subject = "Nueva reserva";
         String body = "Tu reserva ha sido confirmada";
-        
-        // When & Then
-        assertDoesNotThrow(() -> {
-            notificationService.sendEmailNotification(userId, email, subject, body);
-        });
+
+        notificationService.sendEmailNotification(userId, email, subject, body);
+
+        verify(emailNotificationService).sendEmail(email, subject, body);
     }
-    
+
     @Test
     void shouldSendBookingConfirmationNotification() {
-        // Given
         String userId = "user-001";
         String email = "user@example.com";
         String tripId = "trip-001";
         int seatsRequested = 2;
-        
-        // When & Then
-        assertDoesNotThrow(() -> {
-            notificationService.sendBookingConfirmation(userId, email, tripId, seatsRequested);
-        });
+        NotificationSubscription s = new NotificationSubscription(userId, "https://e", "k", "a");
+        when(subscriptionRepository.findActiveByUserId(userId)).thenReturn(List.of(s));
+
+        notificationService.sendBookingConfirmation(userId, email, tripId, seatsRequested);
+
+        verify(pushNotificationService).sendNotification(eq(s), anyString(), anyString());
+        verify(emailNotificationService).sendBookingConfirmation(email, tripId, seatsRequested);
     }
 }

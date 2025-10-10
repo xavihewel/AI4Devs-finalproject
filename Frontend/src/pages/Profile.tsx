@@ -266,10 +266,10 @@ export default function Profile() {
                 <p className="text-gray-500">ID de Usuario</p>
                 <p className="font-mono text-gray-900">{user.id}</p>
               </div>
-              {user.roles && user.roles.length > 0 && (
+              {user.role && (
                 <div>
                   <p className="text-gray-500">Rol</p>
-                  <p className="font-medium text-gray-900">{user.roles.join(', ')}</p>
+                  <p className="font-medium text-gray-900">{user.role}</p>
                 </div>
               )}
             </div>

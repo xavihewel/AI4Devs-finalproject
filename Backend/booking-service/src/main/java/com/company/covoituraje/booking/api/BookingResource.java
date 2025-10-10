@@ -3,6 +3,7 @@ package com.company.covoituraje.booking.api;
 import com.company.covoituraje.booking.domain.Booking;
 import com.company.covoituraje.booking.infrastructure.BookingRepository;
 import com.company.covoituraje.booking.service.BookingValidationService;
+import com.company.covoituraje.booking.integration.NotificationServiceClient;
 import com.company.covoituraje.booking.service.BookingValidationException;
 import com.company.covoituraje.booking.integration.TripsServiceClient;
 import com.company.covoituraje.booking.integration.UsersServiceClient;
@@ -20,6 +21,7 @@ public class BookingResource {
 
     private final BookingRepository repository;
     private final BookingValidationService validationService;
+    private final NotificationServiceClient notificationClient;
     
     static final class AuthContext {
         private static final ThreadLocal<String> USER_ID = new ThreadLocal<>();
@@ -41,11 +43,21 @@ public class BookingResource {
         TripsServiceClient tripsServiceClient = new TripsServiceClient(tripsServiceUrl);
         UsersServiceClient usersServiceClient = new UsersServiceClient(usersServiceUrl);
         this.validationService = new BookingValidationService(tripsServiceClient, usersServiceClient);
+        String notificationServiceUrl = System.getenv().getOrDefault("NOTIFICATION_SERVICE_URL", "http://localhost:8085/api");
+        this.notificationClient = new NotificationServiceClient(notificationServiceUrl);
+    }
+
+    public BookingResource(BookingRepository repository, BookingValidationService validationService, NotificationServiceClient notificationClient) {
+        this.repository = repository;
+        this.validationService = validationService;
+        this.notificationClient = notificationClient;
     }
 
     public BookingResource(BookingRepository repository, BookingValidationService validationService) {
         this.repository = repository;
         this.validationService = validationService;
+        String notificationServiceUrl = System.getenv().getOrDefault("NOTIFICATION_SERVICE_URL", "http://localhost:8085/api");
+        this.notificationClient = new NotificationServiceClient(notificationServiceUrl);
     }
 
     @POST
@@ -196,6 +208,7 @@ public class BookingResource {
 
         booking.confirm();
         booking = repository.save(booking);
+        try { notificationClient.sendBookingConfirmed(currentUser, booking.getTripId().toString(), booking.getSeatsRequested()); } catch (Exception ignored) {}
         
         return mapToDto(booking);
     }
@@ -228,6 +241,7 @@ public class BookingResource {
 
         booking.cancel();
         booking = repository.save(booking);
+        try { notificationClient.sendBookingCancelled(currentUser, booking.getTripId().toString()); } catch (Exception ignored) {}
         
         return mapToDto(booking);
     }

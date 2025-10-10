@@ -3,6 +3,7 @@ package com.company.covoituraje.matching.api;
 import com.company.covoituraje.matching.service.MatchingService;
 import com.company.covoituraje.matching.infrastructure.MatchRepository;
 import com.company.covoituraje.matching.integration.TripsServiceClient;
+import com.company.covoituraje.matching.integration.NotificationServiceClient;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
@@ -15,6 +16,7 @@ public class MatchesResource {
 
     private final MatchingService matchingService;
     private final MatchRepository matchRepository;
+    private final NotificationServiceClient notificationClient;
     
     static final class AuthContext {
         private static final ThreadLocal<String> USER_ID = new ThreadLocal<>();
@@ -32,11 +34,21 @@ public class MatchesResource {
         TripsServiceClient tripsServiceClient = new TripsServiceClient(tripsServiceUrl);
         this.matchingService = new MatchingService(matchRepository, tripsServiceClient);
         this.matchRepository = matchRepository;
+        String notificationServiceUrl = System.getenv().getOrDefault("NOTIFICATION_SERVICE_URL", "http://localhost:8085/api");
+        this.notificationClient = new NotificationServiceClient(notificationServiceUrl);
     }
 
     public MatchesResource(MatchingService matchingService, MatchRepository matchRepository) {
         this.matchingService = matchingService;
         this.matchRepository = matchRepository;
+        String notificationServiceUrl = System.getenv().getOrDefault("NOTIFICATION_SERVICE_URL", "http://localhost:8085/api");
+        this.notificationClient = new NotificationServiceClient(notificationServiceUrl);
+    }
+
+    public MatchesResource(MatchingService matchingService, MatchRepository matchRepository, NotificationServiceClient notificationClient) {
+        this.matchingService = matchingService;
+        this.matchRepository = matchRepository;
+        this.notificationClient = notificationClient;
     }
 
     @GET
@@ -150,5 +162,43 @@ public class MatchesResource {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    @PUT
+    @Path("/{id}/accept")
+    public MatchDto accept(@PathParam("id") String id) {
+        String currentUser = AuthContext.getUserId();
+        if (currentUser == null || currentUser.isBlank()) {
+            throw new BadRequestException("User ID is required");
+        }
+        java.util.UUID matchId;
+        try { matchId = java.util.UUID.fromString(id); } catch (IllegalArgumentException e) { throw new BadRequestException("Invalid match ID format"); }
+        com.company.covoituraje.matching.domain.Match match = matchRepository.findById(matchId).orElseThrow(() -> new NotFoundException("Match not found"));
+        if (!currentUser.equals(match.getPassengerId()) && !currentUser.equals(match.getDriverId())) {
+            throw new ForbiddenException("Access denied");
+        }
+        match.accept();
+        match = matchRepository.save(match);
+        try { notificationClient.sendMatchAccepted(match.getPassengerId(), match.getDriverId(), match.getTripId().toString()); } catch (Exception ignored) {}
+        return mapDomainToDto(match);
+    }
+
+    @PUT
+    @Path("/{id}/reject")
+    public MatchDto reject(@PathParam("id") String id) {
+        String currentUser = AuthContext.getUserId();
+        if (currentUser == null || currentUser.isBlank()) {
+            throw new BadRequestException("User ID is required");
+        }
+        java.util.UUID matchId;
+        try { matchId = java.util.UUID.fromString(id); } catch (IllegalArgumentException e) { throw new BadRequestException("Invalid match ID format"); }
+        com.company.covoituraje.matching.domain.Match match = matchRepository.findById(matchId).orElseThrow(() -> new NotFoundException("Match not found"));
+        if (!currentUser.equals(match.getPassengerId()) && !currentUser.equals(match.getDriverId())) {
+            throw new ForbiddenException("Access denied");
+        }
+        match.reject();
+        match = matchRepository.save(match);
+        try { notificationClient.sendMatchRejected(match.getPassengerId(), match.getTripId().toString()); } catch (Exception ignored) {}
+        return mapDomainToDto(match);
     }
 }

@@ -53,14 +53,17 @@ public class NotificationResource {
 
     @DELETE
     @Path("/unsubscribe")
-    public Response unsubscribe(UnsubscribeRequest request) {
+    public Response unsubscribe(@QueryParam("endpoint") String endpoint) {
         try {
             String userId = AuthContext.getUserId();
             if (userId == null) {
                 return Response.status(401).entity("{\"error\": \"Unauthorized\"}").build();
             }
+            if (endpoint == null || endpoint.isBlank()) {
+                return Response.status(400).entity("{\"error\": \"Missing endpoint query param\"}").build();
+            }
 
-            notificationService.unsubscribeUser(userId, request.endpoint);
+            notificationService.unsubscribeUser(userId, endpoint);
             return Response.ok("{\"message\": \"Unsubscribed successfully\"}").build();
         } catch (Exception e) {
             return Response.status(500).entity("{\"error\": \"Internal server error\"}").build();
