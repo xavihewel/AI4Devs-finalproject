@@ -6,7 +6,7 @@ describe('Profile Page', () => {
   it('loads current profile', () => {
     cy.visit('/me')
     cy.contains('Mi Perfil').should('be.visible')
-    cy.contains('Guardar cambios').should('be.visible')
+    cy.contains(/Guardar Cambios|Guardar cambios/).should('be.visible')
   })
 })
 

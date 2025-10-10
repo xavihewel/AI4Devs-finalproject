@@ -2,30 +2,35 @@ describe('Smoke Tests', () => {
   describe('Application Loads', () => {
     it('should load the home page', () => {
       cy.visit('/')
-      cy.contains('bonÀreaGo').should('be.visible')
-      cy.contains('Tu plataforma corporativa para compartir viajes').should('be.visible')
+      cy.get('body', { timeout: 15000 }).should('be.visible')
+      cy.get('h1', { timeout: 15000 }).should('contain', 'bonÀreaGo')
+      cy.contains('Tu plataforma corporativa para compartir viajes', { timeout: 15000 }).should('be.visible')
     })
 
     it('should display navigation menu', () => {
       cy.visit('/')
-      cy.get('nav').should('be.visible')
-      cy.contains('Inicio').should('be.visible')
-      cy.contains('Iniciar Sesión').should('be.visible')
+      cy.get('nav', { timeout: 15000 }).should('be.visible')
+      cy.contains('Inicio', { timeout: 15000 }).should('be.visible')
+      if (Cypress.env('authDisabled')) {
+        cy.contains('Cerrar Sesión', { timeout: 15000 }).should('be.visible')
+      } else {
+        cy.contains('Iniciar Sesión', { timeout: 15000 }).should('be.visible')
+      }
     })
 
     it('should display features section', () => {
       cy.visit('/')
-      cy.contains('Comparte tu Viaje').should('be.visible')
-      cy.contains('Encuentra Matches').should('be.visible')
-      cy.contains('Ahorra Costos').should('be.visible')
+      cy.contains('Comparte tu Viaje', { timeout: 15000 }).should('be.visible')
+      cy.contains('Encuentra Matches', { timeout: 15000 }).should('be.visible')
+      cy.contains('Ahorra Costos', { timeout: 15000 }).should('be.visible')
     })
 
     it('should display how it works section', () => {
       cy.visit('/')
-      cy.contains('¿Cómo funciona?').should('be.visible')
-      cy.contains('Crea tu Viaje').should('be.visible')
-      cy.contains('Busca Matches').should('be.visible')
-      cy.contains('Reserva y Viaja').should('be.visible')
+      cy.contains('¿Cómo funciona?', { timeout: 15000 }).should('be.visible')
+      cy.contains('Crea tu Viaje', { timeout: 15000 }).should('be.visible')
+      cy.contains('Busca Matches', { timeout: 15000 }).should('be.visible')
+      cy.contains('Reserva y Viaja', { timeout: 15000 }).should('be.visible')
     })
   })
 

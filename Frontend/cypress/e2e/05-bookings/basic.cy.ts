@@ -5,12 +5,13 @@ describe('Bookings List', () => {
 
   it('loads bookings page without errors', () => {
     cy.visit('/bookings')
-    cy.contains('Mis reservas').should('be.visible')
+    cy.contains(/Mis Reservas|Mis reservas/).should('be.visible')
     cy.get('body').then(($b) => {
-      if ($b.text().includes('No tienes reservas.')) {
-        cy.contains('No tienes reservas.').should('be.visible')
+      if ($b.text().includes('No tienes reservas')) {
+        cy.contains('No tienes reservas').should('be.visible')
       } else {
-        cy.get('ul').should('exist')
+        // Nueva UI usa Cards, no una lista ul obligatoria
+        cy.contains('Reserva #').should('exist')
       }
     })
   })

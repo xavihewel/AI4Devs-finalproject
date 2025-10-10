@@ -45,9 +45,23 @@ public class NotificationService {
     
     public void sendPushNotification(String userId, String title, String body) {
         List<NotificationSubscription> subscriptions = subscriptionRepository.findActiveByUserId(userId);
-        
         for (NotificationSubscription subscription : subscriptions) {
-            pushNotificationService.sendNotification(subscription, title, body);
+            PushNotificationService.SendOutcome outcome = pushNotificationService.sendNotificationWithOutcome(subscription, title, body);
+            if (outcome == PushNotificationService.SendOutcome.RETRYABLE_FAILURE) {
+                // simple bounded retry with backoff
+                int attempts = 0;
+                while (attempts < 2 && outcome == PushNotificationService.SendOutcome.RETRYABLE_FAILURE) {
+                    attempts++;
+                    try {
+                        Thread.sleep(250L * attempts);
+                    } catch (InterruptedException ignored) {}
+                    outcome = pushNotificationService.sendNotificationWithOutcome(subscription, title, body);
+                }
+            }
+            if (outcome == PushNotificationService.SendOutcome.GONE) {
+                subscription.setActive(false);
+                subscriptionRepository.save(subscription);
+            }
         }
     }
     

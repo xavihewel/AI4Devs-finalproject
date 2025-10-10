@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { TripsService } from '../api';
 import type { TripDto, TripCreateDto } from '../types/api';
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select, LoadingSpinner } from '../components/ui';
+import MapPreview from '../components/map/MapPreview';
+import { env } from '../env';
 
 interface FormErrors {
   lat?: string;
@@ -170,7 +172,7 @@ export default function Trips() {
       setActionInProgress(trip.id);
       await TripsService.updateTrip(trip.id, { seatsTotal: trip.seatsTotal + 1 });
       await loadTrips();
-      showMessage('success', 'Asientos actualizados');
+      showMessage('success', `Asientos actualizados: ${trip.seatsTotal + 1} total, ${trip.seatsFree + 1} libres`);
     } catch (error) {
       console.error('Error updating trip:', error);
       showMessage('error', 'Error al actualizar el viaje');
@@ -351,8 +353,19 @@ export default function Trips() {
                     const d = trip?.dateTime ? new Date(trip.dateTime) : new Date(0);
                     return isNaN(d.getTime()) ? '' : d.toLocaleTimeString();
                   })()}</p>
-                  <p><strong>Asientos:</strong> {(trip?.seatsFree ?? 0)} / {(trip?.seatsTotal ?? 0)} disponibles</p>
+                  <p><strong>Asientos:</strong> {(trip?.seatsFree ?? 0)} libres de {(trip?.seatsTotal ?? 0)} total</p>
                 </div>
+
+                {typeof trip?.origin?.lat === 'number' && typeof trip?.origin?.lng === 'number' && (
+                  <div className="pt-2">
+                    <MapPreview
+                      origin={{ lat: trip.origin.lat, lng: trip.origin.lng }}
+                      height={180}
+                      interactive={false}
+                      tilesUrl={env.mapTilesUrl}
+                    />
+                  </div>
+                )}
 
                 <div className="flex space-x-2">
                   <Button

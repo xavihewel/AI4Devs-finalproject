@@ -68,7 +68,7 @@ services:
       - REQUIRE_ROLE_EMPLOYEE=false
       - AUTH_DISABLED=true
       - AUTH_BYPASS_USER_ID=user-001
-      - ALLOWED_ORIGINS=http://localhost:5173
+      - ALLOWED_ORIGINS=*
       # VAPID Keys for Push Notifications
       - VAPID_PUBLIC_KEY=BHW9bFosH5N-wdRkQLPnZt8yB4-YJ_7Ol-BHr-wNiD4ADNky1D01Sbd7O7DEDJyugJNs3JCCgfv7Pu3g-o8ZydA
       - VAPID_PRIVATE_KEY=cS7i2NUlX_oa589_Nl7OAJE7vSNj3UfTYkb8gSgZy54
@@ -95,7 +95,7 @@ services:
       - REQUIRE_ROLE_EMPLOYEE=false
       - AUTH_DISABLED=true
       - AUTH_BYPASS_USER_ID=user-001
-      - ALLOWED_ORIGINS=http://localhost:5173
+      - ALLOWED_ORIGINS=*
       # VAPID Keys for Push Notifications
       - VAPID_PUBLIC_KEY=BHW9bFosH5N-wdRkQLPnZt8yB4-YJ_7Ol-BHr-wNiD4ADNky1D01Sbd7O7DEDJyugJNs3JCCgfv7Pu3g-o8ZydA
       - VAPID_PRIVATE_KEY=cS7i2NUlX_oa589_Nl7OAJE7vSNj3UfTYkb8gSgZy54
@@ -124,7 +124,8 @@ services:
       - AUTH_BYPASS_USER_ID=user-001
       - TRIPS_SERVICE_URL=http://trips-service:8080/api
       - USERS_SERVICE_URL=http://users-service:8080/api
-      - ALLOWED_ORIGINS=http://localhost:5173
+      - NOTIFICATION_SERVICE_URL=http://notification-service:8080/api
+      - ALLOWED_ORIGINS=*
     ports:
       - "8083:8080"
     depends_on:
@@ -152,7 +153,8 @@ services:
       - AUTH_DISABLED=true
       - AUTH_BYPASS_USER_ID=user-001
       - TRIPS_SERVICE_URL=http://trips-service:8080/api
-      - ALLOWED_ORIGINS=http://localhost:5173
+      - NOTIFICATION_SERVICE_URL=http://notification-service:8080/api
+      - ALLOWED_ORIGINS=*
     ports:
       - "8084:8080"
     depends_on:
@@ -205,7 +207,7 @@ services:
       - REQUIRE_ROLE_EMPLOYEE=false
       - AUTH_DISABLED=true
       - AUTH_BYPASS_USER_ID=user-001
-      - ALLOWED_ORIGINS=http://localhost:5173
+      - ALLOWED_ORIGINS=*
       # VAPID Keys for Push Notifications
       - VAPID_PUBLIC_KEY=BHW9bFosH5N-wdRkQLPnZt8yB4-YJ_7Ol-BHr-wNiD4ADNky1D01Sbd7O7DEDJyugJNs3JCCgfv7Pu3g-o8ZydA
       - VAPID_PRIVATE_KEY=cS7i2NUlX_oa589_Nl7OAJE7vSNj3UfTYkb8gSgZy54

@@ -110,13 +110,31 @@ public class BookingResource {
     }
 
     @GET
-    public List<BookingDto> listMine() {
+    public List<BookingDto> listMine(@QueryParam("from") String from,
+                                     @QueryParam("to") String to,
+                                     @QueryParam("status") String status) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
             throw new BadRequestException("User ID is required");
         }
 
-        List<Booking> bookings = repository.findByPassengerId(currentUser);
+        java.time.OffsetDateTime fromDt = parseIsoDatetime(from);
+        java.time.OffsetDateTime toDt = parseIsoDatetime(to);
+        List<Booking> bookings;
+        
+        if (fromDt != null && toDt != null) {
+            bookings = repository.findByPassengerIdAndCreatedAtBetween(currentUser, fromDt, toDt);
+        } else {
+            bookings = repository.findByPassengerId(currentUser);
+        }
+
+        // Filter by status if provided
+        if (status != null && !status.isBlank()) {
+            bookings = bookings.stream()
+                    .filter(b -> status.equalsIgnoreCase(b.getStatus()))
+                    .collect(java.util.stream.Collectors.toList());
+        }
+
         return bookings.stream()
                 .map(this::mapToDto)
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);

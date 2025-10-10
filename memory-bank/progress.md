@@ -1,12 +1,12 @@
 # Progress
 
 ## What Works
-- **Infra local**: `docker-compose` con DB, Keycloak, Mailhog y microservicios (trips 8081, users 8082, booking 8083, matching 8084).
+- **Infra local**: `docker-compose` con DB, Keycloak, Mailhog y microservicios (trips 8081, users 8082, booking 8083, matching 8084, notifications 8085).
 - **Base REST**: `@ApplicationPath("/api")` activo en todos los servicios.
-- **Health**: `GET /api/health` operativo en `trips`, `users`, `booking`, `matching`; `AuthFilter` ignora `/api/health` en todos.
+- **Health**: `GET /api/health` operativo en `trips`, `users`, `booking`, `matching`, `notification`; `AuthFilter` ignora `/api/health` en todos.
 - **Auth/OIDC Backend**: Token con `aud=backend-api` (mapper en Keycloak); `OIDC_ISSUER_URI` alineado a localhost.
 - **Frontend Base**: React + TypeScript + Tailwind; dual mode (Docker + local dev). UI functional, navegación funciona.
-- **Database Schemas**: PostgreSQL con schemas separados por servicio (users.users, trips.trips, bookings.bookings, matches.matches) - CORREGIDO y funcionando.
+- **Database Schemas**: PostgreSQL con schemas separados por servicio (users.users, trips.trips, bookings.bookings, matches.matches, notifications.notification_subscriptions) - CORREGIDO y funcionando.
 - **Persistence completa**: Todas las entidades JPA con schema correcto, transacciones funcionando, CRUD completo en todos los servicios.
 - **Scripts de automatización**: 11 scripts operativos para setup, verificación, arranque, testing y seeds.
   - Setup: `setup-dev.sh`, `dev-infra.sh`, `setup-keycloak.sh`, `migrate.sh`
@@ -30,7 +30,43 @@
 
 ## Recent Improvements (Octubre 2025)
 
-### Frontend UX Enhancements
+### Feature: Historial de Viajes (Backend Completado)
+- ✅ **Trips Service**: Filtro status implementado con TDD
+  - GET /trips con parámetro status (ACTIVE, COMPLETED)
+  - Lógica: viajes con dateTime < now() = COMPLETED
+  - 4 tests unitarios nuevos (TripsHistoryFilterTest)
+  - Todos los tests existentes actualizados (23/23 ✅)
+- ✅ **Booking Service**: Filtros status, from, to implementados con TDD
+  - GET /bookings con parámetros status, from, to
+  - Soporte para CONFIRMED, PENDING, CANCELLED
+  - Filtros combinables: status + date range
+  - 5 tests unitarios nuevos (BookingHistoryFilterTest)
+  - Todos los tests existentes actualizados (59/59 ✅)
+- ✅ **TDD Approach**: Tests primero, implementación después
+  - Red phase: Tests fallan antes de implementación
+  - Green phase: Tests pasan después de implementación
+  - Refactor: Código limpio y mantenible
+
+### Feature: Mapa Básico (Anterior)
+- ✅ **Frontend Components**: MapPreview y MapLinkButtons implementados
+  - MapPreview: Marcadores de origen/destino, fit bounds automático, tiles OpenStreetMap
+  - MapLinkButtons: Botones Google Maps/Waze con URLs correctas
+  - Integración en Trips.tsx y Matches.tsx cuando hay coordenadas disponibles
+- ✅ **Dependencias**: Leaflet instalado con --legacy-peer-deps
+  - react-leaflet, leaflet, @types/leaflet instalados correctamente
+  - CSS de Leaflet importado en main.tsx
+  - Variable VITE_MAP_TILES_URL configurada en env.ts y env.example
+- ✅ **Tests**: 16/16 tests unitarios pasando + E2E actualizados
+  - Tests unitarios: MapPreview y MapLinkButtons con mocks de react-leaflet
+  - Tests E2E: Verificación de mapas en Trips y Matches
+  - Build exitoso: TypeScript compila, Vite build completado (410KB gzipped)
+
+### Feature: Reserva de Plaza (Anterior)
+- ✅ **TDD Backend**: 24 tests pasando - reglas de negocio y cancelación configurables
+- ✅ **TDD Frontend**: Tests unitarios completos para BookingsService y páginas UI
+- ✅ **E2E Tests**: Tests Cypress actualizados para flujos completos de reserva y cancelación
+
+### Frontend UX Enhancements (Anterior)
 - ✅ **Validaciones completas en formularios**: Todos los campos obligatorios con asterisco rojo, validación en tiempo real, mensajes específicos por campo
   - Crear viaje: validación de coordenadas (rango), fecha futura, asientos (1-8)
   - Mi Perfil: validación de email con regex, nombre mínimo 2 caracteres, sede obligatoria
@@ -41,6 +77,8 @@
 - ✅ **Inputs mejorados**: Soporte para labels con JSX (React.ReactNode), Select con opciones por defecto
 
 ### Backend Critical Fixes
+- ✅ `notification-service` reparado: dependencias añadidas, CDI, Flyway V3 (UUID real), endpoint DELETE con query param.
+- ✅ Integración de notificaciones: booking (confirm/cancel) y matching (accept/reject) con TDD.
 - ✅ **TripRepository.delete()**: Agregada transacción faltante (begin/commit/rollback)
 - ✅ **Schemas de base de datos corregidos**: Todas las entidades JPA ahora especifican schema correcto
   - `@Table(name = "tabla", schema = "schema")` en User, Trip, Booking, Match
@@ -50,6 +88,7 @@
 - ✅ **Migraciones Flyway**: Todas actualizadas con `SET search_path TO {schema}, public;`
 
 ### Tests & Quality Improvements
+- ✅ Nuevos tests en booking y matching validando llamadas a notificación.
 - ✅ **Backend tests optimizados**: Cambio de PostGIS a PostgreSQL estándar, tiempo de ejecución reducido significativamente
 - ✅ **Testcontainers mejorados**: Timeout aumentado a 2 minutos, eliminación de duplicados en persistence.xml
 - ✅ **Frontend tests corregidos**: 90% de tests pasando (83/92), mocks mejorados, window.confirm implementado
@@ -61,8 +100,8 @@
 - ✅ **seed-test-data.sh**: Script para generar datos de prueba en todos los schemas (5 users, 4 trips, 2 bookings, 3 matches)
 
 ## What's Left
-- **Completar tests frontend**: Arreglar 6 tests restantes (Bookings, Profile, Trips, Matches) para alcanzar 100% de cobertura
-- **Testing E2E completo**: Suite de tests Cypress actualizada (authentication, trips, matches, bookings, flows) - 85% pasando, 4 tests menores por arreglar.
+- **Completar tests frontend**: Arreglar 6 tests restantes (Bookings, Profile, Trips, Matches) y añadir tests de suscripción push para alcanzar 100% de cobertura
+- **Testing E2E completo**: Suite de tests Cypress actualizada (authentication, trips, matches, bookings, notifications, flows) - 85% pasando, 4 tests menores por arreglar.
 - **Auth JWKS remoto (tests)**: Añadir tests con WireMock para `JwtValidator` con JWKS HTTP (éxito, timeout, key miss, caché).
 - **Frontend features**: Completar todas las páginas (Bookings más robusta, Profile funcional, Admin).
 - **Observabilidad avanzada**: Métricas, tracing distribuido, agregación de logs.

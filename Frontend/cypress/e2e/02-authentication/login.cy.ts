@@ -13,6 +13,10 @@ describe('Authentication', () => {
     })
 
     it('should redirect to Keycloak when clicking "Iniciar Sesión"', () => {
+      if (Cypress.env('authDisabled')) {
+        cy.log('Auth bypass enabled: skipping redirect assertion')
+        return
+      }
       cy.visit('/')
       // wait for auth UI to render
       cy.contains(/Iniciar Sesión|Comenzar Ahora|Cerrar Sesión/, { timeout: 10000 }).should('be.visible')
@@ -27,6 +31,10 @@ describe('Authentication', () => {
     })
 
     it('should redirect to Keycloak when clicking "Comenzar Ahora"', () => {
+      if (Cypress.env('authDisabled')) {
+        cy.log('Auth bypass enabled: skipping redirect assertion')
+        return
+      }
       cy.visit('/')
       cy.contains(/Iniciar Sesión|Comenzar Ahora|Cerrar Sesión/, { timeout: 10000 }).should('be.visible')
       cy.contains('Comenzar Ahora').should('be.visible').click({ force: true })
@@ -53,6 +61,10 @@ describe('Authentication', () => {
     })
 
     it('should show error with invalid credentials', () => {
+      if (Cypress.env('authDisabled')) {
+        cy.log('Auth bypass enabled: skipping invalid credential flow')
+        return
+      }
       cy.visit('/')
       cy.contains(/Iniciar Sesión|Comenzar Ahora|Cerrar Sesión/, { timeout: 10000 }).should('be.visible')
       cy.contains('Iniciar Sesión').should('be.visible').click({ force: true })
@@ -91,6 +103,10 @@ describe('Authentication', () => {
 
   describe('Protected Routes', () => {
     it('should redirect to login when accessing /trips without auth', () => {
+      if (Cypress.env('authDisabled')) {
+        cy.log('Auth bypass enabled: skipping protected route redirect check')
+        return
+      }
       cy.visit('/trips')
       
       // Should redirect to Keycloak

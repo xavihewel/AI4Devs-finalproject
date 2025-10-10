@@ -1,41 +1,58 @@
 # Active Context
 
 ## Current Focus
-- **Sistema completamente funcional**: Todos los microservicios operativos con comunicación entre servicios funcionando correctamente
-- **Frontend UX pulido**: Validaciones completas, feedback visual, diseño responsive y consistente en todas las páginas
-- **Database schemas corregidos**: Migración completada de tablas a schemas correctos (users, trips, bookings, matches)
-- **Tests optimizados**: Backend tests 100% funcionando, Frontend tests 90% funcionando (83/92 tests pasan)
-- **Próximo**: Completar tests frontend restantes y tests E2E actualizados
+- **Historial de viajes**: Backend completado con filtros TDD en trips-service y booking-service.
+- **Backend**: Filtros status, from, to implementados en GET /trips y GET /bookings.
+- **Tests**: 23 tests trips-service + 59 tests booking-service pasando (82/82 ✅).
+- **Próximo**: Crear página frontend History.tsx con filtros y estadísticas.
 
 ## Feature Plan
 - Ver `memory-bank/featurePlan.md` para el mapeo de las 15 funcionalidades (cobertura/estado/próximos pasos) y el roadmap por fases.
 
-## Recent Changes (Octubre 9, 2025)
+## Recent Changes (Octubre 10, 2025)
 
-### Database & Backend
-- **Schemas corregidos**: Migración de datos de `public.*` a schemas específicos (`trips.trips`, `matches.matches`)
-- **Entidades JPA**: Todas ahora especifican `@Table(name = "tabla", schema = "schema")`
-- **TripRepository.delete()**: Agregada transacción faltante (begin/commit/rollback)
-- **ServiceClients**: Corregidas URLs duplicadas (eliminado `/api` de paths, ya está en baseURL)
-- **ServiceHttpClient**: Health check usa `/health` en lugar de `/api/health`
-- **TripDto.Origin**: Cambiado de `double` a `Double` para permitir deserialización de null
-- **Migraciones Flyway**: Todas actualizadas con `SET search_path TO {schema}, public;`
-- **Validaciones booking**: Simplificadas temporalmente, mejor logging de errores
+### Feature: Historial de Viajes (Backend Completado)
+- **Trips Service**:
+  - Filtro `status` añadido en `GET /trips` (ACTIVE, COMPLETED)
+  - 4 tests unitarios nuevos (TripsHistoryFilterTest)
+  - Todos los tests existentes actualizados y pasando (23/23 ✅)
+- **Booking Service**:
+  - Filtros `status`, `from`, `to` añadidos en `GET /bookings`
+  - Soporte para CONFIRMED, PENDING, CANCELLED
+  - 5 tests unitarios nuevos (BookingHistoryFilterTest)
+  - Todos los tests existentes actualizados y pasando (59/59 ✅)
+- **TDD Approach**:
+  - Tests primero (Red), implementación después (Green)
+  - Filtros combinables: status + date range
+  - Lógica: viajes con dateTime < now() = COMPLETED
 
-### Tests & Quality
-- **Backend tests optimizados**: Cambio de PostGIS a PostgreSQL estándar, tiempo de ejecución reducido significativamente
-- **Testcontainers mejorados**: Timeout aumentado a 2 minutos, eliminación de duplicados en persistence.xml
-- **Frontend tests corregidos**: 90% de tests pasando (83/92), mocks mejorados, window.confirm implementado
-- **Tests unitarios**: BookingValidationService, BookingResource, y todos los servicios funcionando correctamente
+### Feature: Mapa Básico (Anterior)
+- **Frontend Components**:
+  - `MapPreview.tsx`: Componente con marcadores de origen/destino, fit bounds automático
+  - `MapLinkButtons.tsx`: Botones para Google Maps y Waze con URLs correctas
+  - Integración en `Trips.tsx` y `Matches.tsx` cuando hay coordenadas disponibles
+- **Dependencias**:
+  - `react-leaflet`, `leaflet`, `@types/leaflet` instalados con `--legacy-peer-deps`
+  - CSS de Leaflet importado en `main.tsx`
+  - Variable `VITE_MAP_TILES_URL` configurada en `env.ts` y `env.example`
+- **Tests**:
+  - Tests unitarios: 16/16 ✅ (MapPreview y MapLinkButtons)
+  - Tests E2E: Actualizados para verificar mapas en Trips y Matches
+  - Build exitoso: TypeScript compila, Vite build completado
 
-### Frontend UX
-- **Formulario Crear Viaje**: Validaciones completas (coordenadas, fecha futura, asientos 1-8), mensajes de error específicos
-- **Formulario Mi Perfil**: Validación de email con regex, sede como dropdown, asteriscos rojos en campos obligatorios
-- **Página Reservas**: Rediseñada con Cards, badges de estado, información detallada, confirmaciones
-- **Navbar**: Responsive con hamburger menu, sticky (z-50), consistente en todas las páginas
-- **Feedback visual**: Loading spinners, mensajes de éxito/error, confirmaciones, estados disabled
-- **Integración Matches-Bookings**: Carga automática de reservas existentes, marca visual "Ya reservado"
-- **Componente Input**: Soporte para labels con JSX (React.ReactNode)
+### Feature: Reserva de Plaza (Anterior)
+- **Backend TDD**: 24 tests pasando - reglas de negocio y cancelación configurables
+- **Frontend TDD**: Tests unitarios completos para BookingsService y páginas UI
+- **E2E Tests**: Tests Cypress actualizados para flujos completos de reserva y cancelación
+
+### Database & Backend (Anterior)
+- `notification-service`: UUID real, Flyway V3, integración con booking/matching
+- `booking-service`: NotificationServiceClient, tests TDD para confirm/cancel
+- `matching-service`: Endpoints accept/reject, cliente de notificaciones
+
+### Frontend UX (Anterior)
+- Perfil: sección "Notificaciones Push" con service worker
+- UI mejorada: badges de estado, botones deshabilitados, feedback visual
 
 ### Documentation & Tools
 - **database-schemas.md**: Estructura completa de BD, schemas, índices, troubleshooting
@@ -43,17 +60,9 @@
 - **seed-test-data.sh**: Script para generar datos de prueba en todos los schemas
 
 ## Next Steps (immediate)
-- **Completar tests frontend**: Arreglar 6 tests restantes (Bookings, Profile, Trips, Matches)
-  - Bookings: Mock de cancelación no actualiza estado correctamente
-  - Profile: Mock de API falla, no encuentra "SEDE-1"
-  - Trips: Labels en DOM diferentes a los que busca el test
-  - Matches: Mocks de API no configurados correctamente
-- **Tests E2E**: Actualizar/crear tests para nuevas funcionalidades (~12 tests)
-  - Alta prioridad: Actualizar `profile-edit.cy.ts` (sede ahora es select), `create-cancel.cy.ts` (nueva UI de reservas)
-  - Alta prioridad: Crear tests para reservar desde matches, validaciones de formularios
-  - Media prioridad: Tests de menú responsive, feedback visual
-- **Validaciones cross-service**: Mejorar validaciones en booking-service (actualmente simplificadas)
-- **Reactivar validaciones**: Descomentar validaciones en BookingResource una vez verificadas URLs correctas
+- **Frontend**: Crear página History.tsx con filtros y estadísticas
+- **Tests**: Tests unitarios para History.tsx y E2E para navegación
+- **Documentación**: Actualizar OpenAPI y Memory Bank tras completar frontend
 
 ## Decisions & Considerations
 - **Ruta base común**: `/api` para todos; enrutamiento por path para distinguir servicios.

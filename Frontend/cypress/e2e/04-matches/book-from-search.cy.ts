@@ -3,7 +3,7 @@ describe('Book from Search Results', () => {
     cy.loginViaKeycloak('test.user', 'password123')
   })
 
-  it('should book a trip from search results', () => {
+  it('should book a trip from search results and verify PENDING status', () => {
     // Asegurar que hay viajes disponibles
     cy.request('http://localhost:8081/api/trips?destinationSedeId=SEDE-1').then((res) => {
       expect(res.body.length).to.be.greaterThan(0)
@@ -36,6 +36,13 @@ describe('Book from Search Results', () => {
 
     // Verificar marca "Ya reservado" aparece
     cy.contains('Ya reservado', { timeout: 5000 }).should('be.visible')
+    
+    // Verificar que el botón cambió a "Ya reservado" y está deshabilitado
+    cy.contains('button', 'Ya reservado').should('be.visible').and('be.disabled')
+    
+    // Verificar en la página de bookings que aparece en estado PENDING
+    cy.visit('/bookings')
+    cy.contains('Pendiente').should('be.visible')
   })
 
   it('should validate seats availability when booking', () => {

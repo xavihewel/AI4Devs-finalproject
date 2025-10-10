@@ -26,6 +26,7 @@
 ## Technical Decisions
 - Backend en Java 17 + Jakarta; Maven como build. **JPA/Hibernate con PostgreSQL/PostGIS IMPLEMENTADO**.
 - **Flyway para migraciones** con schemas separados por servicio (trips, users, bookings, matches).
+ - **Flyway para migraciones** con schemas separados por servicio (trips, users, bookings, matches, notifications).
 - **DependencyManagement centralizado** en parent POM para versiones consistentes.
 - **RESOURCE_LOCAL transactions** para simplificar MVP sin CDI completo.
 - **ThreadLocal AuthContext**: Patrón estándar para propagación de userId en todos los servicios.
@@ -87,7 +88,7 @@
 - **Testing E2E**: Cypress tests como documentación viva de flujos de usuario.
 
 ## Runtime Conventions (actualizado)
-- **Routing**: Servicios expuestos bajo `/api` en cada microservicio (puertos locales 8081–8084). En gateway se enrutará por prefijo (`/api/users`, `/api/trips`, `/api/bookings`, `/api/matches`).
+- **Routing**: Servicios expuestos bajo `/api` en cada microservicio (puertos locales 8081–8085). En gateway se enrutará por prefijo (`/api/users`, `/api/trips`, `/api/bookings`, `/api/matches`, `/api/notifications`).
 - **Health**: `GET /api/health` disponible y exento de autenticación en todos los servicios.
 - **Auth**: `OIDC_ISSUER_URI` debe ser coherente con `iss` del token (localhost en dev); `aud` debe incluir `backend-api`.
 

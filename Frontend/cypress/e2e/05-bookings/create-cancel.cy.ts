@@ -10,10 +10,13 @@ describe('Bookings Create & Cancel', () => {
         expect(trips.length).to.be.greaterThan(0)
         const tripId = trips[0].id
 
-        // Crear reserva directamente via API (ya no hay formulario manual en UI)
+        // Crear reserva directamente via API
         cy.request('POST', 'http://localhost:8083/api/bookings', {
           tripId: tripId,
           seatsRequested: 1
+        }).then((response) => {
+          // Verificar que la reserva se creó en estado PENDING
+          expect(response.body.status).to.equal('PENDING')
         })
 
         // Visitar página de reservas
@@ -26,7 +29,7 @@ describe('Bookings Create & Cancel', () => {
         cy.contains('Reserva #', { timeout: 10000 }).should('be.visible')
         cy.contains(tripId).should('be.visible')
         
-        // Verificar badge de estado
+        // Verificar badge de estado PENDING
         cy.contains('Pendiente').should('be.visible')
 
         // Mock de confirmación para el dialog
@@ -42,6 +45,41 @@ describe('Bookings Create & Cancel', () => {
         
         // Verificar que el badge cambió a "Cancelada"
         cy.contains('Cancelada').should('be.visible')
+        
+        // Verificar que el botón de cancelar ya no está disponible
+        cy.contains('Cancelar Reserva').should('not.exist')
+      })
+  })
+
+  it('verifica que no se puede cancelar una reserva ya cancelada', () => {
+    // Crear y cancelar una reserva
+    cy.request('http://localhost:8081/api/trips?destinationSedeId=SEDE-1')
+      .its('body').then((trips: any[]) => {
+        const tripId = trips[0].id
+
+        // Crear reserva
+        cy.request('POST', 'http://localhost:8083/api/bookings', {
+          tripId: tripId,
+          seatsRequested: 1
+        }).then((response) => {
+          const bookingId = response.body.id
+
+          // Cancelar reserva via API
+          cy.request('PUT', `http://localhost:8083/api/bookings/${bookingId}/cancel`)
+            .then((cancelResponse) => {
+              expect(cancelResponse.body.status).to.equal('CANCELLED')
+            })
+
+          // Intentar cancelar nuevamente (debería fallar)
+          cy.request({
+            method: 'PUT',
+            url: `http://localhost:8083/api/bookings/${bookingId}/cancel`,
+            failOnStatusCode: false
+          }).then((response) => {
+            expect(response.status).to.equal(400)
+            expect(response.body).to.include('Booking is already cancelled')
+          })
+        })
       })
   })
 
@@ -56,6 +94,38 @@ describe('Bookings Create & Cancel', () => {
         cy.contains('Ve a "Buscar"').should('be.visible')
       }
     })
+  })
+
+  it('verifica que solo bookings PENDING pueden ser confirmados', () => {
+    // Crear una reserva
+    cy.request('http://localhost:8081/api/trips?destinationSedeId=SEDE-1')
+      .its('body').then((trips: any[]) => {
+        const tripId = trips[0].id
+
+        // Crear reserva
+        cy.request('POST', 'http://localhost:8083/api/bookings', {
+          tripId: tripId,
+          seatsRequested: 1
+        }).then((response) => {
+          const bookingId = response.body.id
+
+          // Confirmar reserva (debería funcionar)
+          cy.request('PUT', `http://localhost:8083/api/bookings/${bookingId}/confirm`)
+            .then((confirmResponse) => {
+              expect(confirmResponse.body.status).to.equal('CONFIRMED')
+            })
+
+          // Intentar confirmar nuevamente (debería fallar)
+          cy.request({
+            method: 'PUT',
+            url: `http://localhost:8083/api/bookings/${bookingId}/confirm`,
+            failOnStatusCode: false
+          }).then((response) => {
+            expect(response.status).to.equal(400)
+            expect(response.body).to.include('Only pending bookings can be confirmed')
+          })
+        })
+      })
   })
 })
 

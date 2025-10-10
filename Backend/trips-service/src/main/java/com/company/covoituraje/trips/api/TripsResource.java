@@ -54,7 +54,8 @@ public class TripsResource {
     @GET
     public List<TripDto> list(@QueryParam("destinationSedeId") String destinationSedeId,
                              @QueryParam("from") String from,
-                             @QueryParam("to") String to) {
+                             @QueryParam("to") String to,
+                             @QueryParam("status") String status) {
         
         // Prefer full datetime ISO filtering if both from/to are ISO-8601
         java.time.OffsetDateTime fromDt = parseIsoDatetime(from);
@@ -78,6 +79,20 @@ public class TripsResource {
                 Integer toMinutes = parseTimeToMinutes(to);
                 trips = trips.stream()
                         .filter(t -> withinRangeByTimeOfDay(t.getDateTime(), fromMinutes, toMinutes))
+                        .collect(java.util.stream.Collectors.toList());
+            }
+        }
+
+        // Filter by status if provided
+        if (status != null && !status.isBlank()) {
+            java.time.OffsetDateTime now = java.time.OffsetDateTime.now();
+            if ("COMPLETED".equalsIgnoreCase(status)) {
+                trips = trips.stream()
+                        .filter(t -> t.getDateTime().isBefore(now))
+                        .collect(java.util.stream.Collectors.toList());
+            } else if ("ACTIVE".equalsIgnoreCase(status)) {
+                trips = trips.stream()
+                        .filter(t -> t.getDateTime().isAfter(now) || t.getDateTime().isEqual(now))
                         .collect(java.util.stream.Collectors.toList());
             }
         }
@@ -151,7 +166,11 @@ public class TripsResource {
                 trip.setDateTime(dt);
             }
             if (update.seatsTotal > 0) {
+                // Calculate currently occupied seats
+                int currentOccupiedSeats = trip.getSeatsTotal() - trip.getSeatsFree();
                 trip.setSeatsTotal(update.seatsTotal);
+                // Recalculate free seats: new total - occupied seats
+                trip.setSeatsFree(update.seatsTotal - currentOccupiedSeats);
             }
             if (update.origin != null) {
                 String originString = update.origin.lat + "," + update.origin.lng;

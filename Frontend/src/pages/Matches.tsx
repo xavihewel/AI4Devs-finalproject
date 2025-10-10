@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { MatchesService, BookingsService } from '../api';
 import type { MatchDto } from '../types/api';
 import { Button, Card, CardContent, Input, Select, LoadingSpinner } from '../components/ui';
+import MapPreview from '../components/map/MapPreview';
+import { env } from '../env';
 
 export default function Matches() {
   const [matches, setMatches] = useState<MatchDto[]>([]);
@@ -240,8 +242,26 @@ export default function Matches() {
                       
                       <div className="space-y-1 text-sm text-gray-600">
                         <p><strong>Origen:</strong> {match.origin}</p>
-                        <p><strong>Asientos disponibles:</strong> {match.seatsFree}</p>
+                        <p><strong>Asientos libres:</strong> {match.seatsFree}</p>
                       </div>
+
+                      {(() => {
+                        // match.origin viene como string "lat,lng"; lo parseamos
+                        const parts = (match.origin || '').split(',').map(s => parseFloat(s.trim()));
+                        const hasCoords = parts.length === 2 && parts.every(n => !isNaN(n));
+                        if (!hasCoords) return null;
+                        const [lat, lng] = parts as [number, number];
+                        return (
+                          <div className="pt-2">
+                            <MapPreview
+                              origin={{ lat, lng }}
+                              height={160}
+                              interactive={false}
+                              tilesUrl={env.mapTilesUrl}
+                            />
+                          </div>
+                        );
+                      })()}
 
                       {/* Match Reasons */}
                       {match.reasons && match.reasons.length > 0 && (
@@ -265,10 +285,14 @@ export default function Matches() {
                         variant="primary"
                         className="w-full"
                         onClick={() => handleBooking(match)}
-                        disabled={bookingInProgress === match.tripId || match.seatsFree === 0}
+                        disabled={bookingInProgress === match.tripId || match.seatsFree === 0 || bookedTrips.has(match.tripId)}
                         loading={bookingInProgress === match.tripId}
                       >
-                        {match.seatsFree === 0 ? 'Sin asientos disponibles' : 'Reservar Viaje'}
+                        {match.seatsFree === 0
+                          ? 'Sin asientos disponibles'
+                          : bookedTrips.has(match.tripId)
+                            ? 'Ya reservado'
+                            : 'Reservar Viaje'}
                       </Button>
                     </div>
                   </div>

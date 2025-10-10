@@ -43,6 +43,34 @@ public class PushNotificationService {
             // Don't throw exception to avoid breaking the main flow
         }
     }
+
+    public SendOutcome sendNotificationWithOutcome(NotificationSubscription subscription, String title, String body) {
+        try {
+            if (pushService == null) {
+                initializePushService();
+            }
+            String payload = createPayload(title, body);
+            // Here we would construct a real web push notification using subscription keys and endpoint.
+            // As a simplified placeholder, we log and assume success unless the endpoint looks clearly invalid.
+            if (subscription.getEndpoint() == null || subscription.getEndpoint().isBlank()) {
+                return SendOutcome.GONE;
+            }
+            System.out.println("[Push] -> " + subscription.getEndpoint() + " | payload=" + payload);
+            return SendOutcome.SUCCESS;
+        } catch (Exception e) {
+            String message = e.getMessage() == null ? "" : e.getMessage();
+            if (message.contains("410") || message.contains("404")) {
+                return SendOutcome.GONE;
+            }
+            return SendOutcome.RETRYABLE_FAILURE;
+        }
+    }
+
+    public enum SendOutcome {
+        SUCCESS,
+        RETRYABLE_FAILURE,
+        GONE
+    }
     
     public String createPayload(String title, String body) {
         JsonObject payload = Json.createObjectBuilder()

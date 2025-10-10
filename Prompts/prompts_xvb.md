@@ -490,3 +490,80 @@
   - Tests unitarios vs integración claramente separados
 - Result: ✅ Backend tests 100% funcionando, Frontend tests 90% funcionando (83/92 tests pasan)
 - Next: Completar 6 tests frontend restantes (Bookings, Profile, Trips, Matches)
+
+## 2025-10-10
+
+### Notificaciones MVP (Backend + Frontend) ✅
+- Intent: Estabilizar `notification-service` y conectar eventos de Booking/Matching; añadir suscripción Push en Frontend.
+- Actions:
+  - Fix `notification-service`: añadir Hibernate, PostgreSQL, Flyway, BouncyCastle; corregir CDI; `V3__Alter_subscription_id_to_uuid.sql`; DELETE `/unsubscribe` con query param.
+  - Integración Booking: `NotificationServiceClient`; enviar notificaciones en confirm/cancel; tests TDD.
+  - Integración Matching: endpoints `PUT /matches/{id}/accept|reject`; client de notificaciones; tests TDD.
+  - Docker/env: `NOTIFICATION_SERVICE_URL` añadido a booking/matching; `env.example` y doc actualizados.
+  - OpenAPI: actualizar `booking-service.yaml` y `matching-service.yaml` (base `/api`, endpoints nuevos).
+  - Frontend: `public/sw.js`, `src/api/notifications.ts`, variables en `env.ts`, UI en `Profile.tsx` para habilitar/deshabilitar Push.
+- Decisions:
+  - Usar UUID real en `notification_subscriptions.id` y `pgcrypto` para `gen_random_uuid()`.
+  - DELETE con query param para idempotencia/compatibilidad; POST `/send` permanece simple.
+  - TDD: primero tests en booking/matching para llamadas a notificación, luego implementación.
+- Result: ✅ Servicios y tests en verde; UI con controles de suscripción push.
+- Next:
+  - Desplegar y validar E2E suscripción push.
+  - Añadir tests Frontend para push (mock Service Worker y PushManager).
+  - Abrir PR de integración.
+
+### Feature: Reserva de Plaza (TDD Completo) ✅
+- Intent: Implementar feature "Reserva de plaza" con TDD backend/frontend y E2E actualizados.
+- Actions:
+  - **Backend TDD**:
+    - `BookingBusinessRulesTest`: 11 tests - reglas de negocio (PENDING status, validación asientos, notificaciones, driver cutoff)
+    - `DriverCancellationRulesTest`: 13 tests - reglas de cancelación configurables
+    - `DriverCancellationService`: Servicio con tiempo de corte configurable (DRIVER_CANCEL_CUTOFF_HOURS)
+    - Tests de integración con Testcontainers y mocks de servicios externos
+  - **Frontend TDD**:
+    - Tests unitarios para `BookingsService` con mocks de axios/Keycloak
+    - Tests para páginas `Bookings` y `Matches` con validaciones de UI
+    - Integración: botón "Reservar" deshabilitado cuando ya reservado
+  - **E2E Tests**:
+    - `create-booking.cy.ts`: Tests actualizados con validaciones de estado PENDING
+    - `create-cancel.cy.ts`: Tests con reglas de cancelación y confirmación
+    - `book-from-search.cy.ts`: Tests de flujo completo desde búsqueda
+- Decisions:
+  - TDD approach: tests primero, implementación después
+  - Reglas de negocio: PENDING status, validación asientos, notificaciones, driver cutoff configurable
+  - UI/UX: badges de estado, botones deshabilitados, feedback visual
+- Result: ✅ 24 tests backend pasando, tests frontend completos, E2E actualizados
+- Next: Continuar con siguiente feature del plan
+
+### Feature: Historial de Viajes (Backend TDD) ✅
+- Intent: Implementar filtros de historial en backend para viajes y reservas con TDD.
+- Actions:
+  - **Trips Service**: Añadir filtro status en GET /trips (ACTIVE, COMPLETED)
+    - TripsHistoryFilterTest: 4 tests unitarios (status filtering, date combination)
+    - Lógica: viajes con dateTime < now() = COMPLETED
+    - Actualizar tests existentes para incluir parámetro status
+  - **Booking Service**: Añadir filtros status, from, to en GET /bookings
+    - BookingHistoryFilterTest: 5 tests unitarios (CONFIRMED, PENDING, CANCELLED)
+    - Filtros combinables: status + date range
+    - Actualizar tests existentes para incluir parámetros
+- Decisions:
+  - TDD approach: Tests primero (Red), implementación después (Green)
+  - Filtros opcionales: status, from, to como query parameters
+  - Lógica de negocio: viajes pasados = COMPLETED, futuros = ACTIVE
+- Result: ✅ 82 tests pasando (23 trips + 59 bookings), filtros implementados
+- Next: Crear página frontend History.tsx con filtros y estadísticas
+
+### Feature: Mapa Básico (OpenStreetMap + React Leaflet) ✅
+- Intent: Implementar mapa básico con OpenStreetMap para visualizar origen/destino de viajes.
+- Actions:
+  - **Dependencias**: Instalar react-leaflet, leaflet, @types/leaflet con --legacy-peer-deps
+  - **Componentes**: Crear MapPreview (marcadores, fit bounds) y MapLinkButtons (Google Maps/Waze)
+  - **Integración**: Añadir mapas en Trips.tsx y Matches.tsx cuando hay coordenadas
+  - **Variables**: Configurar VITE_MAP_TILES_URL en env.ts y env.example
+  - **Tests**: 16 tests unitarios (MapPreview/MapLinkButtons) + E2E actualizados
+- Decisions:
+  - OpenStreetMap gratuito vs Mapbox (requiere token)
+  - Leaflet con --legacy-peer-deps para compatibilidad React 18
+  - Mapas solo cuando hay coordenadas válidas
+- Result: ✅ Build exitoso, tests pasando, mapas integrados en Trips/Matches
+- Next: Re-despliegue Docker para incluir nuevas dependencias

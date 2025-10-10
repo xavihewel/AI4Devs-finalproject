@@ -12,6 +12,7 @@
 - **Persistencia**: PostgreSQL en puerto 5434, schemas separados por servicio, Flyway para migraciones.
 - **JPA Configuration**: `persistence.xml` por servicio, `JpaConfig` para EntityManager, RESOURCE_LOCAL transactions.
 - Frontend (React/TS): autenticación OIDC (Keycloak), PWA opcional; scripts `dev/build/preview`; variables `VITE_*` para issuer/clientId/redirect y base URL API.
+ - Frontend (React/TS): autenticación OIDC (Keycloak), PWA opcional; scripts `dev/build/preview`; variables `VITE_*` para issuer/clientId/redirect y base URL API; Web Push con Service Worker (`public/sw.js`) y VAPID.
 - Servicios locales: PostgreSQL, Redis; docker-compose recomendado para orquestación.
 - Documentación técnica en `/doc` con PlantUML y Mermaid; prompts en `/Prompts/prompts_xvb.md`.
 
@@ -19,6 +20,7 @@
 - Backend expone CORS mediante `CorsFilter` por servicio que refleja el `Origin` permitido.
 - Variable de entorno `ALLOWED_ORIGINS` (coma-separado) controla orígenes permitidos; por defecto `http://localhost:5173`.
 - `docker-compose.yml` inyecta `ALLOWED_ORIGINS` en `trips/users/booking/matching` para desarrollo local.
+ - `docker-compose.yml` inyecta `ALLOWED_ORIGINS` y `NOTIFICATION_SERVICE_URL` en servicios que lo requieren.
 - Frontend modo dev (`Vite` en 5173): `scripts/start-frontend-dev.sh` genera `Frontend/.env.local` con:
   - `VITE_USERS_API_BASE_URL=http://localhost:8082/api`
   - `VITE_TRIPS_API_BASE_URL=http://localhost:8081/api`
@@ -37,7 +39,7 @@
 - **Jakarta Bean Validation**: Para validación de entrada en REST APIs.
 - **ServiceHttpClient**: Cliente HTTP compartido para comunicación entre microservicios.
 - **DTOs compartidos**: Tipos estandarizados para comunicación entre servicios.
-- Frontend: React 19, TypeScript, Tailwind CSS, react-router-dom, keycloak-js, axios, Vite, Jest, Testing Library.
+- Frontend: React 19, TypeScript, Tailwind CSS, react-router-dom, keycloak-js, axios, Vite, Jest, Testing Library. Web Push API + Service Worker.
 - Infra: Docker, docker-compose; PostgreSQL con PostGIS; Keycloak como IdP de dev; scripts de automatización.
 
 ## Implementation Status
@@ -49,6 +51,6 @@
 - **✅ FRONTEND BASE**: React + TypeScript + Tailwind CSS (componentes UI, servicios API, páginas principales)
 
 ## Local Ports & Health Checks
-- Puertos locales: trips `8081`, users `8082`, booking `8083`, matching `8084` (todos bajo `@ApplicationPath("/api")`).
+- Puertos locales: trips `8081`, users `8082`, booking `8083`, matching `8084`, notifications `8085` (todos bajo `@ApplicationPath("/api")`).
 - Health: `GET /api/health` exento de autenticación en todos los servicios.
 - OIDC dev: `OIDC_ISSUER_URI=http://localhost:8080/realms/covoituraje`; tokens con `aud=backend-api`.

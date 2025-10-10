@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { env } from '../env';
+import { subscribePush, unsubscribePush } from '../api/notifications';
 import { UsersService } from '../api/users';
 import type { UserDto, UserUpdateDto } from '../types/api';
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select, LoadingSpinner } from '../components/ui';
@@ -14,6 +16,8 @@ export default function Profile() {
   const [saving, setSaving] = useState<boolean>(false);
   const [user, setUser] = useState<UserDto | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [pushSub, setPushSub] = useState<PushSubscription | null>(null);
+  const [pushError, setPushError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
@@ -276,7 +280,81 @@ export default function Profile() {
       </div>
         </CardContent>
       </Card>
+
+      {/* Notificaciones Push */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Notificaciones Push</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-3">
+            <Button type="button" onClick={() => enablePush(setPushSub, setPushError)}>
+              Habilitar
+            </Button>
+            <Button type="button" variant="secondary" onClick={() => disablePush(setPushSub, setPushError)} disabled={!pushSub}>
+              Deshabilitar
+            </Button>
+          </div>
+          {pushError && <p className="text-red-600 mt-2 text-sm">{pushError}</p>}
+        </CardContent>
+      </Card>
     </div>
   );
+}
+
+async function enablePush(setPushSub: (s: PushSubscription | null) => void, setPushError: (e: string | null) => void) {
+  try {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) throw new Error('Push API no soportada');
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      const key = env.VAPID_PUBLIC_KEY || '';
+      const appKey = urlBase64ToUint8Array(key);
+      sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: appKey });
+    }
+    const p256dh = arrayBufferToBase64(sub.getKey('p256dh'));
+    const auth = arrayBufferToBase64(sub.getKey('auth'));
+    await subscribePush({ endpoint: sub.endpoint, p256dhKey: p256dh, authKey: auth });
+    setPushSub(sub);
+    setPushError(null);
+  } catch (e: any) {
+    setPushError(e?.message || 'No se pudo habilitar las notificaciones');
+  }
+}
+
+async function disablePush(setPushSub: (s: PushSubscription | null) => void, setPushError: (e: string | null) => void) {
+  try {
+    const reg = await navigator.serviceWorker.getRegistration();
+    const sub = await reg?.pushManager.getSubscription();
+    if (sub) {
+      await unsubscribePush(sub.endpoint);
+      await sub.unsubscribe();
+    }
+    setPushSub(null);
+    setPushError(null);
+  } catch (e: any) {
+    setPushError(e?.message || 'No se pudo deshabilitar las notificaciones');
+  }
+}
+
+function urlBase64ToUint8Array(base64String: string) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+function arrayBufferToBase64(buf: ArrayBuffer | null) {
+  if (!buf) return '';
+  const bytes = new Uint8Array(buf);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
 }
 

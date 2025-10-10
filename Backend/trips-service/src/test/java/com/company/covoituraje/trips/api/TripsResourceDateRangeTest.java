@@ -77,21 +77,21 @@ class TripsResourceDateRangeTest {
 
     @Test
     void list_filtersByFromToRange() {
-        List<TripDto> list = resource.list("SEDE-1", "08:00", "09:00");
+        List<TripDto> list = resource.list("SEDE-1", "08:00", "09:00", null);
         assertEquals(2, list.size());
         assertTrue(list.stream().allMatch(t -> t.destinationSedeId.equals("SEDE-1")));
     }
 
     @Test
     void list_filtersByFromOnly() {
-        List<TripDto> list = resource.list(null, "09:00", null);
+        List<TripDto> list = resource.list(null, "09:00", null, null);
         assertEquals(1, list.size());
         assertEquals("2025-01-01T09:30:00Z", list.get(0).dateTime);
     }
 
     @Test
     void list_filtersByToOnly() {
-        List<TripDto> list = resource.list(null, null, "08:15");
+        List<TripDto> list = resource.list(null, null, "08:15", null);
         assertEquals(1, list.size());
         assertEquals("2025-01-01T08:00:00Z", list.get(0).dateTime);
     }
@@ -100,14 +100,14 @@ class TripsResourceDateRangeTest {
     void list_filtersByFullIsoDatetimeRange_withDestination() {
         // add another day outside range
         seedTrip("SEDE-1", "2025-01-02T08:30:00Z");
-        List<TripDto> list = resource.list("SEDE-1", "2025-01-01T08:15:00Z", "2025-01-01T09:00:00Z");
+        List<TripDto> list = resource.list("SEDE-1", "2025-01-01T08:15:00Z", "2025-01-01T09:00:00Z", null);
         assertEquals(1, list.size());
         assertEquals("2025-01-01T08:30:00Z", list.get(0).dateTime);
     }
 
     @Test
     void list_filtersByFullIsoDatetimeRange_withoutDestination() {
-        List<TripDto> list = resource.list(null, "2025-01-01T08:00:00Z", "2025-01-01T08:30:00Z");
+        List<TripDto> list = resource.list(null, "2025-01-01T08:00:00Z", "2025-01-01T08:30:00Z", null);
         assertEquals(2, list.size());
     }
 }

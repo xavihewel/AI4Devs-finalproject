@@ -14,6 +14,7 @@ jest.mock('../api/matches', () => ({
 jest.mock('../api/bookings', () => ({
   BookingsService: {
     getMyBookings: jest.fn(),
+    createBooking: jest.fn(),
   },
 }));
 
@@ -140,6 +141,58 @@ describe('Matches', () => {
       expect(screen.getByText('No se encontraron viajes')).toBeInTheDocument();
       expect(screen.getByText('No hay viajes disponibles que coincidan con tus criterios de búsqueda.')).toBeInTheDocument();
     });
+  });
+
+  it('disables reserve button when trip is already reserved', async () => {
+    (MatchesService.findMatches as jest.Mock).mockResolvedValue(mockMatches);
+    // Simulate existing booking for the trip
+    (BookingsService.getMyBookings as jest.Mock).mockResolvedValueOnce([
+      { id: 'b1', tripId: 'trip1', passengerId: 'uX', seatsRequested: 1, status: 'PENDING', createdAt: '', updatedAt: '' },
+    ]);
+
+    render(<Matches />);
+
+    // Perform search
+    fireEvent.change(screen.getByLabelText('Destino'), { target: { value: 'SEDE-1' } });
+    fireEvent.click(screen.getAllByText('Buscar Viajes')[1]);
+
+    await waitFor(() => {
+      expect(screen.getByText('Encontrados 1 viajes compatibles')).toBeInTheDocument();
+    });
+
+    const reserveBtn = screen.getByRole('button', { name: /Reservar Viaje/i });
+    expect(reserveBtn).toBeDisabled();
+  });
+
+  it('calls createBooking when reserving an available trip and updates UI', async () => {
+    (MatchesService.findMatches as jest.Mock).mockResolvedValue(mockMatches);
+    (BookingsService.getMyBookings as jest.Mock).mockResolvedValue([]);
+    (BookingsService.createBooking as jest.Mock).mockResolvedValue({ id: 'b2' });
+
+    // Mock prompt to choose 1 seat
+    const promptSpy = jest.spyOn(window, 'prompt').mockReturnValue('1');
+
+    render(<Matches />);
+
+    // Perform search
+    fireEvent.change(screen.getByLabelText('Destino'), { target: { value: 'SEDE-1' } });
+    fireEvent.click(screen.getAllByText('Buscar Viajes')[1]);
+
+    const reserveBtn = await screen.findByRole('button', { name: /Reservar Viaje/i });
+    expect(reserveBtn).toBeEnabled();
+
+    fireEvent.click(reserveBtn);
+
+    await waitFor(() => {
+      expect(BookingsService.createBooking).toHaveBeenCalledWith({ tripId: 'trip1', seatsRequested: 1 });
+    });
+
+    // After booking, the trip should be marked as reserved (badge present)
+    await waitFor(() => {
+      expect(screen.getByText('Ya reservado')).toBeInTheDocument();
+    });
+
+    promptSpy.mockRestore();
   });
 
   it('clears search when clear button is clicked', async () => {

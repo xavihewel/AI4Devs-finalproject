@@ -25,10 +25,18 @@ VITE_OIDC_CLIENT_ID=frontend-spa
 VITE_OIDC_REDIRECT_URI=http://localhost:5173/
 
 # API base URLs
-VITE_API_USERS=http://localhost:8081
-VITE_API_TRIPS=http://localhost:8082
-VITE_API_BOOKINGS=http://localhost:8083
-VITE_API_MATCHING=http://localhost:8084
+VITE_API_USERS=http://localhost:8082/api
+VITE_API_TRIPS=http://localhost:8081/api
+VITE_API_BOOKINGS=http://localhost:8083/api
+VITE_API_MATCHING=http://localhost:8084/api
+VITE_API_NOTIFICATIONS=http://localhost:8085/api
+
+# Backend services discovery
+TRIPS_SERVICE_URL=http://localhost:8081
+USERS_SERVICE_URL=http://localhost:8082
+BOOKING_SERVICE_URL=http://localhost:8083
+MATCHING_SERVICE_URL=http://localhost:8084
+NOTIFICATION_SERVICE_URL=http://localhost:8085/api
 ```
 
 Nota: crea archivos `.env` locales en `Backend/` y `Frontend/` con estos valores. No se versionan.

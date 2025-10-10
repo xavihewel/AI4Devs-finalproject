@@ -93,7 +93,7 @@ class BookingResourceTest {
 
     @Test
     void get_returnsList() {
-        List<BookingDto> list = resource.listMine();
+        List<BookingDto> list = resource.listMine(null, null, null);
         assertNotNull(list);
         assertTrue(list.isEmpty());
     }
