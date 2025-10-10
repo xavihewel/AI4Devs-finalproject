@@ -1,30 +1,50 @@
 # Active Context
 
 ## Current Focus
-- **Historial de viajes**: Backend completado con filtros TDD en trips-service y booking-service.
-- **Backend**: Filtros status, from, to implementados en GET /trips y GET /bookings.
-- **Tests**: 23 tests trips-service + 59 tests booking-service pasando (82/82 ✅).
-- **Próximo**: Crear página frontend History.tsx con filtros y estadísticas.
+- **Perfil de usuario**: Feature completado con mejoras de validaciones y UX.
+- **Validaciones**: Tests robustos para campos obligatorios, formato email, longitud mínima.
+- **E2E**: Tests Cypress para navegación, validaciones y funcionalidades del perfil.
+- **Próximo**: Siguiente feature del plan (Notificaciones E2E o Sistema de confianza).
 
 ## Feature Plan
 - Ver `memory-bank/featurePlan.md` para el mapeo de las 15 funcionalidades (cobertura/estado/próximos pasos) y el roadmap por fases.
 
 ## Recent Changes (Octubre 10, 2025)
 
-### Feature: Historial de Viajes (Backend Completado)
-- **Trips Service**:
-  - Filtro `status` añadido en `GET /trips` (ACTIVE, COMPLETED)
-  - 4 tests unitarios nuevos (TripsHistoryFilterTest)
-  - Todos los tests existentes actualizados y pasando (23/23 ✅)
-- **Booking Service**:
-  - Filtros `status`, `from`, `to` añadidos en `GET /bookings`
-  - Soporte para CONFIRMED, PENDING, CANCELLED
-  - 5 tests unitarios nuevos (BookingHistoryFilterTest)
-  - Todos los tests existentes actualizados y pasando (59/59 ✅)
-- **TDD Approach**:
-  - Tests primero (Red), implementación después (Green)
-  - Filtros combinables: status + date range
+### Feature: Perfil de Usuario (Mejorado ✅)
+- **Validaciones Robustas**:
+  - Tests unitarios para validaciones de campos obligatorios
+  - Validación de formato email y longitud mínima de nombre
+  - Manejo de errores de API y estados de carga
+  - 7 tests unitarios pasando (ProfileValidation.test.tsx)
+- **E2E Tests**:
+  - Tests Cypress para navegación y funcionalidades del perfil
+  - Verificación de validaciones, mensajes de éxito/error
+  - Tests para estados de carga y feedback visual
+  - 12 tests E2E (navigate-profile.cy.ts)
+- **UX Mejorada**:
+  - Validaciones en tiempo real con feedback inmediato
+  - Mensajes de error claros y específicos
+  - Estados de carga y confirmaciones de éxito
+  - Indicadores visuales para campos obligatorios
+
+### Feature: Historial de Viajes (Anterior ✅)
+- **Backend (TDD)**:
+  - Trips Service: Filtro `status` en `GET /trips` (ACTIVE, COMPLETED)
+  - Booking Service: Filtros `status`, `from`, `to` en `GET /bookings`
+  - 82 tests pasando (23 trips + 59 bookings)
   - Lógica: viajes con dateTime < now() = COMPLETED
+- **Frontend**:
+  - Página `/history` con filtros (fecha, estado, rol)
+  - Estadísticas: Total viajes, CO2 ahorrado, Km compartidos
+  - Componente `SelectWithChildren` creado para filtros
+  - 9 tests unitarios pasando (History.test.tsx)
+- **E2E**:
+  - Tests Cypress para navegación y filtrado (navigate-history.cy.ts)
+  - Verificación de estadísticas, filtros y badges
+- **Documentación**:
+  - OpenAPI actualizado: trips-service.yaml y booking-service.yaml
+  - Nuevos query params documentados con descripciones
 
 ### Feature: Mapa Básico (Anterior)
 - **Frontend Components**:

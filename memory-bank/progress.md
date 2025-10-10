@@ -30,22 +30,41 @@
 
 ## Recent Improvements (Octubre 2025)
 
-### Feature: Historial de Viajes (Backend Completado)
-- ✅ **Trips Service**: Filtro status implementado con TDD
-  - GET /trips con parámetro status (ACTIVE, COMPLETED)
+### Feature: Perfil de Usuario (Mejorado ✅)
+- ✅ **Validaciones Robustas**:
+  - Tests unitarios para validaciones de campos obligatorios
+  - Validación de formato email y longitud mínima de nombre
+  - Manejo de errores de API y estados de carga
+  - 7 tests unitarios pasando (ProfileValidation.test.tsx)
+- ✅ **E2E Tests**:
+  - Tests Cypress para navegación y funcionalidades del perfil
+  - Verificación de validaciones, mensajes de éxito/error
+  - Tests para estados de carga y feedback visual
+  - 12 tests E2E (navigate-profile.cy.ts)
+- ✅ **UX Mejorada**:
+  - Validaciones en tiempo real con feedback inmediato
+  - Mensajes de error claros y específicos
+  - Estados de carga y confirmaciones de éxito
+  - Indicadores visuales para campos obligatorios
+
+### Feature: Historial de Viajes (Anterior ✅)
+- ✅ **Backend (TDD)**:
+  - Trips Service: Filtro status en GET /trips (ACTIVE, COMPLETED)
+  - Booking Service: Filtros status, from, to en GET /bookings
+  - 82 tests pasando (23 trips + 59 bookings)
   - Lógica: viajes con dateTime < now() = COMPLETED
-  - 4 tests unitarios nuevos (TripsHistoryFilterTest)
-  - Todos los tests existentes actualizados (23/23 ✅)
-- ✅ **Booking Service**: Filtros status, from, to implementados con TDD
-  - GET /bookings con parámetros status, from, to
-  - Soporte para CONFIRMED, PENDING, CANCELLED
-  - Filtros combinables: status + date range
-  - 5 tests unitarios nuevos (BookingHistoryFilterTest)
-  - Todos los tests existentes actualizados (59/59 ✅)
-- ✅ **TDD Approach**: Tests primero, implementación después
-  - Red phase: Tests fallan antes de implementación
-  - Green phase: Tests pasan después de implementación
-  - Refactor: Código limpio y mantenible
+- ✅ **Frontend**:
+  - Página `/history` con filtros (fecha, estado, rol) y estadísticas
+  - Componente `SelectWithChildren` creado para filtros con children
+  - Integración con TripsService y BookingsService
+  - Ruta añadida en App.tsx y enlace en Navbar
+  - 9 tests unitarios pasando (History.test.tsx)
+- ✅ **E2E**:
+  - Tests Cypress para navegación y filtrado (navigate-history.cy.ts)
+  - Verificación de estadísticas, filtros, badges y empty state
+- ✅ **Documentación**:
+  - OpenAPI actualizado: trips-service.yaml y booking-service.yaml
+  - Nuevos query params documentados con descripciones y enums
 
 ### Feature: Mapa Básico (Anterior)
 - ✅ **Frontend Components**: MapPreview y MapLinkButtons implementados

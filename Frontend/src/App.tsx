@@ -7,6 +7,7 @@ import Trips from './pages/Trips';
 import Matches from './pages/Matches';
 import Bookings from './pages/Bookings';
 import Profile from './pages/Profile';
+import { History } from './pages/History';
 import Callback from './pages/Callback';
 import NotFound from './pages/NotFound';
 
@@ -45,6 +46,14 @@ const App: React.FC = () => {
           element={
             <Protected>
               <Profile />
+            </Protected>
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <Protected>
+              <History />
             </Protected>
           }
         />

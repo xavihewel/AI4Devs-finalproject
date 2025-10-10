@@ -535,23 +535,53 @@
 - Result: ✅ 24 tests backend pasando, tests frontend completos, E2E actualizados
 - Next: Continuar con siguiente feature del plan
 
-### Feature: Historial de Viajes (Backend TDD) ✅
-- Intent: Implementar filtros de historial en backend para viajes y reservas con TDD.
+### Feature: Perfil de Usuario (Mejorado) ✅
+- Intent: Mejorar validaciones y UX del perfil de usuario existente.
 - Actions:
-  - **Trips Service**: Añadir filtro status en GET /trips (ACTIVE, COMPLETED)
-    - TripsHistoryFilterTest: 4 tests unitarios (status filtering, date combination)
-    - Lógica: viajes con dateTime < now() = COMPLETED
-    - Actualizar tests existentes para incluir parámetro status
-  - **Booking Service**: Añadir filtros status, from, to en GET /bookings
-    - BookingHistoryFilterTest: 5 tests unitarios (CONFIRMED, PENDING, CANCELLED)
-    - Filtros combinables: status + date range
-    - Actualizar tests existentes para incluir parámetros
+  - **Validaciones Robustas**:
+    - Tests unitarios para validaciones de campos obligatorios
+    - Validación de formato email y longitud mínima de nombre
+    - Manejo de errores de API y estados de carga
+    - 7 tests unitarios pasando (ProfileValidation.test.tsx)
+  - **E2E Tests**:
+    - Tests Cypress para navegación y funcionalidades del perfil
+    - Verificación de validaciones, mensajes de éxito/error
+    - Tests para estados de carga y feedback visual
+    - 12 tests E2E (navigate-profile.cy.ts)
+  - **UX Mejorada**:
+    - Validaciones en tiempo real con feedback inmediato
+    - Mensajes de error claros y específicos
+    - Estados de carga y confirmaciones de éxito
 - Decisions:
-  - TDD approach: Tests primero (Red), implementación después (Green)
-  - Filtros opcionales: status, from, to como query parameters
-  - Lógica de negocio: viajes pasados = COMPLETED, futuros = ACTIVE
-- Result: ✅ 82 tests pasando (23 trips + 59 bookings), filtros implementados
-- Next: Crear página frontend History.tsx con filtros y estadísticas
+  - Mantener funcionalidad existente del perfil
+  - Enfocarse en mejoras de validaciones y UX
+  - Tests E2E para verificar funcionalidad completa
+- Result: ✅ Perfil de usuario mejorado con validaciones robustas y UX mejorada
+- Next: Siguiente feature del plan (Notificaciones E2E o Sistema de confianza)
+
+### Feature: Historial de Viajes (Anterior ✅)
+- Intent: Implementar historial de viajes end-to-end con filtros y estadísticas.
+- Actions:
+  - **Backend (TDD)**:
+    - Trips Service: Filtro status en GET /trips (ACTIVE, COMPLETED)
+    - Booking Service: Filtros status, from, to en GET /bookings
+    - 82 tests pasando (23 trips + 59 bookings)
+  - **Frontend**:
+    - Página `/history` con filtros (fecha, estado, rol) y estadísticas
+    - Componente `SelectWithChildren` creado para filtros con children
+    - Integración con TripsService y BookingsService
+    - Ruta añadida en App.tsx y enlace en Navbar
+    - 9 tests unitarios pasando (History.test.tsx)
+  - **E2E**:
+    - Tests Cypress para navegación y filtrado (navigate-history.cy.ts)
+  - **Documentación**:
+    - OpenAPI actualizado: trips-service.yaml y booking-service.yaml
+- Decisions:
+  - Lógica: viajes con dateTime < now() = COMPLETED
+  - Estadísticas calculadas en frontend (MVP simple)
+  - Filtros combinables: status + date range + rol
+- Result: ✅ Feature completado end-to-end (backend + frontend + tests + docs)
+- Next: Siguiente feature del plan (Notificaciones E2E o Perfil de usuario)
 
 ### Feature: Mapa Básico (OpenStreetMap + React Leaflet) ✅
 - Intent: Implementar mapa básico con OpenStreetMap para visualizar origen/destino de viajes.

@@ -38,16 +38,25 @@ paths:
           name: destinationSedeId
           schema:
             type: string
+          description: Filter by destination sede ID
         - in: query
           name: from
           schema:
             type: string
             format: time
+          description: Filter by start time (ISO-8601 format)
         - in: query
           name: to
           schema:
             type: string
             format: time
+          description: Filter by end time (ISO-8601 format)
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [ACTIVE, COMPLETED]
+          description: Filter by trip status (ACTIVE for future trips, COMPLETED for past trips)
       responses:
         '200':
           description: List of trips

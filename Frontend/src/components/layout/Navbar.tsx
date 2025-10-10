@@ -13,6 +13,7 @@ export const Navbar: React.FC = () => {
     { path: '/trips', label: 'Viajes', requiresAuth: true },
     { path: '/matches', label: 'Buscar', requiresAuth: true },
     { path: '/bookings', label: 'Reservas', requiresAuth: true },
+    { path: '/history', label: 'Historial', requiresAuth: true },
   ];
   
   const isActivePath = (path: string) => {
