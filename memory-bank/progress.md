@@ -97,3 +97,5 @@
 - ✅ Falta de feedback visual en formularios
 - ✅ Tests E2E actualizados y optimizados (85% pasando, 4 tests menores por arreglar)
 - ✅ Sistema pulido: auth reactivada, console.log removidos, timeouts optimizados
+- ✅ Tests backend optimizados: PostGIS → PostgreSQL, tiempo reducido significativamente
+- ✅ Tests frontend mejorados: 90% pasando (83/92), mocks corregidos, window.confirm implementado

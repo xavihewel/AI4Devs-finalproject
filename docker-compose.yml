@@ -178,6 +178,7 @@ services:
         - VITE_OIDC_CLIENT_ID=covoituraje-frontend
         - VITE_OIDC_REDIRECT_URI=http://localhost:3000/callback
         - VITE_AUTH_DISABLED=true
+        - BUILD_ID=${BUILD_ID-0}
     container_name: covoituraje_frontend
     ports:
       - "3000:3000"

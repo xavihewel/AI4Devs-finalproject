@@ -74,11 +74,11 @@ describe('Trips', () => {
     
     await waitFor(() => {
       expect(screen.getByText('Crear Nuevo Viaje')).toBeInTheDocument();
-      expect(screen.getByLabelText('Latitud de Origen')).toBeInTheDocument();
-      expect(screen.getByLabelText('Longitud de Origen')).toBeInTheDocument();
-      expect(screen.getByLabelText('Destino')).toBeInTheDocument();
-      expect(screen.getByLabelText('Fecha y Hora')).toBeInTheDocument();
-      expect(screen.getByLabelText('Asientos Totales')).toBeInTheDocument();
+      expect(screen.getByLabelText('Latitud de Origen *')).toBeInTheDocument();
+      expect(screen.getByLabelText('Longitud de Origen *')).toBeInTheDocument();
+      expect(screen.getByLabelText('Destino *')).toBeInTheDocument();
+      expect(screen.getByLabelText('Fecha y Hora *')).toBeInTheDocument();
+      expect(screen.getByLabelText('Asientos Totales *')).toBeInTheDocument();
     });
   });
 
@@ -107,11 +107,15 @@ describe('Trips', () => {
     });
     
     // Fill form
-    fireEvent.change(screen.getByLabelText('Latitud de Origen'), { target: { value: '40.4168' } });
-    fireEvent.change(screen.getByLabelText('Longitud de Origen'), { target: { value: '-3.7038' } });
-    fireEvent.change(screen.getByLabelText('Destino'), { target: { value: 'SEDE-1' } });
-    fireEvent.change(screen.getByLabelText('Fecha y Hora'), { target: { value: '2024-01-01T08:00' } });
-    fireEvent.change(screen.getByLabelText('Asientos Totales'), { target: { value: '4' } });
+    fireEvent.change(screen.getByLabelText('Latitud de Origen *'), { target: { value: '40.4168' } });
+    fireEvent.change(screen.getByLabelText('Longitud de Origen *'), { target: { value: '-3.7038' } });
+    fireEvent.change(screen.getByLabelText('Destino *'), { target: { value: 'SEDE-1' } });
+    // Use a future date to avoid validation errors
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 1);
+    const futureDateString = futureDate.toISOString().slice(0, 16);
+    fireEvent.change(screen.getByLabelText('Fecha y Hora *'), { target: { value: futureDateString } });
+    fireEvent.change(screen.getByLabelText('Asientos Totales *'), { target: { value: '4' } });
     
     // Submit form
     fireEvent.click(screen.getByText('Crear Viaje'));

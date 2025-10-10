@@ -34,9 +34,13 @@ describe('Profile page', () => {
       render(<Profile />);
     });
     
+    // Wait for the user data to be loaded and displayed
     expect(await screen.findByDisplayValue('Alice')).toBeInTheDocument();
     expect(screen.getByDisplayValue('alice@example.com')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('SEDE-1')).toBeInTheDocument();
+    
+    // For the select, we need to check the selected option
+    const sedeSelect = screen.getByLabelText('Sede *');
+    expect(sedeSelect).toHaveValue('SEDE-1');
   });
 
   it('edits and saves profile', async () => {
@@ -51,15 +55,14 @@ describe('Profile page', () => {
       render(<Profile />);
     });
 
-    const nameInput = await screen.findByLabelText('Nombre');
-    const sedeInput = screen.getByLabelText('Sede');
-    const emailInput = screen.getByLabelText('Email');
+    const nameInput = await screen.findByLabelText('Nombre *');
+    const sedeInput = screen.getByLabelText('Sede *');
+    const emailInput = screen.getByLabelText('Email *');
     const saveBtn = screen.getByRole('button', { name: /Guardar cambios/i });
 
     await userEvent.clear(nameInput);
     await userEvent.type(nameInput, 'Bobby');
-    await userEvent.clear(sedeInput);
-    await userEvent.type(sedeInput, 'SEDE-3');
+    await userEvent.selectOptions(sedeInput, 'SEDE-3');
     await userEvent.clear(emailInput);
     await userEvent.type(emailInput, 'bobby@example.com');
     await userEvent.click(saveBtn);
@@ -72,7 +75,7 @@ describe('Profile page', () => {
     await act(async () => {
       render(<Profile />);
     });
-    expect(await screen.findByRole('alert')).toHaveTextContent('fail');
+    expect(await screen.findByText('No se pudo cargar el perfil')).toBeInTheDocument();
   });
 });
 

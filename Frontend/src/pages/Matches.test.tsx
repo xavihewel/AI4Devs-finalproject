@@ -1,12 +1,19 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Matches from './Matches';
 import { MatchesService } from '../api/matches';
+import { BookingsService } from '../api/bookings';
 import type { MatchDto } from '../types/api';
 
-// Mock the API service
+// Mock the API services
 jest.mock('../api/matches', () => ({
   MatchesService: {
     findMatches: jest.fn(),
+  },
+}));
+
+jest.mock('../api/bookings', () => ({
+  BookingsService: {
+    getMyBookings: jest.fn(),
   },
 }));
 
@@ -27,6 +34,8 @@ describe('Matches', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Mock BookingsService to return empty array by default
+    (BookingsService.getMyBookings as jest.Mock).mockResolvedValue([]);
   });
 
   it('renders matches page title', () => {

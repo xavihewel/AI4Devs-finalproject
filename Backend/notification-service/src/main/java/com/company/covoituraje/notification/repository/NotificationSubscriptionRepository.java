@@ -2,12 +2,14 @@ package com.company.covoituraje.notification.repository;
 
 import com.company.covoituraje.notification.domain.NotificationSubscription;
 import com.company.covoituraje.notification.infrastructure.JpaConfig;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
+@ApplicationScoped
 public class NotificationSubscriptionRepository {
     
     private final EntityManager entityManager;

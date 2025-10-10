@@ -3,6 +3,7 @@ package com.company.covoituraje.notification.api;
 import com.company.covoituraje.notification.domain.NotificationSubscription;
 import com.company.covoituraje.notification.repository.NotificationSubscriptionRepository;
 import com.company.covoituraje.notification.service.NotificationService;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -14,8 +15,10 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public class NotificationResource {
 
-    private final NotificationService notificationService;
-    private final NotificationSubscriptionRepository subscriptionRepository;
+    @Inject
+    private NotificationService notificationService;
+    @Inject
+    private NotificationSubscriptionRepository subscriptionRepository;
     
     static final class AuthContext {
         private static final ThreadLocal<String> USER_ID = new ThreadLocal<>();
@@ -24,10 +27,7 @@ public class NotificationResource {
         static void clear() { USER_ID.remove(); }
     }
 
-    public NotificationResource() {
-        this.notificationService = new NotificationService();
-        this.subscriptionRepository = new NotificationSubscriptionRepository();
-    }
+    public NotificationResource() {}
 
     @POST
     @Path("/subscribe")

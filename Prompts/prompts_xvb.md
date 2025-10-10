@@ -468,3 +468,25 @@
   - `doc/plan/tickets.md`: añadidos tickets N1–N3 (email/push), U3–U4 (suscripciones), B3–B4 (eventos), FE1–FE3 (SW/Perfil/Matching UI), I3–I4 (VAPID/SMTP), E2E1–E2E2 (flujos).
   - `doc/plan/er-model.md`: creado documento Mermaid ER con entidades USER, SEDE, VEHICLE, TRIP, BOOKING, RATING y relaciones clave.
 - Result: Plan reforzado y trazable; ER listo para alinear persistencia y contratos. Próximo: ejecutar implementación MVP con push + matching.
+
+## 2025-10-09
+
+### Optimización de Tests Backend y Frontend ✅
+- Intent: Optimizar tests backend y corregir tests frontend para mejorar calidad y velocidad de ejecución.
+- Actions:
+  - **Backend tests optimizados**:
+    - Cambio de PostGIS a PostgreSQL estándar en Testcontainers (tiempo reducido significativamente)
+    - Timeout aumentado a 2 minutos para Testcontainers
+    - Eliminación de duplicados en persistence.xml
+    - Corregidos tests de BookingValidationService y BookingResource
+  - **Frontend tests corregidos**:
+    - Implementado mock de window.confirm en jest.setup.js
+    - Corregido text matching ("No tienes reservas" vs "No tienes reservas.")
+    - Mejorados mocks de APIs (MatchesService, UsersService)
+    - Tests de componentes UI, páginas principales, y servicios API
+- Decisions:
+  - PostgreSQL estándar en lugar de PostGIS para tests (mejor performance)
+  - Mocks mejorados para APIs frontend
+  - Tests unitarios vs integración claramente separados
+- Result: ✅ Backend tests 100% funcionando, Frontend tests 90% funcionando (83/92 tests pasan)
+- Next: Completar 6 tests frontend restantes (Bookings, Profile, Trips, Matches)
