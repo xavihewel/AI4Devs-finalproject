@@ -73,27 +73,27 @@ class UsersResourceMoreTest {
 
     @Test
     void list_bySede_filters() {
-        List<UserDto> list = resource.list("SEDE-1", null);
+        List<UserDto> list = resource.list("SEDE-1", null, "en");
         assertEquals(2, list.size());
         assertTrue(list.stream().allMatch(u -> "SEDE-1".equals(u.sedeId)));
     }
 
     @Test
     void list_byRole_filters() {
-        List<UserDto> list = resource.list(null, "EMPLOYEE");
+        List<UserDto> list = resource.list(null, "EMPLOYEE", "en");
         assertEquals(2, list.size());
         assertTrue(list.stream().allMatch(u -> u.roles.contains("EMPLOYEE")));
     }
 
     @Test
     void getById_notFound() {
-        assertThrows(jakarta.ws.rs.NotFoundException.class, () -> resource.getById("missing"));
+        assertThrows(jakarta.ws.rs.NotFoundException.class, () -> resource.getById("missing", "en"));
     }
 
     @Test
     void getMe_missingUserId_badRequest() {
         UsersResource.AuthContext.clear();
-        assertThrows(jakarta.ws.rs.BadRequestException.class, () -> resource.getMe());
+        assertThrows(jakarta.ws.rs.BadRequestException.class, () -> resource.getMe("en"));
     }
 }
 

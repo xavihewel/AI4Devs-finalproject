@@ -3,12 +3,14 @@ package com.company.covoituraje.notification.api;
 import com.company.covoituraje.notification.domain.NotificationSubscription;
 import com.company.covoituraje.notification.repository.NotificationSubscriptionRepository;
 import com.company.covoituraje.notification.service.NotificationService;
+import com.company.covoituraje.shared.i18n.LocaleUtils;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
+import java.util.Locale;
 
 @Path("/notifications")
 @Produces(MediaType.APPLICATION_JSON)
@@ -31,7 +33,10 @@ public class NotificationResource {
 
     @POST
     @Path("/subscribe")
-    public Response subscribe(SubscriptionRequest request) {
+    public Response subscribe(
+        @HeaderParam("Accept-Language") String acceptLanguage,
+        SubscriptionRequest request
+    ) {
         try {
             String userId = AuthContext.getUserId();
             if (userId == null) {
@@ -53,7 +58,10 @@ public class NotificationResource {
 
     @DELETE
     @Path("/unsubscribe")
-    public Response unsubscribe(@QueryParam("endpoint") String endpoint) {
+    public Response unsubscribe(
+        @HeaderParam("Accept-Language") String acceptLanguage,
+        @QueryParam("endpoint") String endpoint
+    ) {
         try {
             String userId = AuthContext.getUserId();
             if (userId == null) {
@@ -72,7 +80,7 @@ public class NotificationResource {
 
     @GET
     @Path("/subscriptions")
-    public Response getSubscriptions() {
+    public Response getSubscriptions(@HeaderParam("Accept-Language") String acceptLanguage) {
         try {
             String userId = AuthContext.getUserId();
             if (userId == null) {
@@ -88,7 +96,10 @@ public class NotificationResource {
 
     @POST
     @Path("/send")
-    public Response sendNotification(NotificationRequest request) {
+    public Response sendNotification(
+        @HeaderParam("Accept-Language") String acceptLanguage,
+        NotificationRequest request
+    ) {
         try {
             String userId = AuthContext.getUserId();
             if (userId == null) {

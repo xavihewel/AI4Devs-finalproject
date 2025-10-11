@@ -2,11 +2,14 @@ package com.company.covoituraje.users.api;
 
 import com.company.covoituraje.users.domain.User;
 import com.company.covoituraje.users.infrastructure.UserRepository;
+import com.company.covoituraje.shared.i18n.MessageService;
+import com.company.covoituraje.shared.i18n.LocaleUtils;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
@@ -14,13 +17,21 @@ import java.util.List;
 public class UsersResource {
 
     private final UserRepository repository;
+    private final MessageService messageService;
 
     public UsersResource() {
         this.repository = new UserRepository();
+        this.messageService = new MessageService();
     }
 
     public UsersResource(UserRepository repository) {
         this.repository = repository;
+        this.messageService = new MessageService();
+    }
+
+    public UsersResource(UserRepository repository, MessageService messageService) {
+        this.repository = repository;
+        this.messageService = messageService;
     }
     
     static final class AuthContext {
@@ -32,28 +43,40 @@ public class UsersResource {
 
     @GET
     @Path("/me")
-    public UserDto getMe() {
+    public UserDto getMe(@HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            throw new BadRequestException("User ID is required");
+            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("users.error.user_id_required", locale);
+            throw new BadRequestException(message);
         }
 
         User user = repository.findById(currentUser)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                    String message = messageService.getMessage("users.error.user_not_found", locale);
+                    return new NotFoundException(message);
+                });
         
         return mapToDto(user);
     }
 
     @PUT
     @Path("/me")
-    public UserDto updateMe(UserDto update) {
+    public UserDto updateMe(UserDto update, @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            throw new BadRequestException("User ID is required");
+            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("users.error.user_id_required", locale);
+            throw new BadRequestException(message);
         }
 
         User user = repository.findById(currentUser)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                    String message = messageService.getMessage("users.error.user_not_found", locale);
+                    return new NotFoundException(message);
+                });
         
         user.updateProfile(update.name, update.email, update.sedeId);
         user = repository.save(user);
@@ -63,7 +86,8 @@ public class UsersResource {
 
     @GET
     public List<UserDto> list(@QueryParam("sedeId") String sedeId,
-                             @QueryParam("role") String role) {
+                             @QueryParam("role") String role,
+                             @HeaderParam("Accept-Language") String acceptLanguage) {
         
         List<User> users;
         if (sedeId != null) {
@@ -81,9 +105,13 @@ public class UsersResource {
 
     @GET
     @Path("/{id}")
-    public UserDto getById(@PathParam("id") String id) {
+    public UserDto getById(@PathParam("id") String id, @HeaderParam("Accept-Language") String acceptLanguage) {
         User user = repository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                    String message = messageService.getMessage("users.error.user_not_found", locale);
+                    return new NotFoundException(message);
+                });
         return mapToDto(user);
     }
 

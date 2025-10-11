@@ -1,4 +1,20 @@
-import { api } from './client';
+import axios from 'axios';
+import { env } from '../env';
+import { getKeycloak } from '../auth/keycloak';
+
+// Create a dedicated client for users service (ratings)
+const usersApi = axios.create({
+  baseURL: env.usersApiBaseUrl,
+});
+
+// Add auth interceptor
+usersApi.interceptors.request.use(async (config) => {
+  const keycloak = getKeycloak();
+  if (keycloak?.authenticated && keycloak.token) {
+    config.headers.Authorization = `Bearer ${keycloak.token}`;
+  }
+  return config;
+});
 
 export interface RatingDto {
   id: string;
@@ -33,7 +49,7 @@ export class RatingsService {
    * Create a new rating
    */
   static async createRating(rating: RatingCreateDto): Promise<RatingDto> {
-    const response = await api.post('/ratings', rating);
+    const response = await usersApi.post('/ratings', rating);
     return response.data;
   }
 
@@ -41,7 +57,7 @@ export class RatingsService {
    * Get ratings given by current user
    */
   static async getMyRatings(): Promise<RatingDto[]> {
-    const response = await api.get('/ratings/my-ratings');
+    const response = await usersApi.get('/ratings/my-ratings');
     return response.data;
   }
 
@@ -49,7 +65,7 @@ export class RatingsService {
    * Get ratings received by a specific user
    */
   static async getRatingsForUser(userId: string): Promise<RatingDto[]> {
-    const response = await api.get(`/ratings/user/${userId}`);
+    const response = await usersApi.get(`/ratings/user/${userId}`);
     return response.data;
   }
 
@@ -57,7 +73,7 @@ export class RatingsService {
    * Get trust score for a user
    */
   static async getTrustScore(userId: string): Promise<number> {
-    const response = await api.get(`/ratings/user/${userId}/trust-score`);
+    const response = await usersApi.get(`/ratings/user/${userId}/trust-score`);
     return response.data;
   }
 
@@ -65,7 +81,7 @@ export class RatingsService {
    * Get trust statistics for a user
    */
   static async getTrustStats(userId: string): Promise<TrustStats> {
-    const response = await api.get(`/ratings/user/${userId}/trust-stats`);
+    const response = await usersApi.get(`/ratings/user/${userId}/trust-stats`);
     return response.data;
   }
 }

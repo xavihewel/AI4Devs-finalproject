@@ -275,7 +275,7 @@ export default function Matches() {
                           <p className="text-sm font-medium text-gray-700">Razones de compatibilidad:</p>
                           <ul className="text-xs text-gray-600 space-y-1">
                             {match.reasons.map((reason, index) => (
-                              <li key={index} className="flex items-center">
+                              <li key={`${match.id}-reason-${index}`} className="flex items-center">
                                 <span className="w-1.5 h-1.5 bg-primary-500 rounded-full mr-2"></span>
                                 {reason}
                               </li>

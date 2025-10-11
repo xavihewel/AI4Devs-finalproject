@@ -1,0 +1,18 @@
+{
+  "title": "Historial",
+  "filters": {
+    "title": "Filtros",
+    "date": "Fecha",
+    "status": "Estado",
+    "role": "Rol"
+  },
+  "stats": {
+    "totalTrips": "Total viajes",
+    "co2Saved": "CO2 ahorrado",
+    "kmShared": "Km compartidos"
+  },
+  "list": {
+    "title": "Historial de viajes",
+    "empty": "No hay viajes en el historial"
+  }
+}

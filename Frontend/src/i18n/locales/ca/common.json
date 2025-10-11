@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "home": "Inici",
+    "trips": "Viatges",
+    "search": "Cercar",
+    "bookings": "Reserves",
+    "history": "Historial",
+    "profile": "Perfil"
+  },
+  "actions": {
+    "save": "Desar",
+    "cancel": "Cancel·lar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "confirm": "Confirmar",
+    "create": "Crear",
+    "search": "Cercar",
+    "filter": "Filtrar",
+    "clear": "Netejar",
+    "login": "Iniciar Sessió",
+    "logout": "Tancar Sessió",
+    "openMenu": "Obrir menú"
+  },
+  "messages": {
+    "success": "Operació exitosa",
+    "error": "Error en l'operació",
+    "loading": "Carregant...",
+    "noData": "No hi ha dades disponibles",
+    "tryAgain": "Torna-ho a intentar"
+  },
+  "language": {
+    "select": "Seleccionar idioma",
+    "catalan": "Català",
+    "spanish": "Español",
+    "romanian": "Română",
+    "ukrainian": "Українська",
+    "english": "English",
+    "french": "Français"
+  }
+}

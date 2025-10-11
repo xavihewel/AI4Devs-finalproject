@@ -185,3 +185,4 @@ class RatingTest {
         assertEquals(comment, rating.getComment());
     }
 }
+

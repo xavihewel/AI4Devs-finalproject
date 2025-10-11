@@ -1,18 +1,32 @@
 package com.company.covoituraje.notification.service;
 
+import com.company.covoituraje.notification.config.VapidConfig;
 import com.company.covoituraje.notification.domain.NotificationSubscription;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class PushNotificationServiceTest {
     
     private PushNotificationService pushNotificationService;
+    private VapidConfig vapidConfig;
     
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         pushNotificationService = new PushNotificationService();
+        vapidConfig = mock(VapidConfig.class);
+        
+        // Mock VapidConfig values
+        when(vapidConfig.getSubject()).thenReturn("mailto:test@example.com");
+        when(vapidConfig.getPublicKey()).thenReturn("test-public-key");
+        when(vapidConfig.getPrivateKey()).thenReturn("test-private-key");
+        
+        // Inject mock via reflection
+        var vapidField = PushNotificationService.class.getDeclaredField("vapidConfig");
+        vapidField.setAccessible(true);
+        vapidField.set(pushNotificationService, vapidConfig);
     }
     
     @Test

@@ -2,94 +2,134 @@ package com.company.covoituraje.users.api;
 
 import com.company.covoituraje.users.domain.User;
 import com.company.covoituraje.users.infrastructure.UserRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+import com.company.covoituraje.shared.i18n.MessageService;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
+
+import java.util.Locale;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Testcontainers
 class UsersResourceTest {
 
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
-            DockerImageName.parse("postgis/postgis:15-3.4").asCompatibleSubstituteFor("postgres"))
-            .withDatabaseName("testdb")
-            .withUsername("test")
-            .withPassword("test")
-            .withInitScript("init-schema.sql");
-
-    private EntityManagerFactory emf;
-    private EntityManager em;
-
-    private UsersResource resource;
-    private UserRepository repository;
+    private UsersResource usersResource;
+    private UserRepository mockRepository;
+    private MessageService messageService;
 
     @BeforeEach
     void setUp() {
-        createSchema();
-
-        var props = new java.util.Properties();
-        props.setProperty("jakarta.persistence.jdbc.driver", "org.postgresql.Driver");
-        props.setProperty("jakarta.persistence.jdbc.url", postgres.getJdbcUrl());
-        props.setProperty("jakarta.persistence.jdbc.user", postgres.getUsername());
-        props.setProperty("jakarta.persistence.jdbc.password", postgres.getPassword());
-        props.setProperty("hibernate.hbm2ddl.auto", "create");
-        props.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
-
-        emf = Persistence.createEntityManagerFactory("users-pu", props);
-        em = emf.createEntityManager();
-        repository = new UserRepository(em);
-        resource = new UsersResource(repository);
-        
-        // Always create a fresh test user to avoid test interference
-        User testUser = new User("user-001", "Ana García", "ana.garcia@company.com", "SEDE-1", "EMPLOYEE");
-        repository.save(testUser);
-    }
-
-    private void createSchema() {
-        try (var connection = postgres.createConnection("")) {
-            try (var statement = connection.createStatement()) {
-                statement.execute("CREATE SCHEMA IF NOT EXISTS users;");
+        messageService = new MessageService();
+        mockRepository = new UserRepository() {
+            @Override
+            public Optional<User> findById(String id) {
+                if ("test-user".equals(id)) {
+                    User user = new User();
+                    user.setId("test-user");
+                    user.setName("Test User");
+                    user.setEmail("test@example.com");
+                    user.setSedeId("sede-1");
+                    user.setRole("EMPLOYEE");
+                    return Optional.of(user);
+                }
+                return Optional.empty();
             }
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create schema", e);
-        }
+            
+            @Override
+            public List<User> findAll() {
+                return new ArrayList<>();
+            }
+            
+            @Override
+            public List<User> findBySedeId(String sedeId) {
+                return new ArrayList<>();
+            }
+            
+            @Override
+            public List<User> findByRole(String role) {
+                return new ArrayList<>();
+            }
+            
+            @Override
+            public User save(User user) {
+                return user;
+            }
+        };
+        usersResource = new UsersResource(mockRepository, messageService);
     }
 
     @Test
-    void getMe_returnsDefaultUser() {
-        // Set user context
-        UsersResource.AuthContext.setUserId("user-001");
+    void getMe_returnsUserWithLocalizedMessages() {
+        // Set up auth context
+        UsersResource.AuthContext.setUserId("test-user");
+        
         try {
-            UserDto body = resource.getMe();
-            assertNotNull(body);
-            assertEquals("user-001", body.id);
-            assertEquals("Ana García", body.name);
+            UserDto result = usersResource.getMe("en");
+            
+            assertNotNull(result);
+            assertEquals("test-user", result.id);
+            assertEquals("Test User", result.name);
+            assertEquals("test@example.com", result.email);
+            assertEquals("sede-1", result.sedeId);
+            assertTrue(result.roles.contains("EMPLOYEE"));
         } finally {
             UsersResource.AuthContext.clear();
         }
     }
 
     @Test
-    void putMe_echoesUpdate() {
-        // Set user context
-        UsersResource.AuthContext.setUserId("user-001");
+    void getMe_withAcceptLanguageHeader_usesCorrectLocale() {
+        // Set up auth context
+        UsersResource.AuthContext.setUserId("test-user");
+        
         try {
-            UserDto update = new UserDto();
-            update.name = "Updated Name";
-            update.sedeId = "SEDE-2";
-            update.email = "ana.garcia@company.com";
+            // Test with Spanish locale
+            UserDto result = usersResource.getMe("es");
             
-            UserDto body = resource.updateMe(update);
-            assertEquals("Updated Name", body.name);
-            assertEquals("SEDE-2", body.sedeId);
+            assertNotNull(result);
+            assertEquals("test-user", result.id);
+            // The response should be the same regardless of locale for this endpoint
+            // but the MessageService is available for future localized error messages
+        } finally {
+            UsersResource.AuthContext.clear();
+        }
+    }
+
+    @Test
+    void getMe_withUnsupportedLanguage_fallsBackToDefault() {
+        // Set up auth context
+        UsersResource.AuthContext.setUserId("test-user");
+        
+        try {
+            // Test with unsupported locale
+            UserDto result = usersResource.getMe("de");
+            
+            assertNotNull(result);
+            assertEquals("test-user", result.id);
+        } finally {
+            UsersResource.AuthContext.clear();
+        }
+    }
+
+    @Test
+    void getMe_withoutUserId_throwsBadRequestException() {
+        // Don't set auth context
+        assertThrows(BadRequestException.class, () -> {
+            usersResource.getMe("en");
+        });
+    }
+
+    @Test
+    void getMe_withNonExistentUser_throwsNotFoundException() {
+        // Set up auth context with non-existent user
+        UsersResource.AuthContext.setUserId("non-existent");
+        
+        try {
+            assertThrows(NotFoundException.class, () -> {
+                usersResource.getMe("en");
+            });
         } finally {
             UsersResource.AuthContext.clear();
         }

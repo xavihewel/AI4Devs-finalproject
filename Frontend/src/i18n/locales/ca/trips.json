@@ -1,0 +1,27 @@
+{
+  "title": "Viatges",
+  "create": {
+    "title": "Crear Viatge",
+    "origin": "Origen",
+    "destination": "Destinació",
+    "date": "Data i hora",
+    "seats": "Seients disponibles",
+    "submit": "Crear viatge"
+  },
+  "list": {
+    "title": "Els meus viatges",
+    "empty": "No tens cap viatge creat",
+    "createFirst": "Crea el teu primer viatge"
+  },
+  "status": {
+    "active": "Actiu",
+    "completed": "Completat",
+    "cancelled": "Cancel·lat"
+  },
+  "actions": {
+    "view": "Veure",
+    "edit": "Editar",
+    "cancel": "Cancel·lar",
+    "delete": "Eliminar"
+  }
+}

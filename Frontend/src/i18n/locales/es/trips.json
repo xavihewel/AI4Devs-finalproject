@@ -1,0 +1,27 @@
+{
+  "title": "Viajes",
+  "create": {
+    "title": "Crear Viaje",
+    "origin": "Origen",
+    "destination": "Destino",
+    "date": "Fecha y hora",
+    "seats": "Asientos disponibles",
+    "submit": "Crear viaje"
+  },
+  "list": {
+    "title": "Mis viajes",
+    "empty": "No tienes ningún viaje creado",
+    "createFirst": "Crea tu primer viaje"
+  },
+  "status": {
+    "active": "Activo",
+    "completed": "Completado",
+    "cancelled": "Cancelado"
+  },
+  "actions": {
+    "view": "Ver",
+    "edit": "Editar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar"
+  }
+}

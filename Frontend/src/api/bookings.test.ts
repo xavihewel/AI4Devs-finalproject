@@ -1,4 +1,5 @@
 import { BookingsService } from './bookings';
+import axios from 'axios';
 
 // Mock env and keycloak
 jest.mock('../env', () => ({
@@ -14,24 +15,20 @@ jest.mock('../auth/keycloak', () => ({
   }),
 }));
 
-// Mock axios and its instance methods
-const mockGet = jest.fn();
-const mockPost = jest.fn();
-const mockPut = jest.fn();
+// Mock axios
+const mockAxiosInstance = {
+  get: jest.fn(),
+  post: jest.fn(),
+  put: jest.fn(),
+  interceptors: { request: { use: jest.fn((fn: any) => fn({ headers: {} })) } },
+};
 
-jest.mock('axios', () => {
-  return {
-    __esModule: true,
-    default: {
-      create: () => ({
-        get: mockGet,
-        post: mockPost,
-        put: mockPut,
-        interceptors: { request: { use: jest.fn((fn: any) => fn({ headers: {} })) } },
-      }),
-    },
-  };
-});
+jest.mock('axios', () => ({
+  __esModule: true,
+  default: {
+    create: () => mockAxiosInstance,
+  },
+}));
 
 describe('BookingsService API', () => {
   beforeEach(() => {
@@ -50,11 +47,11 @@ describe('BookingsService API', () => {
         updatedAt: new Date().toISOString(),
       },
     ];
-    mockGet.mockResolvedValueOnce({ data: bookings });
+    mockAxiosInstance.get.mockResolvedValueOnce({ data: bookings });
 
     const result = await BookingsService.getMyBookings();
     expect(result).toEqual(bookings);
-    expect(mockGet).toHaveBeenCalledWith('/bookings');
+    expect(mockAxiosInstance.get).toHaveBeenCalledWith('/bookings');
   });
 
   it('createBooking posts payload and returns created booking', async () => {
@@ -68,11 +65,11 @@ describe('BookingsService API', () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    mockPost.mockResolvedValueOnce({ data: created });
+    mockAxiosInstance.post.mockResolvedValueOnce({ data: created });
 
     const result = await BookingsService.createBooking(payload);
     expect(result).toEqual(created);
-    expect(mockPost).toHaveBeenCalledWith('/bookings', payload);
+    expect(mockAxiosInstance.post).toHaveBeenCalledWith('/bookings', payload);
   });
 
   it('cancelBooking calls PUT and returns updated booking', async () => {
@@ -85,11 +82,11 @@ describe('BookingsService API', () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    mockPut.mockResolvedValueOnce({ data: updated });
+    mockAxiosInstance.put.mockResolvedValueOnce({ data: updated });
 
     const result = await BookingsService.cancelBooking('b3');
     expect(result).toEqual(updated);
-    expect(mockPut).toHaveBeenCalledWith('/bookings/b3/cancel');
+    expect(mockAxiosInstance.put).toHaveBeenCalledWith('/bookings/b3/cancel');
   });
 
   it('confirmBooking calls PUT and returns confirmed booking', async () => {
@@ -102,20 +99,18 @@ describe('BookingsService API', () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    mockPut.mockResolvedValueOnce({ data: confirmed });
+    mockAxiosInstance.put.mockResolvedValueOnce({ data: confirmed });
 
     const result = await BookingsService.confirmBooking('b4');
     expect(result).toEqual(confirmed);
-    expect(mockPut).toHaveBeenCalledWith('/bookings/b4/confirm');
+    expect(mockAxiosInstance.put).toHaveBeenCalledWith('/bookings/b4/confirm');
   });
 
   it('propagates API errors (e.g., 400 when no seats available) on create', async () => {
     const payload = { tripId: 't1', seatsRequested: 2 };
     const error = Object.assign(new Error('Bad Request'), { response: { status: 400 } });
-    mockPost.mockRejectedValueOnce(error);
+    mockAxiosInstance.post.mockRejectedValueOnce(error);
 
     await expect(BookingsService.createBooking(payload)).rejects.toBe(error);
   });
 });
-
-

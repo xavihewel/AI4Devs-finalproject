@@ -1,0 +1,18 @@
+{
+  "title": "History",
+  "filters": {
+    "title": "Filters",
+    "date": "Date",
+    "status": "Status",
+    "role": "Role"
+  },
+  "stats": {
+    "totalTrips": "Total trips",
+    "co2Saved": "CO2 saved",
+    "kmShared": "Km shared"
+  },
+  "list": {
+    "title": "Trip history",
+    "empty": "No trips in history"
+  }
+}

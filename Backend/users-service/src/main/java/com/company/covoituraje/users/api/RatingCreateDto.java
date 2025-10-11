@@ -19,3 +19,4 @@ public class RatingCreateDto {
         this.ratingType = ratingType;
     }
 }
+

@@ -1,0 +1,24 @@
+{
+  "title": "Buscar Viajes",
+  "search": {
+    "title": "Buscar viajes",
+    "from": "Desde",
+    "to": "Hasta",
+    "date": "Fecha",
+    "seats": "Asientos necesarios",
+    "search": "Buscar"
+  },
+  "results": {
+    "title": "Resultados de búsqueda",
+    "empty": "No se encontraron viajes",
+    "tryDifferent": "Prueba con otros criterios"
+  },
+  "match": {
+    "driver": "Conductor",
+    "departure": "Salida",
+    "arrival": "Llegada",
+    "seats": "Asientos",
+    "book": "Reservar",
+    "viewProfile": "Ver perfil"
+  }
+}

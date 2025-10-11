@@ -1,0 +1,18 @@
+{
+  "title": "Historial",
+  "filters": {
+    "title": "Filtres",
+    "date": "Data",
+    "status": "Estat",
+    "role": "Rol"
+  },
+  "stats": {
+    "totalTrips": "Total viatges",
+    "co2Saved": "CO2 estalviat",
+    "kmShared": "Km compartits"
+  },
+  "list": {
+    "title": "Historial de viatges",
+    "empty": "No hi ha viatges al historial"
+  }
+}

@@ -9,6 +9,7 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         
         <class>com.company.covoituraje.users.domain.User</class>
+        <class>com.company.covoituraje.users.domain.Rating</class>
         
         <properties>
             <!-- Database connection -->

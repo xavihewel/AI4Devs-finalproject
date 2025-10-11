@@ -180,3 +180,4 @@ describe('Profile Page', () => {
     cy.contains('Opcional: Tu horario habitual de trabajo').should('be.visible');
   });
 });
+

@@ -1,0 +1,25 @@
+{
+  "required": "Le champ {{field}} est obligatoire",
+  "email": {
+    "invalid": "Format d'email invalide"
+  },
+  "minLength": "Minimum {{min}} caractères",
+  "maxLength": "Maximum {{max}} caractères",
+  "range": "Doit être entre {{min}} et {{max}}",
+  "numeric": "Doit être un nombre",
+  "phone": {
+    "invalid": "Format de téléphone invalide"
+  },
+  "date": {
+    "invalid": "Format de date invalide"
+  },
+  "time": {
+    "invalid": "Format d'heure invalide"
+  },
+  "futureDate": "La date doit être dans le futur",
+  "positiveNumber": "Le nombre doit être positif",
+  "seats": {
+    "min": "Minimum 1 place",
+    "max": "Maximum 8 places"
+  }
+}

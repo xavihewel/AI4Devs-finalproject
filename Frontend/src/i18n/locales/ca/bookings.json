@@ -1,0 +1,21 @@
+{
+  "title": "Reserves",
+  "list": {
+    "title": "Les meves reserves",
+    "empty": "No tens cap reserva",
+    "bookFirst": "Fes la teva primera reserva"
+  },
+  "status": {
+    "pending": "Pendent",
+    "confirmed": "Confirmada",
+    "cancelled": "Cancel·lada"
+  },
+  "actions": {
+    "view": "Veure",
+    "cancel": "Cancel·lar"
+  },
+  "confirmation": {
+    "title": "Reserva confirmada",
+    "message": "La teva reserva ha estat confirmada exitosament"
+  }
+}

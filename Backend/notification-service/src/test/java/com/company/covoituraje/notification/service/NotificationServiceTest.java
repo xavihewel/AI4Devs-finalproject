@@ -49,6 +49,8 @@ class NotificationServiceTest {
 
         when(subscriptionRepository.findByUserIdAndEndpoint(userId, endpoint)).thenReturn(Optional.empty());
         ArgumentCaptor<NotificationSubscription> subscriptionCaptor = ArgumentCaptor.forClass(NotificationSubscription.class);
+        NotificationSubscription expectedResult = new NotificationSubscription(userId, endpoint, p256dhKey, authKey);
+        when(subscriptionRepository.save(any(NotificationSubscription.class))).thenReturn(expectedResult);
 
         NotificationSubscription result = notificationService.subscribeUser(userId, endpoint, p256dhKey, authKey);
 
@@ -71,6 +73,7 @@ class NotificationServiceTest {
 
         NotificationSubscription existing = new NotificationSubscription(userId, endpoint, "old", "old");
         when(subscriptionRepository.findByUserIdAndEndpoint(userId, endpoint)).thenReturn(Optional.of(existing));
+        when(subscriptionRepository.save(existing)).thenReturn(existing);
 
         NotificationSubscription result = notificationService.subscribeUser(userId, endpoint, newP256dhKey, newAuthKey);
 
@@ -101,10 +104,12 @@ class NotificationServiceTest {
         String body = "Tu reserva ha sido confirmada";
         NotificationSubscription s = new NotificationSubscription(userId, "https://e", "k", "a");
         when(subscriptionRepository.findActiveByUserId(userId)).thenReturn(List.of(s));
+        when(pushNotificationService.sendNotificationWithOutcome(s, title, body))
+            .thenReturn(PushNotificationService.SendOutcome.SUCCESS);
 
         notificationService.sendPushNotification(userId, title, body);
 
-        verify(pushNotificationService).sendNotification(s, title, body);
+        verify(pushNotificationService).sendNotificationWithOutcome(s, title, body);
     }
 
     @Test
@@ -127,10 +132,12 @@ class NotificationServiceTest {
         int seatsRequested = 2;
         NotificationSubscription s = new NotificationSubscription(userId, "https://e", "k", "a");
         when(subscriptionRepository.findActiveByUserId(userId)).thenReturn(List.of(s));
+        when(pushNotificationService.sendNotificationWithOutcome(eq(s), anyString(), anyString()))
+            .thenReturn(PushNotificationService.SendOutcome.SUCCESS);
 
         notificationService.sendBookingConfirmation(userId, email, tripId, seatsRequested);
 
-        verify(pushNotificationService).sendNotification(eq(s), anyString(), anyString());
+        verify(pushNotificationService).sendNotificationWithOutcome(eq(s), anyString(), anyString());
         verify(emailNotificationService).sendBookingConfirmation(email, tripId, seatsRequested);
     }
 }

@@ -1,0 +1,24 @@
+{
+  "title": "Cercar Viatges",
+  "search": {
+    "title": "Cerca viatges",
+    "from": "Des de",
+    "to": "Fins a",
+    "date": "Data",
+    "seats": "Seients necessaris",
+    "search": "Cercar"
+  },
+  "results": {
+    "title": "Resultats de la cerca",
+    "empty": "No s'han trobat viatges",
+    "tryDifferent": "Prova amb altres criteris"
+  },
+  "match": {
+    "driver": "Conductor",
+    "departure": "Sortida",
+    "arrival": "Arribada",
+    "seats": "Seients",
+    "book": "Reservar",
+    "viewProfile": "Veure perfil"
+  }
+}

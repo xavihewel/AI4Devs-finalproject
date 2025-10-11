@@ -598,7 +598,7 @@
 - Result: ✅ Build exitoso, tests pasando, mapas integrados en Trips/Matches
 - Next: Re-despliegue Docker para incluir nuevas dependencias
 
-### Feature: Sistema de Confianza (Completado) ✅
+### Feature: Sistema de Confianza (Anterior ✅)
 - Intent: Implementar sistema de valoraciones y confianza entre usuarios
 - Actions:
   - **Backend TDD**: Entidad Rating, migración V3, repository, service, API REST
@@ -608,4 +608,46 @@
   - **CORS**: Filtro implementado pero users-service necesita redeploy
 - Decisions: TDD backend, UI modular, manejo de errores mejorado, z-index corregido
 - Result: ✅ Completado - Backend/frontend implementado, CORS issue identificado
-- Next: Redeploy users-service y continuar con plan (Multi-idioma o Notificaciones E2E)
+
+### Feature: Multi-idioma (Completado) ✅
+- Intent: Implementar soporte completo para 6 idiomas (ca, es, ro, uk, en, fr) en backend y frontend
+- Actions:
+  - **Backend TDD**:
+    - `MessageService`: Servicio compartido con ResourceBundle para 6 idiomas
+    - `LocaleUtils`: Parser de Accept-Language header con fallback a inglés
+    - 4 servicios REST actualizados: users, trips, booking, matching
+    - Todos los endpoints reciben `@HeaderParam("Accept-Language")`
+    - Mensajes de error localizados en todos los servicios
+    - 42 archivos de traducción (7 archivos × 6 idiomas)
+  - **Frontend TDD**:
+    - `react-i18next`: Configuración completa con tests
+    - `LanguageSwitcher`: Componente con dropdown para 6 idiomas
+    - `useValidation`: Hook para mensajes de validación localizados
+    - 48 archivos de traducción (8 namespaces × 6 idiomas)
+    - Axios interceptor automático para Accept-Language header
+  - **Integración**:
+    - Navbar migrado a i18n con LanguageSwitcher integrado
+    - Componentes existentes actualizados (Trips, Matches, Bookings, etc.)
+    - Tests unitarios para todos los componentes i18n
+    - Compilación exitosa en todos los servicios backend
+- Decisions:
+  - TDD approach: tests primero, implementación después
+  - Backend: MessageService compartido, LocaleUtils para parsing
+  - Frontend: react-i18next con namespaces organizados
+  - Axios interceptor automático para Accept-Language
+  - 6 idiomas: Catalán, Español, Rumano, Ucraniano, Inglés, Francés
+- Result: ✅ Completado - Sistema multi-idioma completo funcionando
+- Next: E2E tests multi-idioma en Cypress y documentación final
+
+### 2025-10-11
+- **Multi-idioma Implementation**: Implementación completa del sistema multi-idioma
+  - **Backend**: MessageService, LocaleUtils, 4 servicios REST actualizados
+  - **Frontend**: react-i18next, LanguageSwitcher, useValidation, 48 archivos de traducción
+  - **Integración**: Axios interceptor, Navbar migrado, componentes actualizados
+  - **Tests**: TDD approach con tests unitarios para todos los componentes
+  - **Resultado**: Sistema multi-idioma completo funcionando en 6 idiomas
+  - **CORS Issue**: Identificado problema con users-service en Docker (versión antigua)
+  - **User Feedback**: Menú no traducido, selector de idioma no funcionaba
+  - **Fixes**: i18n initialization en main.tsx, useMemo en Navbar, export duplicado corregido
+  - **React Warnings**: Key props faltantes en Matches.tsx corregidos
+  - **Compilation**: Todos los servicios backend compilan exitosamente

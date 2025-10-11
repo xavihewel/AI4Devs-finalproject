@@ -162,3 +162,4 @@ class RatingServiceTest {
         verify(mockRepository).getMostCommonTagsByRatedId(userId);
     }
 }
+

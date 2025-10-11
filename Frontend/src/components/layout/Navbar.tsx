@@ -1,20 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../auth/AuthProvider';
 import { Button } from '../ui';
+import { LanguageSwitcher } from '../LanguageSwitcher';
 
 export const Navbar: React.FC = () => {
   const location = useLocation();
   const { authenticated, login, logout } = useAuth();
+  const { t } = useTranslation('common');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  const navItems = [
-    { path: '/', label: 'Inicio' },
-    { path: '/trips', label: 'Viajes', requiresAuth: true },
-    { path: '/matches', label: 'Buscar', requiresAuth: true },
-    { path: '/bookings', label: 'Reservas', requiresAuth: true },
-    { path: '/history', label: 'Historial', requiresAuth: true },
-  ];
+  const navItems = useMemo(() => [
+    { path: '/', label: t('nav.home') },
+    { path: '/trips', label: t('nav.trips'), requiresAuth: true },
+    { path: '/matches', label: t('nav.search'), requiresAuth: true },
+    { path: '/bookings', label: t('nav.bookings'), requiresAuth: true },
+    { path: '/history', label: t('nav.history'), requiresAuth: true },
+  ], [t]);
   
   const isActivePath = (path: string) => {
     if (path === '/') {
@@ -70,6 +73,11 @@ export const Navbar: React.FC = () => {
           
           {/* Botones de autenticación (desktop) y botón hamburger */}
           <div className="flex items-center space-x-4">
+            {/* Language Switcher */}
+            <div className="hidden md:block">
+              <LanguageSwitcher />
+            </div>
+            
             {/* Botones de autenticación - Desktop */}
             <div className="hidden md:flex items-center space-x-4">
               {authenticated ? (
@@ -82,14 +90,14 @@ export const Navbar: React.FC = () => {
                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                     }`}
                   >
-                    Mi Perfil
+                    {t('nav.profile')}
                   </Link>
                   <Button
                     variant="secondary"
                     size="sm"
                     onClick={logout}
                   >
-                    Cerrar Sesión
+                    {t('actions.logout')}
                   </Button>
                 </>
               ) : (
@@ -98,7 +106,7 @@ export const Navbar: React.FC = () => {
                   size="sm"
                   onClick={login}
                 >
-                  Iniciar Sesión
+                  {t('actions.login')}
                 </Button>
               )}
             </div>
@@ -110,7 +118,7 @@ export const Navbar: React.FC = () => {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-expanded={mobileMenuOpen}
             >
-              <span className="sr-only">Abrir menú</span>
+              <span className="sr-only">{t('actions.openMenu')}</span>
               {mobileMenuOpen ? (
                 // Icono X
                 <svg className="block h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -152,6 +160,11 @@ export const Navbar: React.FC = () => {
               );
             })}
             
+            {/* Language Switcher - Mobile */}
+            <div className="px-3 py-2">
+              <LanguageSwitcher />
+            </div>
+            
             {/* Perfil y autenticación en móvil */}
             {authenticated && (
               <Link
@@ -163,7 +176,7 @@ export const Navbar: React.FC = () => {
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Mi Perfil
+                {t('nav.profile')}
               </Link>
             )}
             
@@ -177,7 +190,7 @@ export const Navbar: React.FC = () => {
                     setMobileMenuOpen(false);
                   }}
                 >
-                  Cerrar Sesión
+                  {t('actions.logout')}
                 </Button>
               ) : (
                 <Button
@@ -188,7 +201,7 @@ export const Navbar: React.FC = () => {
                     setMobileMenuOpen(false);
                   }}
                 >
-                  Iniciar Sesión
+                  {t('actions.login')}
                 </Button>
               )}
             </div>

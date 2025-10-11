@@ -1,0 +1,27 @@
+{
+  "title": "Trips",
+  "create": {
+    "title": "Create Trip",
+    "origin": "Origin",
+    "destination": "Destination",
+    "date": "Date and time",
+    "seats": "Available seats",
+    "submit": "Create trip"
+  },
+  "list": {
+    "title": "My trips",
+    "empty": "You don't have any trips created",
+    "createFirst": "Create your first trip"
+  },
+  "status": {
+    "active": "Active",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "actions": {
+    "view": "View",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  }
+}

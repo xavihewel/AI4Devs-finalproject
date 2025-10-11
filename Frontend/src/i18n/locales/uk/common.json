@@ -1,0 +1,37 @@
+{
+  "nav": {
+    "home": "Home",
+    "trips": "Trips",
+    "search": "Search",
+    "bookings": "Bookings",
+    "history": "History",
+    "profile": "Profile"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear"
+  },
+  "messages": {
+    "success": "Operation successful",
+    "error": "Error in operation",
+    "loading": "Loading...",
+    "noData": "No data available",
+    "tryAgain": "Try again"
+  },
+  "language": {
+    "select": "Select language",
+    "catalan": "Català",
+    "spanish": "Español",
+    "romanian": "Română",
+    "ukrainian": "Українська",
+    "english": "English",
+    "french": "Français"
+  }
+}

@@ -2,10 +2,12 @@ package com.company.covoituraje.notification.service;
 
 import com.company.covoituraje.notification.domain.NotificationSubscription;
 import com.company.covoituraje.notification.repository.NotificationSubscriptionRepository;
+import com.company.covoituraje.shared.i18n.MessageService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @ApplicationScoped
@@ -19,6 +21,9 @@ public class NotificationService {
     
     @Inject
     private EmailNotificationService emailNotificationService;
+    
+    @Inject
+    private MessageService messageService;
     
     public NotificationSubscription subscribeUser(String userId, String endpoint, String p256dhKey, String authKey) {
         Optional<NotificationSubscription> existing = subscriptionRepository.findByUserIdAndEndpoint(userId, endpoint);
@@ -69,23 +74,23 @@ public class NotificationService {
         emailNotificationService.sendEmail(email, subject, body);
     }
     
-    public void sendBookingConfirmation(String userId, String email, String tripId, int seatsRequested) {
+    public void sendBookingConfirmation(String userId, String email, String tripId, int seatsRequested, Locale locale) {
         // Send push notification
-        String pushTitle = "Reserva confirmada";
-        String pushBody = String.format("Tu reserva de %d asiento(s) ha sido confirmada", seatsRequested);
+        String pushTitle = messageService.getMessage("push.booking.confirmed.title", locale);
+        String pushBody = messageService.getMessage("push.booking.confirmed.body", locale, seatsRequested);
         sendPushNotification(userId, pushTitle, pushBody);
         
         // Send email notification
-        emailNotificationService.sendBookingConfirmation(email, tripId, seatsRequested);
+        emailNotificationService.sendBookingConfirmation(email, tripId, seatsRequested, locale);
     }
     
-    public void sendTripCancellation(String userId, String email, String tripId) {
+    public void sendTripCancellation(String userId, String email, String tripId, Locale locale) {
         // Send push notification
-        String pushTitle = "Viaje cancelado";
-        String pushBody = String.format("El viaje %s ha sido cancelado", tripId);
+        String pushTitle = messageService.getMessage("push.trip.cancelled.title", locale);
+        String pushBody = messageService.getMessage("push.trip.cancelled.body", locale, tripId);
         sendPushNotification(userId, pushTitle, pushBody);
         
         // Send email notification
-        emailNotificationService.sendTripCancellation(email, tripId);
+        emailNotificationService.sendTripCancellation(email, tripId, locale);
     }
 }

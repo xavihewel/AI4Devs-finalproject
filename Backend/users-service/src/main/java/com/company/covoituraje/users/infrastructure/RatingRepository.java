@@ -2,7 +2,7 @@ package com.company.covoituraje.users.infrastructure;
 
 import com.company.covoituraje.users.domain.Rating;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 
 import java.util.List;
@@ -11,19 +11,36 @@ import java.util.UUID;
 
 public class RatingRepository {
     
-    @PersistenceContext
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
+    
+    public RatingRepository() {
+        this.entityManager = JpaConfig.createEntityManager();
+    }
+    
+    public RatingRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
     
     /**
      * Save a rating entity
      */
     public Rating save(Rating rating) {
-        if (rating.getId() == null) {
-            entityManager.persist(rating);
-        } else {
-            rating = entityManager.merge(rating);
+        EntityTransaction tx = entityManager.getTransaction();
+        try {
+            tx.begin();
+            if (rating.getId() == null) {
+                entityManager.persist(rating);
+            } else {
+                rating = entityManager.merge(rating);
+            }
+            tx.commit();
+            return rating;
+        } catch (Exception e) {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            throw e;
         }
-        return rating;
     }
     
     /**

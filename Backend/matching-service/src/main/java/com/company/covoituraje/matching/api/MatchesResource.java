@@ -4,11 +4,14 @@ import com.company.covoituraje.matching.service.MatchingService;
 import com.company.covoituraje.matching.infrastructure.MatchRepository;
 import com.company.covoituraje.matching.integration.TripsServiceClient;
 import com.company.covoituraje.matching.integration.NotificationServiceClient;
+import com.company.covoituraje.shared.i18n.MessageService;
+import com.company.covoituraje.shared.i18n.LocaleUtils;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Path("/matches")
 @Produces(MediaType.APPLICATION_JSON)
@@ -17,6 +20,7 @@ public class MatchesResource {
     private final MatchingService matchingService;
     private final MatchRepository matchRepository;
     private final NotificationServiceClient notificationClient;
+    private final MessageService messageService;
     
     static final class AuthContext {
         private static final ThreadLocal<String> USER_ID = new ThreadLocal<>();
@@ -36,6 +40,7 @@ public class MatchesResource {
         this.matchRepository = matchRepository;
         String notificationServiceUrl = System.getenv().getOrDefault("NOTIFICATION_SERVICE_URL", "http://localhost:8085/api");
         this.notificationClient = new NotificationServiceClient(notificationServiceUrl);
+        this.messageService = new MessageService();
     }
 
     public MatchesResource(MatchingService matchingService, MatchRepository matchRepository) {
@@ -43,27 +48,41 @@ public class MatchesResource {
         this.matchRepository = matchRepository;
         String notificationServiceUrl = System.getenv().getOrDefault("NOTIFICATION_SERVICE_URL", "http://localhost:8085/api");
         this.notificationClient = new NotificationServiceClient(notificationServiceUrl);
+        this.messageService = new MessageService();
     }
 
     public MatchesResource(MatchingService matchingService, MatchRepository matchRepository, NotificationServiceClient notificationClient) {
         this.matchingService = matchingService;
         this.matchRepository = matchRepository;
         this.notificationClient = notificationClient;
+        this.messageService = new MessageService();
+    }
+
+    public MatchesResource(MatchingService matchingService, MatchRepository matchRepository, NotificationServiceClient notificationClient, MessageService messageService) {
+        this.matchingService = matchingService;
+        this.matchRepository = matchRepository;
+        this.notificationClient = notificationClient;
+        this.messageService = messageService;
     }
 
     @GET
     public List<MatchDto> findMatches(@QueryParam("destinationSedeId") String destinationSedeId,
                                      @QueryParam("time") String time,
-                                     @QueryParam("origin") String origin) {
+                                     @QueryParam("origin") String origin,
+                                     @HeaderParam("Accept-Language") String acceptLanguage) {
         
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            throw new BadRequestException("User ID is required");
+            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("matches.error.user_id_required", locale);
+            throw new BadRequestException(message);
         }
 
         // Validate required parameters
         if (destinationSedeId == null || destinationSedeId.isBlank()) {
-            throw new BadRequestException("Destination sede ID is required");
+            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("matches.error.destination_sede_required", locale);
+            throw new BadRequestException(message);
         }
 
         // Use the matching service to find real matches
@@ -83,10 +102,13 @@ public class MatchesResource {
     @GET
     @Path("/my-matches")
     public List<MatchDto> getMyMatches(@QueryParam("from") String from,
-                                       @QueryParam("to") String to) {
+                                       @QueryParam("to") String to,
+                                       @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            throw new BadRequestException("User ID is required");
+            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("matches.error.user_id_required", locale);
+            throw new BadRequestException(message);
         }
 
         java.time.OffsetDateTime fromDt = parseIsoDatetime(from);
@@ -107,16 +129,21 @@ public class MatchesResource {
     @Path("/driver/{driverId}")
     public List<MatchDto> getDriverMatches(@PathParam("driverId") String driverId,
                                            @QueryParam("from") String from,
-                                           @QueryParam("to") String to) {
+                                           @QueryParam("to") String to,
+                                           @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            throw new BadRequestException("User ID is required");
+            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("matches.error.user_id_required", locale);
+            throw new BadRequestException(message);
         }
 
         // For now, only allow users to see their own matches
         // In the future, drivers should be able to see matches for their trips
         if (!currentUser.equals(driverId)) {
-            throw new ForbiddenException("Access denied");
+            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("matches.error.access_denied", locale);
+            throw new ForbiddenException(message);
         }
 
         java.time.OffsetDateTime fromDt = parseIsoDatetime(from);

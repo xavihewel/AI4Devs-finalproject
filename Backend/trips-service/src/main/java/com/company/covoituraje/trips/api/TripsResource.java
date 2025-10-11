@@ -2,6 +2,8 @@ package com.company.covoituraje.trips.api;
 
 import com.company.covoituraje.trips.domain.Trip;
 import com.company.covoituraje.trips.infrastructure.TripRepository;
+import com.company.covoituraje.shared.i18n.MessageService;
+import com.company.covoituraje.shared.i18n.LocaleUtils;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
@@ -9,6 +11,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 @Path("/trips")
@@ -17,6 +20,8 @@ import java.util.UUID;
 public class TripsResource {
 
     private final TripRepository repository;
+    private final MessageService messageService;
+    
     static final class AuthContext {
         private static final ThreadLocal<String> USER_ID = new ThreadLocal<>();
         static void setUserId(String userId) { USER_ID.set(userId); }
@@ -26,17 +31,26 @@ public class TripsResource {
 
     public TripsResource() {
         this.repository = new TripRepository();
+        this.messageService = new MessageService();
     }
 
     public TripsResource(TripRepository repository) {
         this.repository = repository;
+        this.messageService = new MessageService();
+    }
+
+    public TripsResource(TripRepository repository, MessageService messageService) {
+        this.repository = repository;
+        this.messageService = messageService;
     }
 
     @POST
-    public TripDto create(TripCreateDto create) {
+    public TripDto create(TripCreateDto create, @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            throw new BadRequestException("User ID is required");
+            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("trips.error.user_id_required", locale);
+            throw new BadRequestException(message);
         }
 
         // Parse dateTime from ISO8601 string
@@ -55,7 +69,8 @@ public class TripsResource {
     public List<TripDto> list(@QueryParam("destinationSedeId") String destinationSedeId,
                              @QueryParam("from") String from,
                              @QueryParam("to") String to,
-                             @QueryParam("status") String status) {
+                             @QueryParam("status") String status,
+                             @HeaderParam("Accept-Language") String acceptLanguage) {
         
         // Prefer full datetime ISO filtering if both from/to are ISO-8601
         java.time.OffsetDateTime fromDt = parseIsoDatetime(from);
@@ -132,28 +147,40 @@ public class TripsResource {
 
     @GET
     @Path("/{id}")
-    public TripDto getById(@PathParam("id") String id) {
+    public TripDto getById(@PathParam("id") String id, @HeaderParam("Accept-Language") String acceptLanguage) {
         UUID tripId = UUID.fromString(id);
         Trip trip = repository.findById(tripId)
-                .orElseThrow(() -> new NotFoundException("Trip not found"));
+                .orElseThrow(() -> {
+                    Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                    String message = messageService.getMessage("trips.error.trip_not_found", locale);
+                    return new NotFoundException(message);
+                });
         return mapToDto(trip);
     }
 
     @PUT
     @Path("/{id}")
-    public TripDto update(@PathParam("id") String id, TripCreateDto update) {
+    public TripDto update(@PathParam("id") String id, TripCreateDto update, @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            throw new BadRequestException("User ID is required");
+            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("trips.error.user_id_required", locale);
+            throw new BadRequestException(message);
         }
 
         UUID tripId = UUID.fromString(id);
         Trip trip = repository.findById(tripId)
-                .orElseThrow(() -> new NotFoundException("Trip not found"));
+                .orElseThrow(() -> {
+                    Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                    String message = messageService.getMessage("trips.error.trip_not_found", locale);
+                    return new NotFoundException(message);
+                });
 
         // Only the driver can update their trip (basic rule)
         if (!currentUser.equals(trip.getDriverId())) {
-            throw new ForbiddenException("Only the driver can update the trip");
+            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("trips.error.only_driver_can_update", locale);
+            throw new ForbiddenException(message);
         }
 
         // Apply partial updates
@@ -184,18 +211,26 @@ public class TripsResource {
 
     @DELETE
     @Path("/{id}")
-    public void delete(@PathParam("id") String id) {
+    public void delete(@PathParam("id") String id, @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            throw new BadRequestException("User ID is required");
+            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("trips.error.user_id_required", locale);
+            throw new BadRequestException(message);
         }
 
         UUID tripId = UUID.fromString(id);
         Trip trip = repository.findById(tripId)
-                .orElseThrow(() -> new NotFoundException("Trip not found"));
+                .orElseThrow(() -> {
+                    Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                    String message = messageService.getMessage("trips.error.trip_not_found", locale);
+                    return new NotFoundException(message);
+                });
 
         if (!currentUser.equals(trip.getDriverId())) {
-            throw new ForbiddenException("Only the driver can delete the trip");
+            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("trips.error.only_driver_can_delete", locale);
+            throw new ForbiddenException(message);
         }
 
         repository.delete(trip);

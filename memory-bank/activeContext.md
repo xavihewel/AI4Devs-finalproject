@@ -1,16 +1,37 @@
 # Active Context
 
 ## Current Focus
-- **Sistema de confianza**: Feature completado con backend TDD, frontend UI y tests.
-- **CORS Issue**: Problema identificado - users-service necesita redeploy con nuevos endpoints.
-- **Próximo**: Resolver CORS y continuar con plan (Notificaciones E2E o Multi-idioma).
+- **Multi-idioma**: Implementación completa de soporte para 6 idiomas (ca, es, ro, uk, en, fr).
+- **Backend**: 4 servicios REST actualizados con Accept-Language header y MessageService.
+- **Frontend**: react-i18next configurado con LanguageSwitcher y traducciones completas.
+- **Próximo**: E2E tests multi-idioma en Cypress y documentación final.
 
 ## Feature Plan
 - Ver `memory-bank/featurePlan.md` para el mapeo de las 15 funcionalidades (cobertura/estado/próximos pasos) y el roadmap por fases.
 
-## Recent Changes (Octubre 10, 2025)
+## Recent Changes (Octubre 11, 2025)
 
-### Feature: Sistema de Confianza (Completado ✅)
+### Feature: Multi-idioma (Completado ✅)
+- **Backend TDD**:
+  - `MessageService`: Servicio compartido con ResourceBundle para 6 idiomas
+  - `LocaleUtils`: Parser de Accept-Language header con fallback a inglés
+  - 4 servicios REST actualizados: users, trips, booking, matching
+  - Todos los endpoints reciben `@HeaderParam("Accept-Language")`
+  - Mensajes de error localizados en todos los servicios
+  - 42 archivos de traducción (7 archivos × 6 idiomas)
+- **Frontend TDD**:
+  - `react-i18next`: Configuración completa con tests
+  - `LanguageSwitcher`: Componente con dropdown para 6 idiomas
+  - `useValidation`: Hook para mensajes de validación localizados
+  - 48 archivos de traducción (8 namespaces × 6 idiomas)
+  - Axios interceptor automático para Accept-Language header
+- **Integración**:
+  - Navbar migrado a i18n con LanguageSwitcher integrado
+  - Componentes existentes actualizados (Trips, Matches, Bookings, etc.)
+  - Tests unitarios para todos los componentes i18n
+  - Compilación exitosa en todos los servicios backend
+
+### Feature: Sistema de Confianza (Anterior ✅)
 - **Backend TDD**:
   - Entidad `Rating` con JPA, migración V3, repository y service
   - API REST: `POST /ratings`, `GET /ratings/my-ratings`, `GET /ratings/user/{userId}`
@@ -100,9 +121,9 @@
 - **seed-test-data.sh**: Script para generar datos de prueba en todos los schemas
 
 ## Next Steps (immediate)
-- **CORS Fix**: Redeploy users-service con nuevos endpoints de confianza
-- **Multi-idioma**: Implementar soporte para 6 idiomas (Catalán, Castellano, Rumano, Ucraniano, Inglés, Francés)
-- **Plan Continuation**: Notificaciones E2E o siguiente feature del roadmap
+- **E2E Tests**: Suite Cypress multi-idioma (language-switching, emails, persistencia)
+- **Documentación**: Actualizar memory-bank/techContext.md con arquitectura i18n
+- **Plan Continuation**: Siguiente feature del roadmap o mejoras adicionales
 
 ## Decisions & Considerations
 - **Ruta base común**: `/api` para todos; enrutamiento por path para distinguir servicios.

@@ -1,0 +1,21 @@
+{
+  "title": "Bookings",
+  "list": {
+    "title": "My bookings",
+    "empty": "You don't have any bookings",
+    "bookFirst": "Make your first booking"
+  },
+  "status": {
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "cancelled": "Cancelled"
+  },
+  "actions": {
+    "view": "View",
+    "cancel": "Cancel"
+  },
+  "confirmation": {
+    "title": "Booking confirmed",
+    "message": "Your booking has been confirmed successfully"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "required": "El camp {{field}} és obligatori",
+  "email": {
+    "invalid": "Format d'email invàlid"
+  },
+  "minLength": "Mínim {{min}} caràcters",
+  "maxLength": "Màxim {{max}} caràcters",
+  "range": "Ha d'estar entre {{min}} i {{max}}",
+  "numeric": "Ha de ser un número",
+  "phone": {
+    "invalid": "Format de telèfon invàlid"
+  },
+  "date": {
+    "invalid": "Format de data invàlid"
+  },
+  "time": {
+    "invalid": "Format d'hora invàlid"
+  },
+  "futureDate": "La data ha de ser futura",
+  "positiveNumber": "El número ha de ser positiu",
+  "seats": {
+    "min": "Mínim 1 seient",
+    "max": "Màxim 8 seients"
+  }
+}

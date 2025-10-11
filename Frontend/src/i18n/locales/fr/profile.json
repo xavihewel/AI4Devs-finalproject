@@ -1,0 +1,20 @@
+{
+  "title": "Profile",
+  "personal": {
+    "title": "Personal information",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "office": "Office"
+  },
+  "preferences": {
+    "title": "Preferences",
+    "language": "Language",
+    "notifications": "Notifications",
+    "privacy": "Privacy"
+  },
+  "actions": {
+    "save": "Save changes",
+    "edit": "Edit profile"
+  }
+}

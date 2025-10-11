@@ -1,0 +1,25 @@
+{
+  "required": "The field {{field}} is required",
+  "email": {
+    "invalid": "Invalid email format"
+  },
+  "minLength": "Minimum {{min}} characters",
+  "maxLength": "Maximum {{max}} characters",
+  "range": "Must be between {{min}} and {{max}}",
+  "numeric": "Must be a number",
+  "phone": {
+    "invalid": "Invalid phone format"
+  },
+  "date": {
+    "invalid": "Invalid date format"
+  },
+  "time": {
+    "invalid": "Invalid time format"
+  },
+  "futureDate": "Date must be in the future",
+  "positiveNumber": "Number must be positive",
+  "seats": {
+    "min": "Minimum 1 seat",
+    "max": "Maximum 8 seats"
+  }
+}

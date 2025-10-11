@@ -57,10 +57,10 @@ describe('RatingForm', () => {
       />
     );
 
-    const punctualCheckbox = screen.getByText('punctual').previousElementSibling as HTMLInputElement;
-    fireEvent.click(punctualCheckbox);
+    const puntualCheckbox = screen.getByText('puntual').previousElementSibling as HTMLInputElement;
+    fireEvent.click(puntualCheckbox);
 
-    expect(punctualCheckbox).toBeChecked();
+    expect(puntualCheckbox).toBeChecked();
   });
 
   it('should allow entering comment', () => {
@@ -89,15 +89,20 @@ describe('RatingForm', () => {
       />
     );
 
+    // First select a tag to enable the button
+    const punctualCheckbox = screen.getByText('puntual').previousElementSibling as HTMLInputElement;
+    fireEvent.click(punctualCheckbox);
+    
+    // Then deselect it to test the error
+    fireEvent.click(punctualCheckbox);
+    
+    // Now the button should be disabled, so we need to test the validation differently
+    // Let's test that the button is disabled when no tags are selected
     const submitButton = screen.getByText('Enviar Valoración');
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(screen.getByText('Selecciona al menos una etiqueta')).toBeInTheDocument();
-    });
+    expect(submitButton).toBeDisabled();
   });
 
-  it('should submit rating successfully', async () => {
+  it('should submit rating successfully and show success message', async () => {
     mockRatingsService.createRating.mockResolvedValue({} as any);
     
     render(
@@ -109,8 +114,8 @@ describe('RatingForm', () => {
     );
 
     // Select a tag
-    const punctualCheckbox = screen.getByText('punctual').previousElementSibling as HTMLInputElement;
-    fireEvent.click(punctualCheckbox);
+    const puntualCheckbox = screen.getByText('puntual').previousElementSibling as HTMLInputElement;
+    fireEvent.click(puntualCheckbox);
 
     // Submit form
     const submitButton = screen.getByText('Enviar Valoración');
@@ -120,11 +125,22 @@ describe('RatingForm', () => {
       expect(mockRatingsService.createRating).toHaveBeenCalledWith({
         ratedId: 'test-user',
         ratingType: 'THUMBS_UP',
-        tags: ['punctual'],
+        tags: ['puntual'],
         comment: undefined
       });
-      expect(mockOnSuccess).toHaveBeenCalled();
     });
+
+    // Check success message appears
+    await waitFor(() => {
+      expect(screen.getByText('¡Valoración enviada correctamente!')).toBeInTheDocument();
+      expect(screen.getByText('Tu valoración ha sido guardada y será visible para otros usuarios.')).toBeInTheDocument();
+      expect(screen.getByText('¡Enviado!')).toBeInTheDocument();
+    });
+
+    // Check that onSuccess is called after delay
+    await waitFor(() => {
+      expect(mockOnSuccess).toHaveBeenCalled();
+    }, { timeout: 3000 });
   });
 
   it('should show error when API fails', async () => {
@@ -139,8 +155,8 @@ describe('RatingForm', () => {
     );
 
     // Select a tag
-    const punctualCheckbox = screen.getByText('punctual').previousElementSibling as HTMLInputElement;
-    fireEvent.click(punctualCheckbox);
+    const puntualCheckbox = screen.getByText('puntual').previousElementSibling as HTMLInputElement;
+    fireEvent.click(puntualCheckbox);
 
     // Submit form
     const submitButton = screen.getByText('Enviar Valoración');
@@ -178,8 +194,8 @@ describe('RatingForm', () => {
     );
 
     // Select a tag
-    const punctualCheckbox = screen.getByText('punctual').previousElementSibling as HTMLInputElement;
-    fireEvent.click(punctualCheckbox);
+    const puntualCheckbox = screen.getByText('puntual').previousElementSibling as HTMLInputElement;
+    fireEvent.click(puntualCheckbox);
 
     // Submit form
     const submitButton = screen.getByText('Enviar Valoración');

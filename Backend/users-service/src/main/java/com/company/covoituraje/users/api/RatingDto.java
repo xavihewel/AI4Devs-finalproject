@@ -32,3 +32,4 @@ public class RatingDto {
         this.updatedAt = rating.getUpdatedAt();
     }
 }
+
