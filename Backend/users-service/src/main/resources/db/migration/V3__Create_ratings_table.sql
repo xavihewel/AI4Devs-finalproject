@@ -34,3 +34,4 @@ COMMENT ON COLUMN ratings.rating_type IS 'Type of rating (THUMBS_UP, THUMBS_DOWN
 COMMENT ON COLUMN ratings.tags IS 'Array of tags describing the rating (e.g., punctual, friendly, safe)';
 COMMENT ON COLUMN ratings.comment IS 'Optional comment for the rating';
 
+

@@ -64,7 +64,7 @@ export const LanguageSwitcher: React.FC = () => {
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative" ref={dropdownRef} data-testid="language-switcher">
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}

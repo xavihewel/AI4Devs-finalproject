@@ -640,14 +640,34 @@
 - Next: E2E tests multi-idioma en Cypress y documentación final
 
 ### 2025-10-11
-- **Multi-idioma Implementation**: Implementación completa del sistema multi-idioma
-  - **Backend**: MessageService, LocaleUtils, 4 servicios REST actualizados
-  - **Frontend**: react-i18next, LanguageSwitcher, useValidation, 48 archivos de traducción
-  - **Integración**: Axios interceptor, Navbar migrado, componentes actualizados
-  - **Tests**: TDD approach con tests unitarios para todos los componentes
-  - **Resultado**: Sistema multi-idioma completo funcionando en 6 idiomas
-  - **CORS Issue**: Identificado problema con users-service en Docker (versión antigua)
-  - **User Feedback**: Menú no traducido, selector de idioma no funcionaba
-  - **Fixes**: i18n initialization en main.tsx, useMemo en Navbar, export duplicado corregido
-  - **React Warnings**: Key props faltantes en Matches.tsx corregidos
-  - **Compilation**: Todos los servicios backend compilan exitosamente
+
+#### Multi-idioma Implementation (Completado ✅)
+- **Backend**: MessageService, LocaleUtils, 4 servicios REST actualizados
+- **Frontend**: react-i18next, LanguageSwitcher, useValidation, 48 archivos de traducción
+- **Integración**: Axios interceptor, Navbar migrado, componentes actualizados
+- **Tests**: TDD approach con tests unitarios para todos los componentes
+- **Resultado**: Sistema multi-idioma completo funcionando en 6 idiomas
+- **CORS Issue**: Identificado problema con users-service en Docker (versión antigua)
+- **User Feedback**: Menú no traducido, selector de idioma no funcionaba
+- **Fixes**: i18n initialization en main.tsx, useMemo en Navbar, export duplicado corregido
+- **React Warnings**: Key props faltantes en Matches.tsx corregidos
+- **Compilation**: Todos los servicios backend compilan exitosamente
+
+#### Multi-idioma E2E Tests & Documentation (Completado ✅)
+- **E2E Tests**: Suite Cypress completa para language switching (language-switching.cy.ts)
+  - 18 test cases covering all 6 languages (ca, es, ro, uk, en, fr)
+  - Tests de persistencia localStorage y navegación entre páginas
+  - Tests de validación en diferentes idiomas
+  - Tests de dropdown behavior y current language highlighting
+  - Tests de rapid language switching y cross-page navigation
+- **Documentación**: techContext.md actualizado con arquitectura i18n completa
+  - Frontend i18n architecture (react-i18next, LanguageDetector, 8 namespaces, 48 translation files)
+  - Backend i18n architecture (MessageService, LocaleUtils, 42 translation files)
+  - Supported languages con fallback strategy
+  - Implementation details y testing approach
+- **Memory Bank**: activeContext.md y progress.md actualizados
+  - Multi-idioma marcado como completado
+  - E2E tests y documentación marcados como completados
+  - Próximos pasos actualizados
+- **Component Enhancement**: LanguageSwitcher.tsx con data-testid attributes para Cypress testing
+- **Resultado**: Feature multi-idioma completamente implementado, documentado y testeado

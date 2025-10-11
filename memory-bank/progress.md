@@ -30,6 +30,36 @@
 
 ## Recent Improvements (Octubre 2025)
 
+### Feature: Multi-idioma (Completado ✅)
+- ✅ **Backend TDD**:
+  - MessageService: Servicio compartido con ResourceBundle para 6 idiomas
+  - LocaleUtils: Parser de Accept-Language header con fallback a inglés
+  - 4 servicios REST actualizados: users, trips, booking, matching
+  - Todos los endpoints reciben `@HeaderParam("Accept-Language")`
+  - Mensajes de error localizados en todos los servicios
+  - 42 archivos de traducción (7 archivos × 6 idiomas)
+- ✅ **Frontend TDD**:
+  - react-i18next: Configuración completa con tests
+  - LanguageSwitcher: Componente con dropdown para 6 idiomas
+  - useValidation: Hook para mensajes de validación localizados
+  - 48 archivos de traducción (8 namespaces × 6 idiomas)
+  - Axios interceptor automático para Accept-Language header
+- ✅ **Integración**:
+  - Navbar migrado a i18n con LanguageSwitcher integrado
+  - Componentes existentes actualizados (Trips, Matches, Bookings, etc.)
+  - Tests unitarios para todos los componentes i18n
+  - Compilación exitosa en todos los servicios backend
+- ✅ **E2E Tests**:
+  - Suite Cypress completa para language switching (language-switching.cy.ts)
+  - Tests para todos los 6 idiomas (ca, es, ro, uk, en, fr)
+  - Verificación de persistencia localStorage
+  - Tests de validación en diferentes idiomas
+  - Tests de navegación entre páginas con cambio de idioma
+- ✅ **Documentación**:
+  - techContext.md actualizado con arquitectura i18n completa
+  - Detalles de implementación frontend y backend
+  - Estrategia de fallback y persistencia documentada
+
 ### Feature: Sistema de Confianza (Completado ✅)
 - ✅ **Backend TDD**:
   - Entidad `Rating` con JPA, migración V3, repository y service
@@ -141,7 +171,7 @@
 
 ## What's Left
 - **CORS Fix**: Redeploy users-service con nuevos endpoints de confianza
-- **Multi-idioma**: Implementar soporte para 6 idiomas (Catalán, Castellano, Rumano, Ucraniano, Inglés, Francés)
+- **✅ Multi-idioma**: Implementación completa para 6 idiomas (Catalán, Castellano, Rumano, Ucraniano, Inglés, Francés) con E2E tests
 - **Completar tests frontend**: Arreglar 6 tests restantes (Bookings, Profile, Trips, Matches) y añadir tests de suscripción push para alcanzar 100% de cobertura
 - **Testing E2E completo**: Suite de tests Cypress actualizada (authentication, trips, matches, bookings, notifications, flows) - 85% pasando, 4 tests menores por arreglar.
 - **Auth JWKS remoto (tests)**: Añadir tests con WireMock para `JwtValidator` con JWKS HTTP (éxito, timeout, key miss, caché).

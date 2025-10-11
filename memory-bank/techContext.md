@@ -42,6 +42,38 @@
 - Frontend: React 19, TypeScript, Tailwind CSS, react-router-dom, keycloak-js, axios, Vite, Jest, Testing Library. Web Push API + Service Worker.
 - Infra: Docker, docker-compose; PostgreSQL con PostGIS; Keycloak como IdP de dev; scripts de automatización.
 
+## Internationalization (i18n)
+
+### Frontend i18n Architecture
+- **react-i18next**: Configuración completa con 6 idiomas soportados (ca, es, ro, uk, en, fr)
+- **LanguageDetector**: Detección automática con localStorage persistence
+- **8 Namespaces**: common, trips, matches, bookings, profile, history, trust, validation
+- **48 Translation Files**: 8 namespaces × 6 idiomas = 48 archivos JSON
+- **Axios Interceptor**: Envío automático de Accept-Language header a backend
+- **LanguageSwitcher Component**: Dropdown con banderas y persistencia de selección
+
+### Backend i18n Architecture
+- **MessageService**: Servicio compartido con ResourceBundle para 6 idiomas
+- **LocaleUtils**: Parser de Accept-Language header con fallback a inglés
+- **42 Translation Files**: 7 archivos de propiedades × 6 idiomas = 42 archivos
+- **REST Integration**: Todos los endpoints reciben `@HeaderParam("Accept-Language")`
+- **Error Messages**: Mensajes de error localizados en todos los servicios
+- **Fallback Strategy**: Inglés como idioma por defecto si no se encuentra traducción
+
+### Supported Languages
+1. **Català** (ca) - Idioma por defecto
+2. **Español** (es) 
+3. **Română** (ro)
+4. **Українська** (uk)
+5. **English** (en) - Fallback language
+6. **Français** (fr)
+
+### Implementation Details
+- **Frontend**: Configuración en `src/i18n/config.ts` con detección automática
+- **Backend**: MessageService en shared library, LocaleUtils para parsing
+- **Persistence**: localStorage en frontend, Accept-Language header en backend
+- **Testing**: E2E tests en Cypress para verificar funcionalidad multi-idioma
+
 ## Implementation Status
 - **✅ FASE 1**: Persistencia completa (PostgreSQL + JPA + Flyway + Seeds)
 - **✅ FASE 2**: APIs REST con JPA (repositorios reales, AuthFilter estandarizado, algoritmo de matching)
@@ -49,6 +81,7 @@
 - **✅ FASE 4**: Docker-compose para desarrollo local (infraestructura completa, scripts automatización)
 - **✅ FASE 5**: Integraciones entre servicios (ServiceHttpClient, DTOs compartidos, validaciones cross-service)
 - **✅ FRONTEND BASE**: React + TypeScript + Tailwind CSS (componentes UI, servicios API, páginas principales)
+- **✅ MULTI-LANGUAGE**: Soporte completo para 6 idiomas (frontend + backend + E2E tests)
 
 ## Local Ports & Health Checks
 - Puertos locales: trips `8081`, users `8082`, booking `8083`, matching `8084`, notifications `8085` (todos bajo `@ApplicationPath("/api")`).

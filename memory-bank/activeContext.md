@@ -1,10 +1,12 @@
 # Active Context
 
 ## Current Focus
-- **Multi-idioma**: Implementación completa de soporte para 6 idiomas (ca, es, ro, uk, en, fr).
+- **Multi-idioma**: ✅ COMPLETADO - Implementación completa de soporte para 6 idiomas (ca, es, ro, uk, en, fr).
 - **Backend**: 4 servicios REST actualizados con Accept-Language header y MessageService.
 - **Frontend**: react-i18next configurado con LanguageSwitcher y traducciones completas.
-- **Próximo**: E2E tests multi-idioma en Cypress y documentación final.
+- **E2E Tests**: Suite Cypress completa para language switching implementada.
+- **Documentación**: techContext.md actualizado con arquitectura i18n completa.
+- **Próximo**: Siguiente feature del roadmap o mejoras adicionales.
 
 ## Feature Plan
 - Ver `memory-bank/featurePlan.md` para el mapeo de las 15 funcionalidades (cobertura/estado/próximos pasos) y el roadmap por fases.
@@ -30,6 +32,16 @@
   - Componentes existentes actualizados (Trips, Matches, Bookings, etc.)
   - Tests unitarios para todos los componentes i18n
   - Compilación exitosa en todos los servicios backend
+- **E2E Tests**:
+  - Suite Cypress completa para language switching (language-switching.cy.ts)
+  - 18 test cases covering all 6 languages (ca, es, ro, uk, en, fr)
+  - Tests de persistencia localStorage y navegación entre páginas
+  - Tests de validación en diferentes idiomas
+  - Tests de dropdown behavior y current language highlighting
+- **Documentación**:
+  - techContext.md actualizado con arquitectura i18n completa
+  - Detalles de implementación frontend y backend
+  - Estrategia de fallback y persistencia documentada
 
 ### Feature: Sistema de Confianza (Anterior ✅)
 - **Backend TDD**:
@@ -121,8 +133,8 @@
 - **seed-test-data.sh**: Script para generar datos de prueba en todos los schemas
 
 ## Next Steps (immediate)
-- **E2E Tests**: Suite Cypress multi-idioma (language-switching, emails, persistencia)
-- **Documentación**: Actualizar memory-bank/techContext.md con arquitectura i18n
+- **✅ E2E Tests**: Suite Cypress multi-idioma completada (language-switching.cy.ts)
+- **✅ Documentación**: techContext.md actualizado con arquitectura i18n completa
 - **Plan Continuation**: Siguiente feature del roadmap o mejoras adicionales
 
 ## Decisions & Considerations
