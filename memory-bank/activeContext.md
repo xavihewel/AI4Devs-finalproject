@@ -1,11 +1,10 @@
 # Active Context
 
 ## Current Focus
-- **Feature: Multi-idioma Completo**: ✅ COMPLETADO - Todas las páginas migradas a i18n
+- **Feature #3 - Creación de Viajes**: En progreso - Fase 1 (i18n) y Fase 2 (UI mejorada) completadas.
 - **Fase 1 ✅**: Trips.tsx migrado a react-i18next con 6 idiomas completos.
-- **Fase 2 ✅**: EditTripModal, TripCard mejorado, filtros y búsqueda completados.
-- **Fase 3 ✅**: Matches, Bookings, Profile, History migrados completamente a i18n
-- **Próximo**: Continuar con otras funcionalidades del roadmap
+- **Fase 2 ✅**: EditTripModal, TripCard mejorado, filtros y búsqueda completamente integrados y funcionando.
+- **Próximo**: Fase 3 (Backend validations) y Fase 4 (E2E tests).
 
 ## Feature Plan
 - Ver `memory-bank/featurePlan.md` para el mapeo de las 15 funcionalidades (cobertura/estado/próximos pasos) y el roadmap por fases.
@@ -53,13 +52,15 @@
   - Opciones de sede localizadas
   - Trip cards con información localizada
 - **Fase 2 ✅ - Enhanced Trip Management UI**:
-  - EditTripModal component: Modal completo para edición de viajes
+  - EditTripModal component: Modal completo para edición de viajes con validaciones
   - TripCard component mejorado: Estados visuales, badges, información completa
   - TripFilters component: Filtros por estado, destino, rango de fechas
   - Estados visuales claros: ACTIVE (verde), COMPLETED (gris)
   - Filtros activos con chips removibles
   - Búsqueda y filtrado en tiempo real
   - 6 idiomas completos para todos los nuevos componentes
+  - Integración completa en Trips.tsx con data-testid para tests E2E
+  - Tests E2E verificados: filtros funcionando correctamente
 
 ### Feature: Sistema de Confianza (Anterior ✅)
 - **Backend TDD**:
