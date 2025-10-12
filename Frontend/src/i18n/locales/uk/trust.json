@@ -1,21 +1,21 @@
 {
-  "title": "Trust system",
+  "title": "Система довіри",
   "profile": {
-    "title": "Trust profile",
-    "score": "Trust score",
-    "ratings": "Ratings",
-    "tags": "Tags"
+    "title": "Профіль довіри",
+    "score": "Оцінка довіри",
+    "ratings": "Оцінки",
+    "tags": "Теги"
   },
   "rating": {
-    "title": "Rate user",
-    "thumbsUp": "Positive",
-    "thumbsDown": "Negative",
-    "comment": "Comment",
-    "tags": "Tags",
-    "submit": "Submit rating"
+    "title": "Оцінити користувача",
+    "thumbsUp": "Позитивна",
+    "thumbsDown": "Негативна",
+    "comment": "Коментар",
+    "tags": "Теги",
+    "submit": "Надіслати оцінку"
   },
   "list": {
-    "title": "Ratings received",
-    "empty": "You haven't received any ratings"
+    "title": "Отримані оцінки",
+    "empty": "Ви не отримали жодної оцінки"
   }
 }

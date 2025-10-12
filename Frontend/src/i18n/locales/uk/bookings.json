@@ -1,21 +1,21 @@
 {
-  "title": "Bookings",
+  "title": "Бронювання",
   "list": {
-    "title": "My bookings",
-    "empty": "You don't have any bookings",
-    "bookFirst": "Make your first booking"
+    "title": "Мої бронювання",
+    "empty": "У вас немає бронювань",
+    "bookFirst": "Зробіть своє перше бронювання"
   },
   "status": {
-    "pending": "Pending",
-    "confirmed": "Confirmed",
-    "cancelled": "Cancelled"
+    "pending": "В очікуванні",
+    "confirmed": "Підтверджено",
+    "cancelled": "Скасовано"
   },
   "actions": {
-    "view": "View",
-    "cancel": "Cancel"
+    "view": "Переглянути",
+    "cancel": "Скасувати"
   },
   "confirmation": {
-    "title": "Booking confirmed",
-    "message": "Your booking has been confirmed successfully"
+    "title": "Бронювання підтверджено",
+    "message": "Ваше бронювання успішно підтверджено"
   }
 }

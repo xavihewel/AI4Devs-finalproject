@@ -1,27 +1,79 @@
 {
-  "title": "Trips",
+  "title": "Поїздки",
   "create": {
-    "title": "Create Trip",
-    "origin": "Origin",
-    "destination": "Destination",
-    "date": "Date and time",
-    "seats": "Available seats",
-    "submit": "Create trip"
+    "title": "Створити Поїздку",
+    "newTrip": "Створити Нову Поїздку",
+    "origin": "Походження",
+    "latitude": "Широта Походження",
+    "longitude": "Довгота Походження",
+    "destination": "Призначення",
+    "date": "Дата і час",
+    "seats": "Доступні місця",
+    "seatsTotal": "Всього Місць",
+    "submit": "Створити поїздку",
+    "cancel": "Скасувати",
+    "creating": "Створення...",
+    "selectDestination": "Виберіть призначення",
+    "maxSeats": "Максимум 8 місць"
   },
   "list": {
-    "title": "My trips",
-    "empty": "You don't have any trips created",
-    "createFirst": "Create your first trip"
+    "title": "Мої Поїздки",
+    "empty": "У вас немає створених поїздок",
+    "createFirst": "Створіть свою першу поїздку",
+    "emptyDescription": "Створіть свою першу поїздку, щоб почати ділитися з колегами",
+    "tripTo": "Поїздка до {{destination}}",
+    "seatsFree": "{{free}} вільних із {{total}} всього"
   },
   "status": {
-    "active": "Active",
-    "completed": "Completed",
-    "cancelled": "Cancelled"
+    "active": "Активна",
+    "completed": "Завершена",
+    "cancelled": "Скасована"
   },
   "actions": {
-    "view": "View",
-    "edit": "Edit",
-    "cancel": "Cancel",
-    "delete": "Delete"
+    "view": "Переглянути",
+    "edit": "Редагувати",
+    "cancel": "Скасувати",
+    "delete": "Видалити",
+    "addSeat": "+1 Місце",
+    "show": "Показати",
+    "hide": "Приховати"
+  },
+  "labels": {
+    "origin": "Походження:",
+    "destination": "Призначення:",
+    "time": "Час:",
+    "seats": "Місця:"
+  },
+  "messages": {
+    "createSuccess": "Поїздку успішно створено!",
+    "createError": "Помилка створення поїздки",
+    "updateSuccess": "Поїздку успішно оновлено!",
+    "tripUpdated": "Поїздку успішно оновлено",
+    "updateError": "Помилка оновлення поїздки",
+    "deleteSuccess": "Поїздку успішно скасовано",
+    "deleteError": "Помилка скасування поїздки",
+    "loadError": "Помилка завантаження поїздок",
+    "confirmDelete": "Ви впевнені, що хочете скасувати цю поїздку?",
+    "formErrors": "Будь ласка, виправте помилки у формі",
+    "seatsUpdated": "Місця оновлено: {{total}} всього, {{free}} вільних"
+  },
+  "sedes": {
+    "select": "Виберіть призначення",
+    "SEDE-1": "Офіс Мадрид Центр",
+    "SEDE-2": "Офіс Мадрид Північ",
+    "SEDE-3": "Офіс Барселона"
+  },
+  "filters": {
+    "title": "Фільтри",
+    "status": "Статус",
+    "destination": "Призначення",
+    "dateFrom": "Дата з",
+    "dateTo": "Дата до",
+    "allStatuses": "Всі статуси",
+    "allDestinations": "Всі призначення",
+    "from": "З",
+    "to": "До",
+    "clearAll": "Очистити фільтри",
+    "noResults": "Не знайдено поїздок з застосованими фільтрами"
   }
 }

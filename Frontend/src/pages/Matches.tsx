@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MatchesService, BookingsService } from '../api';
 import type { MatchDto } from '../types/api';
 import { Button, Card, CardContent, Input, Select, LoadingSpinner } from '../components/ui';
@@ -8,6 +9,7 @@ import { RatingForm } from '../components/trust/RatingForm';
 import { env } from '../env';
 
 export default function Matches() {
+  const { t } = useTranslation('matches');
   const [matches, setMatches] = useState<MatchDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [searching, setSearching] = useState(false);
@@ -55,16 +57,16 @@ export default function Matches() {
   };
 
   const sedeOptions = [
-    { value: '', label: 'Seleccionar destino...' },
-    { value: 'SEDE-1', label: 'Sede Madrid Centro' },
-    { value: 'SEDE-2', label: 'Sede Madrid Norte' },
-    { value: 'SEDE-3', label: 'Sede Barcelona' },
+    { value: '', label: t('search.destinationPlaceholder') },
+    { value: 'SEDE-1', label: t('sede.SEDE-1') },
+    { value: 'SEDE-2', label: t('sede.SEDE-2') },
+    { value: 'SEDE-3', label: t('sede.SEDE-3') },
   ];
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchParams.destinationSedeId) {
-      alert('Por favor selecciona un destino');
+      alert(t('search.selectDestination'));
       return;
     }
 
@@ -74,7 +76,7 @@ export default function Matches() {
       setMatches(data);
     } catch (error) {
       console.error('Error searching matches:', error);
-      alert('Error al buscar matches. Intenta nuevamente.');
+      alert(t('match.searchError'));
     } finally {
       setSearching(false);
     }
@@ -88,19 +90,19 @@ export default function Matches() {
   };
 
   const handleBooking = async (match: MatchDto) => {
-    const seatsToBook = prompt(`¿Cuántos asientos deseas reservar? (Disponibles: ${match.seatsFree})`);
+    const seatsToBook = prompt(t('match.seatsPrompt', { seats: match.seatsFree }));
     
     if (!seatsToBook) return; // Usuario canceló
     
     const seats = parseInt(seatsToBook, 10);
     
     if (isNaN(seats) || seats < 1) {
-      showMessage('error', 'Por favor ingresa un número válido de asientos');
+      showMessage('error', t('match.invalidSeats'));
       return;
     }
     
     if (seats > match.seatsFree) {
-      showMessage('error', `Solo hay ${match.seatsFree} asientos disponibles`);
+      showMessage('error', t('match.notEnoughSeats', { seats: match.seatsFree }));
       return;
     }
     
@@ -114,13 +116,13 @@ export default function Matches() {
       // Marcar el viaje como reservado
       setBookedTrips(prev => new Set(prev).add(match.tripId));
       
-      showMessage('success', `¡Reserva creada exitosamente! ${seats} asiento(s) reservado(s). Ve a "Reservas" para ver tu reserva.`);
+      showMessage('success', t('match.bookingSuccess', { seats }));
       
       // Recargar búsqueda para actualizar asientos disponibles
       await handleSearch({ preventDefault: () => {} } as React.FormEvent);
     } catch (error: any) {
       console.error('Error creating booking:', error);
-      const errorMsg = error?.response?.data?.message || error?.message || 'Error al crear la reserva';
+      const errorMsg = error?.response?.data?.message || error?.message || t('match.bookingError');
       showMessage('error', errorMsg);
     } finally {
       setBookingInProgress(null);
@@ -135,15 +137,15 @@ export default function Matches() {
   };
 
   const getScoreLabel = (score: number) => {
-    if (score >= 0.8) return 'Excelente';
-    if (score >= 0.6) return 'Bueno';
-    if (score >= 0.4) return 'Regular';
-    return 'Bajo';
+    if (score >= 0.8) return t('match.score.excellent');
+    if (score >= 0.6) return t('match.score.good');
+    if (score >= 0.4) return t('match.score.regular');
+    return t('match.score.low');
   };
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900">Buscar Viajes</h1>
+      <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
 
       {message && (
         <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>
@@ -157,27 +159,27 @@ export default function Matches() {
           <form onSubmit={handleSearch} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Select
-                label="Destino"
+                label={t('search.destination')}
                 value={searchParams.destinationSedeId}
                 onChange={(e) => handleInputChange('destinationSedeId', e.target.value)}
                 options={sedeOptions}
               />
 
               <Input
-                label="Hora Preferida (HH:MM)"
+                label={t('search.time')}
                 type="time"
                 value={searchParams.time}
                 onChange={(e) => handleInputChange('time', e.target.value)}
-                placeholder="08:30"
+                placeholder={t('search.timePlaceholder')}
               />
 
               <Input
-                label="Ubicación de Origen (lat,lng)"
+                label={t('search.origin')}
                 type="text"
                 value={searchParams.origin}
                 onChange={(e) => handleInputChange('origin', e.target.value)}
-                placeholder="40.4168,-3.7038"
-                helperText="Formato: latitud,longitud"
+                placeholder={t('search.originPlaceholder')}
+                helperText={t('search.originHelper')}
               />
             </div>
 
@@ -189,7 +191,7 @@ export default function Matches() {
                 loading={searching}
                 disabled={searching || !searchParams.destinationSedeId}
               >
-                {searching ? 'Buscando...' : 'Buscar Viajes'}
+                {searching ? t('search.searching') : t('search.search')}
               </Button>
             </div>
           </form>
@@ -207,7 +209,7 @@ export default function Matches() {
       {matches.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-xl font-semibold text-gray-900">
-            Encontrados {matches.length} viajes compatibles
+            {t('results.title', { count: matches.length })}
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -226,7 +228,7 @@ export default function Matches() {
                             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                             </svg>
-                            Ya reservado
+                            {t('match.alreadyBooked')}
                           </span>
                         )}
                       </div>
@@ -243,12 +245,12 @@ export default function Matches() {
                     {/* Trip Details */}
                     <div className="space-y-2">
                       <h3 className="font-semibold text-lg">
-                        Viaje a {match.destinationSedeId}
+                        {t('match.tripTo', { destination: match.destinationSedeId })}
                       </h3>
                       
                       <div className="space-y-1 text-sm text-gray-600">
-                        <p><strong>Origen:</strong> {match.origin}</p>
-                        <p><strong>Asientos libres:</strong> {match.seatsFree}</p>
+                        <p><strong>{t('match.origin')}:</strong> {match.origin}</p>
+                        <p><strong>{t('match.freeSeats')}:</strong> {match.seatsFree}</p>
                       </div>
 
                       {(() => {
@@ -272,7 +274,7 @@ export default function Matches() {
                       {/* Match Reasons */}
                       {match.reasons && match.reasons.length > 0 && (
                         <div className="space-y-1">
-                          <p className="text-sm font-medium text-gray-700">Razones de compatibilidad:</p>
+                          <p className="text-sm font-medium text-gray-700">{t('match.compatibilityReasons')}:</p>
                           <ul className="text-xs text-gray-600 space-y-1">
                             {match.reasons.map((reason, index) => (
                               <li key={`${match.id}-reason-${index}`} className="flex items-center">
@@ -295,10 +297,10 @@ export default function Matches() {
                         loading={bookingInProgress === match.tripId}
                       >
                         {match.seatsFree === 0
-                          ? 'Sin asientos disponibles'
+                          ? t('match.noSeatsAvailable')
                           : bookedTrips.has(match.tripId)
-                            ? 'Ya reservado'
-                            : 'Reservar Viaje'}
+                            ? t('match.alreadyBooked')
+                            : t('match.book')}
                       </Button>
                       
                       {/* Trust System Buttons */}
@@ -309,7 +311,7 @@ export default function Matches() {
                           className="flex-1"
                           onClick={() => setShowTrustProfile(match.driverId)}
                         >
-                          👤 Ver Perfil
+                          👤 {t('match.viewProfile')}
                         </Button>
                         <Button
                           variant="secondary"
@@ -317,7 +319,7 @@ export default function Matches() {
                           className="flex-1"
                           onClick={() => setShowRatingForm(match.driverId)}
                         >
-                          ⭐ Valorar
+                          ⭐ {t('match.rate')}
                         </Button>
                       </div>
                     </div>
@@ -335,9 +337,9 @@ export default function Matches() {
           <CardContent>
             <div className="text-center py-8">
               <div className="text-4xl mb-4">🔍</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron viajes</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('results.empty')}</h3>
               <p className="text-gray-500 mb-4">
-                No hay viajes disponibles que coincidan con tus criterios de búsqueda.
+                {t('results.tryDifferent')}
               </p>
               <Button
                 variant="secondary"
@@ -346,7 +348,7 @@ export default function Matches() {
                   setMatches([]);
                 }}
               >
-                Limpiar Búsqueda
+                {t('results.clearSearch')}
               </Button>
             </div>
           </CardContent>
@@ -359,9 +361,9 @@ export default function Matches() {
           <CardContent>
             <div className="text-center py-8">
               <div className="text-4xl mb-4">🔍</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Busca tu viaje ideal</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('results.initialTitle')}</h3>
               <p className="text-gray-500">
-                Completa el formulario de búsqueda para encontrar viajes compatibles con tu ubicación y horario.
+                {t('results.initialDescription')}
               </p>
             </div>
           </CardContent>
@@ -374,13 +376,13 @@ export default function Matches() {
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Perfil de Confianza</h2>
+                <h2 className="text-xl font-semibold">{t('modals.trustProfile.title')}</h2>
                 <Button
                   variant="secondary"
                   size="sm"
                   onClick={() => setShowTrustProfile(null)}
                 >
-                  ✕
+                  {t('modals.trustProfile.close')}
                 </Button>
               </div>
               <TrustProfile userId={showTrustProfile} />
@@ -395,20 +397,20 @@ export default function Matches() {
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Valorar Usuario</h2>
+                <h2 className="text-xl font-semibold">{t('modals.rating.title')}</h2>
                 <Button
                   variant="secondary"
                   size="sm"
                   onClick={() => setShowRatingForm(null)}
                 >
-                  ✕
+                  {t('modals.rating.close')}
                 </Button>
               </div>
               <RatingForm
                 ratedUserId={showRatingForm}
                 onSuccess={() => {
                   setShowRatingForm(null);
-                  showMessage('success', 'Valoración enviada correctamente');
+                  showMessage('success', t('modals.rating.success'));
                 }}
                 onCancel={() => setShowRatingForm(null)}
               />

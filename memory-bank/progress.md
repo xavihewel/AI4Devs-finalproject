@@ -60,6 +60,26 @@
   - Detalles de implementación frontend y backend
   - Estrategia de fallback y persistencia documentada
 
+### Feature #3: Creación de Viajes (En Progreso 🔄)
+- ✅ **Fase 1 - Frontend i18n Migration**:
+  - Trips.tsx migrado completamente a react-i18next
+  - 12 archivos de traducción actualizados (6 idiomas × 2 namespaces)
+  - useValidation hook mejorado con validaciones para coordenadas, fechas, asientos
+  - 100% de textos localizados (sin strings hardcoded)
+  - Validaciones en tiempo real en idioma del usuario
+  - Mensajes de éxito/error localizados
+  - Opciones de sede localizadas
+  - Trip cards con información localizada
+- ✅ **Fase 2 - Enhanced Trip Management UI** (Completado):
+  - EditTripModal component: Modal completo para edición de viajes con validaciones
+  - TripCard component mejorado: Estados visuales, badges, información completa
+  - TripFilters component: Filtros por estado, destino, rango de fechas
+  - Estados visuales claros: ACTIVE (verde), COMPLETED (gris)
+  - Filtros activos con chips removibles
+  - Búsqueda y filtrado en tiempo real
+  - 6 idiomas completos para todos los nuevos componentes
+  - Integración completa en Trips.tsx
+
 ### Feature: Sistema de Confianza (Completado ✅)
 - ✅ **Backend TDD**:
   - Entidad `Rating` con JPA, migración V3, repository y service

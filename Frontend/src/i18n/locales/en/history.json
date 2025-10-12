@@ -1,19 +1,44 @@
 {
-  "title": "History",
+  "title": "Trip History",
+  "stats": {
+    "totalTrips": "Total Trips",
+    "co2Saved": "CO₂ Saved",
+    "kmShared": "Km Shared",
+    "co2Unit": "kg",
+    "kmUnit": "km"
+  },
   "filters": {
     "title": "Filters",
-    "date": "Date",
+    "from": "From",
+    "to": "To",
     "status": "Status",
-    "role": "Role"
+    "role": "Role",
+    "clear": "Clear Filters"
   },
-  "stats": {
-    "totalTrips": "Total trips",
-    "co2Saved": "CO2 saved",
-    "kmShared": "Km shared"
+  "status": {
+    "all": "All",
+    "COMPLETED": "Completed",
+    "ACTIVE": "Active", 
+    "CONFIRMED": "Confirmed",
+    "PENDING": "Pending",
+    "CANCELLED": "Cancelled"
+  },
+  "role": {
+    "all": "All",
+    "driver": "Driver",
+    "passenger": "Passenger"
   },
   "list": {
-    "title": "Trip history",
-    "empty": "No trips in history"
+    "empty": "No trips found in history.",
+    "loadError": "Error loading history. Please try again."
+  },
+  "trip": {
+    "destination": "Destination",
+    "seats": "Seats"
+  },
+  "booking": {
+    "tripId": "Trip ID",
+    "seatsRequested": "Reserved seats"
   }
 }
 

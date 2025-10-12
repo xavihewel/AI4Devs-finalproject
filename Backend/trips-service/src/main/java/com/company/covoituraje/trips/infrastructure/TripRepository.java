@@ -87,10 +87,12 @@ public class TripRepository {
     }
 
     public List<Trip> findAvailableTrips(String destinationSedeId) {
+        OffsetDateTime now = OffsetDateTime.now();
         TypedQuery<Trip> query = entityManager.createQuery(
-            "SELECT t FROM Trip t WHERE t.destinationSedeId = :destinationSedeId AND t.seatsFree > 0 ORDER BY t.dateTime ASC", 
+            "SELECT t FROM Trip t WHERE t.destinationSedeId = :destinationSedeId AND t.seatsFree > 0 AND t.dateTime > :now ORDER BY t.dateTime ASC", 
             Trip.class);
         query.setParameter("destinationSedeId", destinationSedeId);
+        query.setParameter("now", now);
         return query.getResultList();
     }
 

@@ -1,12 +1,11 @@
 # Active Context
 
 ## Current Focus
-- **Multi-idioma**: ✅ COMPLETADO - Implementación completa de soporte para 6 idiomas (ca, es, ro, uk, en, fr).
-- **Backend**: 4 servicios REST actualizados con Accept-Language header y MessageService.
-- **Frontend**: react-i18next configurado con LanguageSwitcher y traducciones completas.
-- **E2E Tests**: Suite Cypress completa para language switching implementada.
-- **Documentación**: techContext.md actualizado con arquitectura i18n completa.
-- **Próximo**: Siguiente feature del roadmap o mejoras adicionales.
+- **Feature: Multi-idioma Completo**: ✅ COMPLETADO - Todas las páginas migradas a i18n
+- **Fase 1 ✅**: Trips.tsx migrado a react-i18next con 6 idiomas completos.
+- **Fase 2 ✅**: EditTripModal, TripCard mejorado, filtros y búsqueda completados.
+- **Fase 3 ✅**: Matches, Bookings, Profile, History migrados completamente a i18n
+- **Próximo**: Continuar con otras funcionalidades del roadmap
 
 ## Feature Plan
 - Ver `memory-bank/featurePlan.md` para el mapeo de las 15 funcionalidades (cobertura/estado/próximos pasos) y el roadmap por fases.
@@ -42,6 +41,25 @@
   - techContext.md actualizado con arquitectura i18n completa
   - Detalles de implementación frontend y backend
   - Estrategia de fallback y persistencia documentada
+
+### Feature #3: Creación de Viajes (En Progreso 🔄)
+- **Fase 1 ✅ - Frontend i18n Migration**:
+  - Trips.tsx migrado completamente a react-i18next
+  - 12 archivos de traducción actualizados (6 idiomas × 2 namespaces)
+  - useValidation hook mejorado con validaciones para coordenadas, fechas, asientos
+  - 100% de textos localizados (sin strings hardcoded)
+  - Validaciones en tiempo real en idioma del usuario
+  - Mensajes de éxito/error localizados
+  - Opciones de sede localizadas
+  - Trip cards con información localizada
+- **Fase 2 ✅ - Enhanced Trip Management UI**:
+  - EditTripModal component: Modal completo para edición de viajes
+  - TripCard component mejorado: Estados visuales, badges, información completa
+  - TripFilters component: Filtros por estado, destino, rango de fechas
+  - Estados visuales claros: ACTIVE (verde), COMPLETED (gris)
+  - Filtros activos con chips removibles
+  - Búsqueda y filtrado en tiempo real
+  - 6 idiomas completos para todos los nuevos componentes
 
 ### Feature: Sistema de Confianza (Anterior ✅)
 - **Backend TDD**:

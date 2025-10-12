@@ -1,21 +1,21 @@
 {
-  "title": "Trust system",
+  "title": "Système de confiance",
   "profile": {
-    "title": "Trust profile",
-    "score": "Trust score",
-    "ratings": "Ratings",
-    "tags": "Tags"
+    "title": "Profil de confiance",
+    "score": "Score de confiance",
+    "ratings": "Évaluations",
+    "tags": "Étiquettes"
   },
   "rating": {
-    "title": "Rate user",
-    "thumbsUp": "Positive",
-    "thumbsDown": "Negative",
-    "comment": "Comment",
-    "tags": "Tags",
-    "submit": "Submit rating"
+    "title": "Évaluer l'utilisateur",
+    "thumbsUp": "Positif",
+    "thumbsDown": "Négatif",
+    "comment": "Commentaire",
+    "tags": "Étiquettes",
+    "submit": "Soumettre l'évaluation"
   },
   "list": {
-    "title": "Ratings received",
-    "empty": "You haven't received any ratings"
+    "title": "Évaluations reçues",
+    "empty": "Vous n'avez reçu aucune évaluation"
   }
 }

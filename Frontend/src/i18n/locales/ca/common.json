@@ -36,5 +36,44 @@
     "ukrainian": "Українська",
     "english": "English",
     "french": "Français"
+  },
+  "home": {
+    "title": "bonÀreaGo",
+    "subtitle": "La teva plataforma corporativa per compartir viatges. Redueix costos i contribueix a la sostenibilitat.",
+    "getStarted": "Començar Ara",
+    "createTrip": "Crear Viatge",
+    "searchTrips": "Cercar Viatges",
+    "features": {
+      "share": {
+        "title": "Comparteix el Teu Viatge",
+        "description": "Ofereix seients disponibles en els teus viatges corporatius i ajuda als teus companys"
+      },
+      "find": {
+        "title": "Troba Coincidències",
+        "description": "El nostre algoritme intel·ligent et troba els millors viatges segons la teva ubicació i horari"
+      },
+      "save": {
+        "title": "Estalvia Costos",
+        "description": "Redueix despeses de transport compartint viatges amb companys de feina"
+      }
+    },
+    "howItWorks": {
+      "title": "Com funciona?",
+      "subtitle": "Tres passos simples per començar a compartir viatges",
+      "steps": {
+        "create": {
+          "title": "Crea el Teu Viatge",
+          "description": "Publica el teu viatge corporatiu amb origen, destinació i horari"
+        },
+        "search": {
+          "title": "Cerca Coincidències",
+          "description": "Troba viatges compatibles amb la teva ubicació i horari"
+        },
+        "book": {
+          "title": "Reserva i Viatja",
+          "description": "Confirma la teva reserva i gaudeix del viatge compartit"
+        }
+      }
+    }
   }
 }

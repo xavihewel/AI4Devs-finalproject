@@ -11,7 +11,9 @@
     "invalid": "Format de telèfon invàlid"
   },
   "date": {
-    "invalid": "Format de data invàlid"
+    "invalid": "Format de data invàlid",
+    "required": "La data i hora són obligatòries",
+    "future": "La data ha de ser en el futur"
   },
   "time": {
     "invalid": "Format d'hora invàlid"
@@ -19,7 +21,21 @@
   "futureDate": "La data ha de ser futura",
   "positiveNumber": "El número ha de ser positiu",
   "seats": {
-    "min": "Mínim 1 seient",
-    "max": "Màxim 8 seients"
+    "min": "Ha d'haver-hi almenys 1 seient",
+    "max": "No poden ser més de 8 seients",
+    "required": "Els seients són obligatoris"
+  },
+  "coordinates": {
+    "latitude": {
+      "required": "La latitud és obligatòria",
+      "range": "La latitud ha d'estar entre -90 i 90"
+    },
+    "longitude": {
+      "required": "La longitud és obligatòria",
+      "range": "La longitud ha d'estar entre -180 i 180"
+    }
+  },
+  "destination": {
+    "required": "La destinació és obligatòria"
   }
 }

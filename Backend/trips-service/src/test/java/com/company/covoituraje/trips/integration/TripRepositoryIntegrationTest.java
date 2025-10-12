@@ -124,6 +124,27 @@ class TripRepositoryIntegrationTest {
     }
 
     @Test
+    void shouldFilterOutPastTripsFromAvailableTrips() {
+        // Given
+        OffsetDateTime now = OffsetDateTime.now();
+        Trip futureTrip = new Trip("driver-1", "origin1", "SEDE-1", now.plusHours(1), 3);
+        Trip pastTrip = new Trip("driver-2", "origin2", "SEDE-1", now.minusHours(1), 2); // Past trip
+        Trip currentTrip = new Trip("driver-3", "origin3", "SEDE-1", now.minusMinutes(30), 2); // Just started
+        
+        repository.save(futureTrip);
+        repository.save(pastTrip);
+        repository.save(currentTrip);
+
+        // When
+        List<Trip> availableTrips = repository.findAvailableTrips("SEDE-1");
+
+        // Then
+        assertEquals(1, availableTrips.size());
+        assertEquals("driver-1", availableTrips.get(0).getDriverId());
+        assertTrue(availableTrips.get(0).getDateTime().isAfter(now));
+    }
+
+    @Test
     void shouldUpdateTripSeats() {
         // Given
         Trip trip = new Trip("driver-1", "origin1", "SEDE-1", OffsetDateTime.now().plusHours(1), 3);

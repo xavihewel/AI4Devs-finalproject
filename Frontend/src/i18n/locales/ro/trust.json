@@ -1,21 +1,21 @@
 {
-  "title": "Trust system",
+  "title": "Sistem de încredere",
   "profile": {
-    "title": "Trust profile",
-    "score": "Trust score",
-    "ratings": "Ratings",
-    "tags": "Tags"
+    "title": "Profil de încredere",
+    "score": "Scor de încredere",
+    "ratings": "Evaluări",
+    "tags": "Etichete"
   },
   "rating": {
-    "title": "Rate user",
-    "thumbsUp": "Positive",
-    "thumbsDown": "Negative",
-    "comment": "Comment",
-    "tags": "Tags",
-    "submit": "Submit rating"
+    "title": "Evaluează utilizatorul",
+    "thumbsUp": "Pozitiv",
+    "thumbsDown": "Negativ",
+    "comment": "Comentariu",
+    "tags": "Etichete",
+    "submit": "Trimite evaluarea"
   },
   "list": {
-    "title": "Ratings received",
-    "empty": "You haven't received any ratings"
+    "title": "Evaluări primite",
+    "empty": "Nu ai primit nicio evaluare"
   }
 }

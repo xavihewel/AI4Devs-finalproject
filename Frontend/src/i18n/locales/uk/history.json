@@ -1,18 +1,18 @@
 {
-  "title": "History",
+  "title": "Історія",
   "filters": {
-    "title": "Filters",
-    "date": "Date",
-    "status": "Status",
-    "role": "Role"
+    "title": "Фільтри",
+    "date": "Дата",
+    "status": "Статус",
+    "role": "Роль"
   },
   "stats": {
-    "totalTrips": "Total trips",
-    "co2Saved": "CO2 saved",
-    "kmShared": "Km shared"
+    "totalTrips": "Всього поїздок",
+    "co2Saved": "CO2 збережено",
+    "kmShared": "Км поділено"
   },
   "list": {
-    "title": "Trip history",
-    "empty": "No trips in history"
+    "title": "Історія поїздок",
+    "empty": "Немає поїздок в історії"
   }
 }

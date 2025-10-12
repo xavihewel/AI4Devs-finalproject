@@ -1,24 +1,24 @@
 {
-  "title": "Search Trips",
+  "title": "Rechercher des Voyages",
   "search": {
-    "title": "Search trips",
-    "from": "From",
-    "to": "To",
+    "title": "Rechercher des voyages",
+    "from": "De",
+    "to": "À",
     "date": "Date",
-    "seats": "Seats needed",
-    "search": "Search"
+    "seats": "Places nécessaires",
+    "search": "Rechercher"
   },
   "results": {
-    "title": "Search results",
-    "empty": "No trips found",
-    "tryDifferent": "Try different criteria"
+    "title": "Résultats de recherche",
+    "empty": "Aucun voyage trouvé",
+    "tryDifferent": "Essayez d'autres critères"
   },
   "match": {
-    "driver": "Driver",
-    "departure": "Departure",
-    "arrival": "Arrival",
-    "seats": "Seats",
-    "book": "Book",
-    "viewProfile": "View profile"
+    "driver": "Conducteur",
+    "departure": "Départ",
+    "arrival": "Arrivée",
+    "seats": "Places",
+    "book": "Réserver",
+    "viewProfile": "Voir le profil"
   }
 }

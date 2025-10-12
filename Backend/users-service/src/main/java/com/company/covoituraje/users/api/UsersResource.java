@@ -46,14 +46,14 @@ public class UsersResource {
     public UserDto getMe(@HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("users.error.user_id_required", locale);
             throw new BadRequestException(message);
         }
 
         User user = repository.findById(currentUser)
                 .orElseThrow(() -> {
-                    Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                    Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
                     String message = messageService.getMessage("users.error.user_not_found", locale);
                     return new NotFoundException(message);
                 });
@@ -66,14 +66,14 @@ public class UsersResource {
     public UserDto updateMe(UserDto update, @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("users.error.user_id_required", locale);
             throw new BadRequestException(message);
         }
 
         User user = repository.findById(currentUser)
                 .orElseThrow(() -> {
-                    Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                    Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
                     String message = messageService.getMessage("users.error.user_not_found", locale);
                     return new NotFoundException(message);
                 });
@@ -108,7 +108,7 @@ public class UsersResource {
     public UserDto getById(@PathParam("id") String id, @HeaderParam("Accept-Language") String acceptLanguage) {
         User user = repository.findById(id)
                 .orElseThrow(() -> {
-                    Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                    Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
                     String message = messageService.getMessage("users.error.user_not_found", locale);
                     return new NotFoundException(message);
                 });

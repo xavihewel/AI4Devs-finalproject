@@ -15,7 +15,7 @@ export const LanguageSwitcher: React.FC = () => {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const languages: Language[] = [
-    { code: 'ca', name: 'Català', flag: '🇪🇸' },
+    { code: 'ca', name: 'Català', flag: '🏴' },
     { code: 'es', name: 'Español', flag: '🇪🇸' },
     { code: 'ro', name: 'Română', flag: '🇷🇴' },
     { code: 'uk', name: 'Українська', flag: '🇺🇦' },

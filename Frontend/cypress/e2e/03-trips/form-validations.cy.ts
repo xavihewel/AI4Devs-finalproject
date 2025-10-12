@@ -2,7 +2,8 @@ describe('Trip Form Validations', () => {
   beforeEach(() => {
     cy.loginViaKeycloak('test.user', 'password123')
     cy.visit('/trips')
-    cy.contains('button', 'Crear Viaje').click()
+    cy.get('[data-testid="trips-page"]', { timeout: 15000 }).should('be.visible')
+    cy.get('button').contains('Crear Viaje').click()
   })
 
   it('should show asterisks on all required fields', () => {

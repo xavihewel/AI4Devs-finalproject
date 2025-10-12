@@ -1,19 +1,44 @@
 {
-  "title": "Historial",
+  "title": "Historial de Viatges",
+  "stats": {
+    "totalTrips": "Total Viatges",
+    "co2Saved": "CO₂ Estalviat",
+    "kmShared": "Km Compartits",
+    "co2Unit": "kg",
+    "kmUnit": "km"
+  },
   "filters": {
     "title": "Filtres",
-    "date": "Data",
+    "from": "Des de",
+    "to": "Fins a",
     "status": "Estat",
-    "role": "Rol"
+    "role": "Rol",
+    "clear": "Netejar Filtres"
   },
-  "stats": {
-    "totalTrips": "Total viatges",
-    "co2Saved": "CO2 estalviat",
-    "kmShared": "Km compartits"
+  "status": {
+    "all": "Tots",
+    "COMPLETED": "Completat",
+    "ACTIVE": "Actiu", 
+    "CONFIRMED": "Confirmat",
+    "PENDING": "Pendent",
+    "CANCELLED": "Cancel·lat"
+  },
+  "role": {
+    "all": "Tots",
+    "driver": "Conductor",
+    "passenger": "Passatger"
   },
   "list": {
-    "title": "Historial de viatges",
-    "empty": "No hi ha viatges al historial"
+    "empty": "No s'han trobat viatges a l'historial.",
+    "loadError": "Error al carregar l'historial. Si us plau torna a intentar."
+  },
+  "trip": {
+    "destination": "Destinació",
+    "seats": "Seients"
+  },
+  "booking": {
+    "tripId": "ID del Viatge",
+    "seatsRequested": "Seients reservats"
   }
 }
 

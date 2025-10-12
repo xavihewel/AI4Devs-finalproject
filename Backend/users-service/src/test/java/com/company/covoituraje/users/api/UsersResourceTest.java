@@ -8,6 +8,8 @@ import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -22,7 +24,7 @@ class UsersResourceTest {
     @BeforeEach
     void setUp() {
         messageService = new MessageService();
-        mockRepository = new UserRepository() {
+        mockRepository = new UserRepository(null) {
             @Override
             public Optional<User> findById(String id) {
                 if ("test-user".equals(id)) {

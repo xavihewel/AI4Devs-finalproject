@@ -11,8 +11,30 @@ export const useValidation = () => {
     range: (min: number, max: number) => t('range', { min, max }),
     numeric: () => t('numeric'),
     phone: () => t('phone.invalid'),
-    date: () => t('date.invalid'),
+    date: {
+      invalid: () => t('date.invalid'),
+      required: () => t('date.required'),
+      future: () => t('date.future'),
+    },
     time: () => t('time.invalid'),
+    seats: {
+      min: () => t('seats.min'),
+      max: () => t('seats.max'),
+      required: () => t('seats.required'),
+    },
+    coordinates: {
+      latitude: {
+        required: () => t('coordinates.latitude.required'),
+        range: () => t('coordinates.latitude.range'),
+      },
+      longitude: {
+        required: () => t('coordinates.longitude.required'),
+        range: () => t('coordinates.longitude.range'),
+      },
+    },
+    destination: {
+      required: () => t('destination.required'),
+    },
   };
 };
 

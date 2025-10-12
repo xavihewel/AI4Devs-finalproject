@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BookingsService } from '../api/bookings';
 import type { BookingDto } from '../types/api';
 import { Button, Card, CardContent, CardHeader, CardTitle, LoadingSpinner } from '../components/ui';
 
 export default function Bookings() {
+  const { t } = useTranslation('bookings');
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState<BookingDto[]>([]);
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
@@ -25,14 +27,14 @@ export default function Bookings() {
       setBookings(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error loading bookings:', error);
-      showMessage('error', 'Error al cargar las reservas');
+      showMessage('error', t('list.loadingError'));
     } finally {
       setLoading(false);
     }
   };
 
   const handleCancel = async (id: string) => {
-    if (!window.confirm('¿Estás seguro de que quieres cancelar esta reserva?')) {
+    if (!window.confirm(t('booking.cancelConfirm'))) {
       return;
     }
     
@@ -40,10 +42,10 @@ export default function Bookings() {
       setActionInProgress(id);
       await BookingsService.cancelBooking(id);
       await loadBookings();
-      showMessage('success', 'Reserva cancelada exitosamente');
+      showMessage('success', t('booking.cancelSuccess'));
     } catch (error) {
       console.error('Error cancelling booking:', error);
-      showMessage('error', 'Error al cancelar la reserva');
+      showMessage('error', t('booking.cancelError'));
     } finally {
       setActionInProgress(null);
     }
@@ -55,16 +57,10 @@ export default function Bookings() {
       PENDING: 'bg-yellow-100 text-yellow-800 border-yellow-200',
       CANCELLED: 'bg-red-100 text-red-800 border-red-200',
     };
-    
-    const labels = {
-      CONFIRMED: 'Confirmada',
-      PENDING: 'Pendiente',
-      CANCELLED: 'Cancelada',
-    };
 
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium border ${styles[status]}`}>
-        {labels[status]}
+        {t(`status.badges.${status}`)}
       </span>
     );
   };
@@ -80,7 +76,7 @@ export default function Bookings() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Mis Reservas</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
       </div>
 
       {message && (
@@ -94,12 +90,12 @@ export default function Bookings() {
           <CardContent>
             <div className="text-center py-12">
               <div className="text-6xl mb-4">📋</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No tienes reservas</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('list.empty')}</h3>
               <p className="text-gray-500 mb-4">
-                Cuando reserves un viaje, aparecerá aquí.
+                {t('list.emptyDescription')}
               </p>
               <p className="text-sm text-gray-400">
-                Ve a "Buscar" para encontrar viajes disponibles
+                {t('list.emptyHint')}
               </p>
             </div>
           </CardContent>
@@ -110,7 +106,7 @@ export default function Bookings() {
             <Card key={booking.id}>
               <CardHeader>
                 <div className="flex justify-between items-start">
-                  <CardTitle>Reserva #{booking.id.substring(0, 8)}</CardTitle>
+                  <CardTitle>{t('booking.id', { id: booking.id.substring(0, 8) })}</CardTitle>
                   {getStatusBadge(booking.status)}
                 </div>
               </CardHeader>
@@ -118,15 +114,15 @@ export default function Bookings() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-500">ID del Viaje</p>
+                      <p className="text-gray-500">{t('booking.tripId')}</p>
                       <p className="font-medium text-gray-900">{booking.tripId}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Asientos reservados</p>
+                      <p className="text-gray-500">{t('booking.seatsRequested')}</p>
                       <p className="font-medium text-gray-900">{booking.seatsRequested}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Fecha de reserva</p>
+                      <p className="text-gray-500">{t('booking.bookingDate')}</p>
                       <p className="font-medium text-gray-900">
                         {new Date(booking.createdAt || Date.now()).toLocaleDateString('es-ES', {
                           year: 'numeric',
@@ -136,11 +132,9 @@ export default function Bookings() {
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Estado</p>
+                      <p className="text-gray-500">{t('booking.status')}</p>
                       <p className="font-medium text-gray-900">
-                        {booking.status === 'CONFIRMED' && 'Confirmada'}
-                        {booking.status === 'PENDING' && 'Pendiente de confirmación'}
-                        {booking.status === 'CANCELLED' && 'Cancelada'}
+                        {t(`status.${booking.status}`)}
                       </p>
                     </div>
                   </div>
@@ -154,7 +148,7 @@ export default function Bookings() {
                         disabled={actionInProgress === booking.id}
                         loading={actionInProgress === booking.id}
                       >
-                        Cancelar Reserva
+                        {t('booking.cancel')}
                       </Button>
                     </div>
                   )}

@@ -7,7 +7,10 @@ describe('Trips Edit & Delete', () => {
     // Precondición: trips-service disponible
     cy.request('http://localhost:8081/api/trips')
     cy.visit('/trips')
-    cy.contains('Crear Viaje', { timeout: 15000 }).click()
+    
+    // Usar data-testid para encontrar el botón de crear
+    cy.get('[data-testid="trips-page"]', { timeout: 15000 }).should('be.visible')
+    cy.get('button').contains('Crear Viaje').click()
 
     cy.get('input[placeholder="40.4168"]', { timeout: 15000 }).clear().type('40.4168')
     cy.get('input[placeholder="-3.7038"]', { timeout: 15000 }).clear().type('-3.7038')

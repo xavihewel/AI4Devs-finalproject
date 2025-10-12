@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TripsService } from '../api/trips';
 import { BookingsService } from '../api/bookings';
 import type { TripDto, BookingDto } from '../types/api';
@@ -20,6 +21,7 @@ type FilterRole = 'all' | 'driver' | 'passenger';
 type FilterStatus = 'all' | 'COMPLETED' | 'ACTIVE' | 'CANCELLED' | 'PENDING' | 'CONFIRMED';
 
 export function History() {
+  const { t } = useTranslation('history');
   const [items, setItems] = useState<HistoryItem[]>([]);
   const [filteredItems, setFilteredItems] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,7 +85,7 @@ export function History() {
       calculateStats(tripItems, bookingItems);
     } catch (err) {
       console.error('Error loading history:', err);
-      setError('Error al cargar el historial. Por favor, intenta de nuevo.');
+      setError(t('list.loadError'));
     } finally {
       setLoading(false);
     }
@@ -174,71 +176,71 @@ export function History() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Historial de Viajes</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('title')}</h1>
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card>
           <div className="text-center">
-            <p className="text-sm font-medium text-gray-600">Total Viajes</p>
+            <p className="text-sm font-medium text-gray-600">{t('stats.totalTrips')}</p>
             <p className="text-3xl font-bold text-blue-600 mt-2">{stats.totalTrips}</p>
           </div>
         </Card>
         <Card>
           <div className="text-center">
-            <p className="text-sm font-medium text-gray-600">CO₂ Ahorrado</p>
-            <p className="text-3xl font-bold text-green-600 mt-2">{stats.co2Saved} kg</p>
+            <p className="text-sm font-medium text-gray-600">{t('stats.co2Saved')}</p>
+            <p className="text-3xl font-bold text-green-600 mt-2">{stats.co2Saved} {t('stats.co2Unit')}</p>
           </div>
         </Card>
         <Card>
           <div className="text-center">
-            <p className="text-sm font-medium text-gray-600">Km Compartidos</p>
-            <p className="text-3xl font-bold text-purple-600 mt-2">{stats.kmShared} km</p>
+            <p className="text-sm font-medium text-gray-600">{t('stats.kmShared')}</p>
+            <p className="text-3xl font-bold text-purple-600 mt-2">{stats.kmShared} {t('stats.kmUnit')}</p>
           </div>
         </Card>
       </div>
 
       {/* Filters */}
       <Card className="mb-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Filtros</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('filters.title')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Input
-            label="Desde"
+            label={t('filters.from')}
             type="date"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
           />
           <Input
-            label="Hasta"
+            label={t('filters.to')}
             type="date"
             value={toDate}
             onChange={(e) => setToDate(e.target.value)}
           />
           <SelectWithChildren
-            label="Estado"
+            label={t('filters.status')}
             value={statusFilter}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value as FilterStatus)}
           >
-            <option value="all">Todos</option>
-            <option value="COMPLETED">Completado</option>
-            <option value="ACTIVE">Activo</option>
-            <option value="CONFIRMED">Confirmado</option>
-            <option value="PENDING">Pendiente</option>
-            <option value="CANCELLED">Cancelado</option>
+            <option value="all">{t('status.all')}</option>
+            <option value="COMPLETED">{t('status.COMPLETED')}</option>
+            <option value="ACTIVE">{t('status.ACTIVE')}</option>
+            <option value="CONFIRMED">{t('status.CONFIRMED')}</option>
+            <option value="PENDING">{t('status.PENDING')}</option>
+            <option value="CANCELLED">{t('status.CANCELLED')}</option>
           </SelectWithChildren>
           <SelectWithChildren
-            label="Rol"
+            label={t('filters.role')}
             value={roleFilter}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setRoleFilter(e.target.value as FilterRole)}
           >
-            <option value="all">Todos</option>
-            <option value="driver">Conductor</option>
-            <option value="passenger">Pasajero</option>
+            <option value="all">{t('role.all')}</option>
+            <option value="driver">{t('role.driver')}</option>
+            <option value="passenger">{t('role.passenger')}</option>
           </SelectWithChildren>
         </div>
         <div className="mt-4 flex justify-end">
           <Button variant="secondary" onClick={clearFilters}>
-            Limpiar Filtros
+            {t('filters.clear')}
           </Button>
         </div>
       </Card>
@@ -255,7 +257,7 @@ export function History() {
         {filteredItems.length === 0 ? (
           <Card>
             <p className="text-center text-gray-500 py-8">
-              No se encontraron viajes en el historial.
+              {t('list.empty')}
             </p>
           </Card>
         ) : (
@@ -272,18 +274,18 @@ export function History() {
                       {item.status}
                     </span>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                      {item.type === 'trip' ? 'Conductor' : 'Pasajero'}
+                      {item.type === 'trip' ? t('role.driver') : t('role.passenger')}
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 mb-1">{formatDate(item.date)}</p>
                   {item.type === 'trip' && (
                     <div className="text-sm text-gray-900">
                       <p>
-                        <span className="font-medium">Destino:</span>{' '}
+                        <span className="font-medium">{t('trip.destination')}:</span>{' '}
                         {(item.details as TripDto).destinationSedeId}
                       </p>
                       <p>
-                        <span className="font-medium">Asientos:</span>{' '}
+                        <span className="font-medium">{t('trip.seats')}:</span>{' '}
                         {(item.details as TripDto).seatsFree} /{' '}
                         {(item.details as TripDto).seatsTotal}
                       </p>
@@ -292,11 +294,11 @@ export function History() {
                   {item.type === 'booking' && (
                     <div className="text-sm text-gray-900">
                       <p>
-                        <span className="font-medium">Viaje ID:</span>{' '}
+                        <span className="font-medium">{t('booking.tripId')}:</span>{' '}
                         {(item.details as BookingDto).tripId}
                       </p>
                       <p>
-                        <span className="font-medium">Asientos reservados:</span>{' '}
+                        <span className="font-medium">{t('booking.seatsRequested')}:</span>{' '}
                         {(item.details as BookingDto).seatsRequested}
                       </p>
                     </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { env } from '../env';
 import { subscribePush, unsubscribePush } from '../api/notifications';
 import { UsersService } from '../api/users';
@@ -12,6 +13,7 @@ interface FormErrors {
 }
 
 export default function Profile() {
+  const { t } = useTranslation('profile');
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [user, setUser] = useState<UserDto | null>(null);
@@ -36,22 +38,22 @@ export default function Profile() {
 
     // Validar nombre
     if (!name || name.trim().length < 2) {
-      errors.name = 'El nombre debe tener al menos 2 caracteres';
+      errors.name = t('validation.nameMinLength');
     }
 
     // Validar email
     if (!email || email.trim().length === 0) {
-      errors.email = 'El email es obligatorio';
+      errors.email = t('validation.emailRequired');
     } else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        errors.email = 'Por favor ingresa un email válido';
+        errors.email = t('validation.emailInvalid');
       }
     }
 
     // Validar sede
     if (!sedeId || sedeId === '') {
-      errors.sedeId = 'La sede es obligatoria';
+      errors.sedeId = t('validation.sedeRequired');
     }
 
     return errors;
@@ -74,7 +76,7 @@ export default function Profile() {
       })
       .catch((e) => {
         console.error('Error loading user:', e);
-        showMessage('error', 'Error al cargar el perfil');
+        showMessage('error', t('actions.loadError'));
       })
       .finally(() => setLoading(false));
   }, []);
@@ -95,7 +97,7 @@ export default function Profile() {
 
     // Si hay errores, no enviar
     if (Object.keys(errors).length > 0) {
-      showMessage('error', 'Por favor corrige los errores en el formulario');
+      showMessage('error', t('validation.formErrors'));
       return;
     }
 
@@ -104,10 +106,10 @@ export default function Profile() {
       const payload: UserUpdateDto = { name, email, sedeId };
       const updated = await UsersService.updateCurrentUser(payload);
       setUser(updated);
-      showMessage('success', '¡Perfil actualizado exitosamente!');
+      showMessage('success', t('actions.updateSuccess'));
     } catch (e: any) {
       console.error('[Profile] Error updating user:', e);
-      const errorMsg = e?.response?.data?.message || e?.message || 'Error al actualizar el perfil';
+      const errorMsg = e?.response?.data?.message || e?.message || t('actions.updateError');
       showMessage('error', errorMsg);
     } finally {
       setSaving(false);
@@ -141,10 +143,10 @@ export default function Profile() {
   };
 
   const sedeOptions = [
-    { value: '', label: 'Selecciona tu sede' },
-    { value: 'SEDE-1', label: 'Sede Madrid Centro' },
-    { value: 'SEDE-2', label: 'Sede Madrid Norte' },
-    { value: 'SEDE-3', label: 'Sede Barcelona' },
+    { value: '', label: t('personal.sedePlaceholder') },
+    { value: 'SEDE-1', label: t('sede.SEDE-1') },
+    { value: 'SEDE-2', label: t('sede.SEDE-2') },
+    { value: 'SEDE-3', label: t('sede.SEDE-3') },
   ];
 
   if (loading) {
@@ -160,7 +162,7 @@ export default function Profile() {
       <Card>
         <CardContent>
           <div className="text-center py-8">
-            <p className="text-red-600">No se pudo cargar el perfil</p>
+            <p className="text-red-600">{t('actions.loadError')}</p>
       </div>
         </CardContent>
       </Card>
@@ -170,7 +172,7 @@ export default function Profile() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Mi Perfil</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
       </div>
 
       {message && (
@@ -181,21 +183,21 @@ export default function Profile() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Información Personal</CardTitle>
+          <CardTitle>{t('personal.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Nota de campos obligatorios */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-sm text-blue-800">
-                <span className="text-red-600 font-bold">*</span> Indica un campo obligatorio
+                <span className="text-red-600 font-bold">*</span> {t('personal.required')}
               </p>
             </div>
 
             <Input
               label={
                 <span>
-                  Nombre <span className="text-red-600">*</span>
+                  {t('personal.name')} <span className="text-red-600">*</span>
                 </span>
               }
               type="text"
@@ -203,14 +205,14 @@ export default function Profile() {
               onChange={(e) => handleInputChange('name', e.target.value)}
               onBlur={() => handleFieldBlur('name')}
               error={touched.name ? formErrors.name : undefined}
-              placeholder="Juan Pérez"
+              placeholder={t('personal.namePlaceholder')}
               required
             />
 
             <Input
               label={
                 <span>
-                  Email <span className="text-red-600">*</span>
+                  {t('personal.email')} <span className="text-red-600">*</span>
                 </span>
               }
               type="email"
@@ -218,15 +220,15 @@ export default function Profile() {
               onChange={(e) => handleInputChange('email', e.target.value)}
               onBlur={() => handleFieldBlur('email')}
               error={touched.email ? formErrors.email : undefined}
-              placeholder="juan.perez@empresa.com"
-              helperText="Usamos tu email corporativo para las notificaciones"
+              placeholder={t('personal.emailPlaceholder')}
+              helperText={t('personal.emailHelper')}
               required
             />
 
             <Select
               label={
                 <span>
-                  Sede <span className="text-red-600">*</span>
+                  {t('personal.sede')} <span className="text-red-600">*</span>
                 </span>
               }
               value={sedeId}
@@ -238,12 +240,12 @@ export default function Profile() {
             />
 
             <Input
-              label="Horario Preferido"
+              label={t('personal.schedule')}
               type="text"
               value={schedule}
               onChange={(e) => handleInputChange('schedule', e.target.value)}
-              placeholder="08:00 - 17:00"
-              helperText="Opcional: Tu horario habitual de trabajo"
+              placeholder={t('personal.schedulePlaceholder')}
+              helperText={t('personal.scheduleHelper')}
             />
 
             <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200">
@@ -253,7 +255,7 @@ export default function Profile() {
                 disabled={saving}
                 loading={saving}
               >
-                {saving ? 'Guardando...' : 'Guardar Cambios'}
+                {saving ? t('actions.saving') : t('actions.save')}
         </Button>
             </div>
           </form>
@@ -264,15 +266,15 @@ export default function Profile() {
       <Card>
         <CardContent>
           <div className="space-y-2">
-            <h3 className="font-semibold text-gray-900">Información de la Cuenta</h3>
+            <h3 className="font-semibold text-gray-900">{t('account.title')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-gray-500">ID de Usuario</p>
+                <p className="text-gray-500">{t('account.userId')}</p>
                 <p className="font-mono text-gray-900">{user.id}</p>
               </div>
               {user.role && (
                 <div>
-                  <p className="text-gray-500">Rol</p>
+                  <p className="text-gray-500">{t('account.role')}</p>
                   <p className="font-medium text-gray-900">{user.role}</p>
                 </div>
               )}
@@ -284,15 +286,15 @@ export default function Profile() {
       {/* Notificaciones Push */}
       <Card>
         <CardHeader>
-          <CardTitle>Notificaciones Push</CardTitle>
+          <CardTitle>{t('notifications.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-3">
-            <Button type="button" onClick={() => enablePush(setPushSub, setPushError)}>
-              Habilitar
+            <Button type="button" onClick={() => enablePush(setPushSub, setPushError, t)}>
+              {t('notifications.enable')}
             </Button>
-            <Button type="button" variant="secondary" onClick={() => disablePush(setPushSub, setPushError)} disabled={!pushSub}>
-              Deshabilitar
+            <Button type="button" variant="secondary" onClick={() => disablePush(setPushSub, setPushError, t)} disabled={!pushSub}>
+              {t('notifications.disable')}
             </Button>
           </div>
           {pushError && <p className="text-red-600 mt-2 text-sm">{pushError}</p>}
@@ -302,7 +304,7 @@ export default function Profile() {
   );
 }
 
-async function enablePush(setPushSub: (s: PushSubscription | null) => void, setPushError: (e: string | null) => void) {
+async function enablePush(setPushSub: (s: PushSubscription | null) => void, setPushError: (e: string | null) => void, t: (key: string) => string) {
   try {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) throw new Error('Push API no soportada');
     const reg = await navigator.serviceWorker.register('/sw.js');
@@ -318,11 +320,11 @@ async function enablePush(setPushSub: (s: PushSubscription | null) => void, setP
     setPushSub(sub);
     setPushError(null);
   } catch (e: any) {
-    setPushError(e?.message || 'No se pudo habilitar las notificaciones');
+    setPushError(e?.message || t('notifications.error'));
   }
 }
 
-async function disablePush(setPushSub: (s: PushSubscription | null) => void, setPushError: (e: string | null) => void) {
+async function disablePush(setPushSub: (s: PushSubscription | null) => void, setPushError: (e: string | null) => void, t: (key: string) => string) {
   try {
     const reg = await navigator.serviceWorker.getRegistration();
     const sub = await reg?.pushManager.getSubscription();
@@ -333,7 +335,7 @@ async function disablePush(setPushSub: (s: PushSubscription | null) => void, set
     setPushSub(null);
     setPushError(null);
   } catch (e: any) {
-    setPushError(e?.message || 'No se pudo deshabilitar las notificaciones');
+    setPushError(e?.message || t('notifications.error'));
   }
 }
 

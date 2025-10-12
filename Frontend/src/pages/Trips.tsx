@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TripsService } from '../api';
 import type { TripDto, TripCreateDto } from '../types/api';
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select, LoadingSpinner } from '../components/ui';
-import MapPreview from '../components/map/MapPreview';
+import { EditTripModal } from '../components/trips/EditTripModal';
+import { TripCard } from '../components/trips/TripCard';
+import { TripFilters, type TripFilters as TripFiltersType } from '../components/trips/TripFilters';
+import { useValidation } from '../utils/validation';
 import { env } from '../env';
 
 interface FormErrors {
@@ -14,7 +18,10 @@ interface FormErrors {
 }
 
 export default function Trips() {
+  const { t } = useTranslation(['trips', 'common']);
+  const validation = useValidation();
   const [trips, setTrips] = useState<TripDto[]>([]);
+  const [filteredTrips, setFilteredTrips] = useState<TripDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -22,6 +29,16 @@ export default function Trips() {
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  
+  // New states for enhanced UI
+  const [editingTrip, setEditingTrip] = useState<TripDto | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [filters, setFilters] = useState<TripFiltersType>({
+    status: '',
+    destination: '',
+    dateFrom: '',
+    dateTo: ''
+  });
 
   // Form state
   const [formData, setFormData] = useState<TripCreateDto>({
@@ -35,6 +52,11 @@ export default function Trips() {
     loadTrips();
   }, []);
 
+  // Apply filters when trips or filters change
+  useEffect(() => {
+    applyFilters();
+  }, [trips, filters]);
+
   const showMessage = (type: 'success' | 'error', text: string) => {
     setMessage({ type, text });
     setTimeout(() => setMessage(null), 3000);
@@ -45,39 +67,39 @@ export default function Trips() {
 
     // Validar latitud
     if (formData.origin.lat === 0 && !touched.lat) {
-      errors.lat = 'La latitud es obligatoria';
+      errors.lat = validation.coordinates.latitude.required();
     } else if (formData.origin.lat < -90 || formData.origin.lat > 90) {
-      errors.lat = 'La latitud debe estar entre -90 y 90';
+      errors.lat = validation.coordinates.latitude.range();
     }
 
     // Validar longitud
     if (formData.origin.lng === 0 && !touched.lng) {
-      errors.lng = 'La longitud es obligatoria';
+      errors.lng = validation.coordinates.longitude.required();
     } else if (formData.origin.lng < -180 || formData.origin.lng > 180) {
-      errors.lng = 'La longitud debe estar entre -180 y 180';
+      errors.lng = validation.coordinates.longitude.range();
     }
 
     // Validar destino
     if (!formData.destinationSedeId || formData.destinationSedeId === '') {
-      errors.destinationSedeId = 'El destino es obligatorio';
+      errors.destinationSedeId = validation.destination.required();
     }
 
     // Validar fecha y hora
     if (!formData.dateTime) {
-      errors.dateTime = 'La fecha y hora son obligatorias';
+      errors.dateTime = validation.date.required();
     } else {
       const selectedDate = new Date(formData.dateTime);
       const now = new Date();
       if (selectedDate <= now) {
-        errors.dateTime = 'La fecha debe ser en el futuro';
+        errors.dateTime = validation.date.future();
       }
     }
 
     // Validar asientos
     if (!formData.seatsTotal || formData.seatsTotal < 1) {
-      errors.seatsTotal = 'Debe haber al menos 1 asiento';
+      errors.seatsTotal = validation.seats.min();
     } else if (formData.seatsTotal > 8) {
-      errors.seatsTotal = 'No pueden ser más de 8 asientos';
+      errors.seatsTotal = validation.seats.max();
     }
 
     return errors;
@@ -96,7 +118,7 @@ export default function Trips() {
       setTrips(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error loading trips:', error);
-      showMessage('error', 'Error al cargar los viajes');
+      showMessage('error', t('trips:messages.loadError'));
     } finally {
       setLoading(false);
     }
@@ -120,7 +142,7 @@ export default function Trips() {
 
     // Si hay errores, no enviar
     if (Object.keys(errors).length > 0) {
-      showMessage('error', 'Por favor corrige los errores en el formulario');
+      showMessage('error', t('trips:messages.formErrors'));
       return;
     }
 
@@ -141,27 +163,27 @@ export default function Trips() {
       setFormErrors({});
       setTouched({});
       await loadTrips();
-      showMessage('success', '¡Viaje creado exitosamente!');
+      showMessage('success', t('trips:messages.createSuccess'));
     } catch (error) {
       console.error('Error creating trip:', error);
-      showMessage('error', 'Error al crear el viaje');
+      showMessage('error', t('trips:messages.createError'));
     } finally {
       setCreating(false);
     }
   };
 
   const handleDelete = async (tripId: string) => {
-    if (!window.confirm('¿Estás seguro de que quieres cancelar este viaje?')) {
+    if (!window.confirm(t('trips:messages.confirmDelete'))) {
       return;
     }
     try {
       setActionInProgress(tripId);
       await TripsService.deleteTrip(tripId);
       await loadTrips();
-      showMessage('success', 'Viaje cancelado exitosamente');
+      showMessage('success', t('trips:messages.deleteSuccess'));
     } catch (error) {
       console.error('Error deleting trip:', error);
-      showMessage('error', 'Error al cancelar el viaje');
+      showMessage('error', t('trips:messages.deleteError'));
     } finally {
       setActionInProgress(null);
     }
@@ -172,13 +194,91 @@ export default function Trips() {
       setActionInProgress(trip.id);
       await TripsService.updateTrip(trip.id, { seatsTotal: trip.seatsTotal + 1 });
       await loadTrips();
-      showMessage('success', `Asientos actualizados: ${trip.seatsTotal + 1} total, ${trip.seatsFree + 1} libres`);
+      showMessage('success', t('trips:messages.seatsUpdated', { total: trip.seatsTotal + 1, free: trip.seatsFree + 1 }));
     } catch (error) {
       console.error('Error updating trip:', error);
-      showMessage('error', 'Error al actualizar el viaje');
+      showMessage('error', t('trips:messages.updateError'));
     } finally {
       setActionInProgress(null);
     }
+  };
+
+  // New functions for enhanced UI
+  const applyFilters = () => {
+    let filtered = [...trips];
+
+    // Filter by status
+    if (filters.status) {
+      const now = new Date();
+      filtered = filtered.filter(trip => {
+        const tripDate = trip.dateTime ? new Date(trip.dateTime) : new Date(0);
+        if (filters.status === 'ACTIVE') {
+          return tripDate >= now;
+        } else if (filters.status === 'COMPLETED') {
+          return tripDate < now;
+        }
+        return true;
+      });
+    }
+
+    // Filter by destination
+    if (filters.destination) {
+      filtered = filtered.filter(trip => trip.destinationSedeId === filters.destination);
+    }
+
+    // Filter by date range
+    if (filters.dateFrom) {
+      const fromDate = new Date(filters.dateFrom);
+      filtered = filtered.filter(trip => {
+        const tripDate = trip.dateTime ? new Date(trip.dateTime) : new Date(0);
+        return tripDate >= fromDate;
+      });
+    }
+
+    if (filters.dateTo) {
+      const toDate = new Date(filters.dateTo);
+      toDate.setHours(23, 59, 59, 999); // End of day
+      filtered = filtered.filter(trip => {
+        const tripDate = trip.dateTime ? new Date(trip.dateTime) : new Date(0);
+        return tripDate <= toDate;
+      });
+    }
+
+    setFilteredTrips(filtered);
+  };
+
+  const handleEditTrip = (trip: TripDto) => {
+    setEditingTrip(trip);
+    setShowEditModal(true);
+  };
+
+  const handleSaveTrip = async (tripId: string, data: TripCreateDto) => {
+    setCreating(true);
+    try {
+      await TripsService.updateTrip(tripId, data);
+      await loadTrips();
+      showMessage('success', t('trips:messages.tripUpdated'));
+      setShowEditModal(false);
+      setEditingTrip(null);
+    } catch (error) {
+      console.error('Error updating trip:', error);
+      showMessage('error', t('trips:messages.updateError'));
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleFiltersChange = (newFilters: TripFiltersType) => {
+    setFilters(newFilters);
+  };
+
+  const handleClearFilters = () => {
+    setFilters({
+      status: '',
+      destination: '',
+      dateFrom: '',
+      dateTo: ''
+    });
   };
 
   const handleInputChange = (field: string, value: any) => {
@@ -197,10 +297,10 @@ export default function Trips() {
   };
 
   const sedeOptions = [
-    { value: '', label: 'Selecciona un destino' },
-    { value: 'SEDE-1', label: 'Sede Madrid Centro' },
-    { value: 'SEDE-2', label: 'Sede Madrid Norte' },
-    { value: 'SEDE-3', label: 'Sede Barcelona' },
+    { value: '', label: t('trips:sedes.select') },
+    { value: 'SEDE-1', label: t('trips:sedes.SEDE-1') },
+    { value: 'SEDE-2', label: t('trips:sedes.SEDE-2') },
+    { value: 'SEDE-3', label: t('trips:sedes.SEDE-3') },
   ];
 
   if (loading) {
@@ -212,14 +312,15 @@ export default function Trips() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="trips-page">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Mis Viajes</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{t('trips:list.title')}</h1>
         <Button
           variant="primary"
           onClick={() => setShowCreateForm(!showCreateForm)}
+          data-testid="create-trip-button"
         >
-          {showCreateForm ? 'Cancelar' : 'Crear Viaje'}
+          {showCreateForm ? t('trips:create.cancel') : t('trips:create.title')}
         </Button>
       </div>
 
@@ -232,13 +333,13 @@ export default function Trips() {
       {showCreateForm && (
         <Card>
           <CardHeader>
-            <CardTitle>Crear Nuevo Viaje</CardTitle>
+            <CardTitle>{t('trips:create.newTrip')}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  label="Latitud de Origen *"
+                  label={`${t('trips:create.latitude')} *`}
                   type="number"
                   step="any"
                   value={formData.origin.lat}
@@ -252,7 +353,7 @@ export default function Trips() {
                   required
                 />
                 <Input
-                  label="Longitud de Origen *"
+                  label={`${t('trips:create.longitude')} *`}
                   type="number"
                   step="any"
                   value={formData.origin.lng}
@@ -268,7 +369,7 @@ export default function Trips() {
               </div>
 
               <Select
-                label="Destino *"
+                label={`${t('trips:create.destination')} *`}
                 value={formData.destinationSedeId}
                 onChange={(e) => handleInputChange('destinationSedeId', e.target.value)}
                 onBlur={() => handleFieldBlur('destinationSedeId')}
@@ -278,7 +379,7 @@ export default function Trips() {
               />
 
               <Input
-                label="Fecha y Hora *"
+                label={`${t('trips:create.date')} *`}
                 type="datetime-local"
                 value={formData.dateTime}
                 onChange={(e) => handleInputChange('dateTime', e.target.value)}
@@ -288,7 +389,7 @@ export default function Trips() {
               />
 
               <Input
-                label="Asientos Totales *"
+                label={`${t('trips:create.seatsTotal')} *`}
                 type="number"
                 min="1"
                 max="8"
@@ -299,7 +400,7 @@ export default function Trips() {
                 }}
                 onBlur={() => handleFieldBlur('seatsTotal')}
                 error={touched.seatsTotal ? formErrors.seatsTotal : undefined}
-                helperText="Máximo 8 asientos"
+                helperText={t('trips:create.maxSeats')}
                 required
               />
 
@@ -310,14 +411,14 @@ export default function Trips() {
                   loading={creating}
                   disabled={creating}
                 >
-                  Crear Viaje
+                  {creating ? t('trips:create.creating') : t('trips:create.submit')}
                 </Button>
                 <Button
                   type="button"
                   variant="secondary"
                   onClick={() => setShowCreateForm(false)}
                 >
-                  Cancelar
+                  {t('trips:create.cancel')}
                 </Button>
               </div>
             </form>
@@ -325,92 +426,73 @@ export default function Trips() {
         </Card>
       )}
 
+      {/* Filters */}
+      <TripFilters
+        filters={filters}
+        onFiltersChange={handleFiltersChange}
+        onClearFilters={handleClearFilters}
+      />
+
+      {/* Trips Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {(trips ?? []).map((trip) => (
-          <Card key={trip.id}>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between items-start">
-                  <h3 className="font-semibold text-lg">Viaje a {trip.destinationSedeId}</h3>
-                  <span className="text-sm text-gray-500">
-                    {(() => {
-                      const d = trip?.dateTime ? new Date(trip.dateTime) : new Date(0);
-                      return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
-                    })()}
-                  </span>
-                </div>
-                
-                <div className="space-y-2 text-sm text-gray-600">
-                  {(() => {
-                    const lat = typeof trip?.origin?.lat === 'number' ? trip.origin.lat : 0;
-                    const lng = typeof trip?.origin?.lng === 'number' ? trip.origin.lng : 0;
-                    return (
-                      <p><strong>Origen:</strong> {lat.toFixed(4)}, {lng.toFixed(4)}</p>
-                    );
-                  })()}
-                  <p><strong>Destino:</strong> {trip.destinationSedeId}</p>
-                  <p><strong>Hora:</strong> {(() => {
-                    const d = trip?.dateTime ? new Date(trip.dateTime) : new Date(0);
-                    return isNaN(d.getTime()) ? '' : d.toLocaleTimeString();
-                  })()}</p>
-                  <p><strong>Asientos:</strong> {(trip?.seatsFree ?? 0)} libres de {(trip?.seatsTotal ?? 0)} total</p>
-                </div>
-
-                {typeof trip?.origin?.lat === 'number' && typeof trip?.origin?.lng === 'number' && (
-                  <div className="pt-2">
-                    <MapPreview
-                      origin={{ lat: trip.origin.lat, lng: trip.origin.lng }}
-                      height={180}
-                      interactive={false}
-                      tilesUrl={env.mapTilesUrl}
-                    />
-                  </div>
-                )}
-
-                <div className="flex space-x-2">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    data-cy={`edit-trip-${trip.id}`}
-                    onClick={() => handleIncreaseSeats(trip)}
-                    disabled={actionInProgress === trip.id}
-                    loading={actionInProgress === trip.id}
-                  >
-                    +1 Asiento
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    data-cy={`delete-trip-${trip.id}`}
-                    onClick={() => handleDelete(trip.id)}
-                    disabled={actionInProgress === trip.id}
-                    loading={actionInProgress === trip.id}
-                  >
-                    Cancelar
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {(filteredTrips ?? []).map((trip) => (
+          <TripCard
+            key={trip.id}
+            trip={trip}
+            onEdit={handleEditTrip}
+            onDelete={handleDelete}
+            onIncreaseSeats={handleIncreaseSeats}
+            actionInProgress={actionInProgress}
+            loading={loading}
+          />
         ))}
       </div>
+
+      {filteredTrips.length === 0 && trips.length > 0 && (
+        <Card>
+          <CardContent>
+            <div className="text-center py-8">
+              <p className="text-gray-500 text-lg">{t('trips:filters.noResults')}</p>
+              <Button
+                variant="secondary"
+                className="mt-4"
+                onClick={handleClearFilters}
+              >
+                {t('trips:filters.clearAll')}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {trips.length === 0 && (
         <Card>
           <CardContent>
             <div className="text-center py-8">
               <div className="text-4xl mb-4">🚗</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No tienes viajes creados</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('trips:list.empty')}</h3>
               <p className="text-gray-500 mb-4">
-                Crea tu primer viaje para comenzar a compartir con tus compañeros
+                {t('trips:list.emptyDescription')}
               </p>
               <Button variant="primary" onClick={() => setShowCreateForm(true)}>
-                Crear mi primer viaje
+                {t('trips:list.createFirst')}
               </Button>
             </div>
           </CardContent>
         </Card>
       )}
+
+      {/* Edit Trip Modal */}
+      <EditTripModal
+        trip={editingTrip}
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setEditingTrip(null);
+        }}
+        onSave={handleSaveTrip}
+        loading={creating}
+      />
     </div>
   );
 }

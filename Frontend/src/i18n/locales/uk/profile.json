@@ -1,20 +1,20 @@
 {
-  "title": "Profile",
+  "title": "Профіль",
   "personal": {
-    "title": "Personal information",
-    "name": "Name",
+    "title": "Особиста інформація",
+    "name": "Ім'я",
     "email": "Email",
-    "phone": "Phone",
-    "office": "Office"
+    "phone": "Телефон",
+    "office": "Офіс"
   },
   "preferences": {
-    "title": "Preferences",
-    "language": "Language",
-    "notifications": "Notifications",
-    "privacy": "Privacy"
+    "title": "Налаштування",
+    "language": "Мова",
+    "notifications": "Сповіщення",
+    "privacy": "Приватність"
   },
   "actions": {
-    "save": "Save changes",
-    "edit": "Edit profile"
+    "save": "Зберегти зміни",
+    "edit": "Редагувати профіль"
   }
 }

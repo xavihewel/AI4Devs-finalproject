@@ -7,21 +7,21 @@ describe('Trips Navigation', () => {
     cy.visit('/')
     cy.contains('Crear Viaje', { timeout: 15000 }).click()
     cy.url().should('include', '/trips')
-    cy.contains('Mis Viajes', { timeout: 15000 }).should('be.visible')
+    cy.get('[data-testid="trips-page"]', { timeout: 15000 }).should('be.visible')
   })
 
   it('should navigate to trips page from navbar', () => {
     cy.visit('/')
     cy.get('nav', { timeout: 15000 }).contains('Viajes', { timeout: 15000 }).click()
     cy.url().should('include', '/trips')
-    cy.contains('Mis Viajes', { timeout: 15000 }).should('be.visible')
+    cy.get('[data-testid="trips-page"]', { timeout: 15000 }).should('be.visible')
   })
 
   it('should display trips page elements', () => {
     cy.visit('/trips')
     
-    // Should have page title
-    cy.contains('Mis Viajes', { timeout: 15000 }).should('be.visible')
+    // Should have page container
+    cy.get('[data-testid="trips-page"]', { timeout: 15000 }).should('be.visible')
     
     // Should have create trip button
     cy.contains('Crear Viaje', { timeout: 15000 }).should('be.visible')
@@ -58,9 +58,6 @@ describe('Trips Navigation', () => {
             // No maps found - this is acceptable if trips don't have coordinates
             cy.log('No maps found - trips may not have coordinates')
           }
-        }).catch(() => {
-          // Timeout is acceptable - no maps found
-          cy.log('No maps found - trips may not have coordinates')
         })
       } else {
         // No trips available - this is expected in test environment

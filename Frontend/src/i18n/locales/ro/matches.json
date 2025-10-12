@@ -1,24 +1,24 @@
 {
-  "title": "Search Trips",
+  "title": "Căutare Călătorii",
   "search": {
-    "title": "Search trips",
-    "from": "From",
-    "to": "To",
-    "date": "Date",
-    "seats": "Seats needed",
-    "search": "Search"
+    "title": "Caută călătorii",
+    "from": "De la",
+    "to": "La",
+    "date": "Data",
+    "seats": "Locuri necesare",
+    "search": "Caută"
   },
   "results": {
-    "title": "Search results",
-    "empty": "No trips found",
-    "tryDifferent": "Try different criteria"
+    "title": "Rezultate căutare",
+    "empty": "Nu s-au găsit călătorii",
+    "tryDifferent": "Încearcă criterii diferite"
   },
   "match": {
-    "driver": "Driver",
-    "departure": "Departure",
-    "arrival": "Arrival",
-    "seats": "Seats",
-    "book": "Book",
-    "viewProfile": "View profile"
+    "driver": "Șofer",
+    "departure": "Plecare",
+    "arrival": "Sosire",
+    "seats": "Locuri",
+    "book": "Rezervă",
+    "viewProfile": "Vezi profilul"
   }
 }
