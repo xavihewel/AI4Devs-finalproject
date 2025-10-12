@@ -100,9 +100,9 @@ describe('Enhanced Trip Features (Fase 2)', () => {
         // Click edit button
         cy.contains('Editar').first().click()
         
-        // Modal should open
-        cy.get('.fixed.inset-0').should('be.visible')
-        cy.contains('Crear Viaje').should('be.visible')
+        // Modal should open - wait for it to be visible
+        cy.get('.fixed.inset-0', { timeout: 5000 }).should('be.visible')
+        cy.contains('Editar Viaje').should('be.visible')
         
         // Should have form fields
         cy.get('input[type="number"]').should('exist')
@@ -126,6 +126,9 @@ describe('Enhanced Trip Features (Fase 2)', () => {
     cy.get('[data-testid="language-switcher"]').click()
     cy.contains('English').click()
     
+    // Wait for language change to take effect
+    cy.wait(500)
+    
     // Should see English text
     cy.contains('My Trips').should('be.visible')
     cy.contains('Create Trip').should('be.visible')
@@ -133,6 +136,9 @@ describe('Enhanced Trip Features (Fase 2)', () => {
     // Switch to Catalan
     cy.get('[data-testid="language-switcher"]').click()
     cy.contains('Català').click()
+    
+    // Wait for language change to take effect
+    cy.wait(500)
     
     // Should see Catalan text
     cy.contains('Els Meus Viatges').should('be.visible')

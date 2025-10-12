@@ -1,20 +1,49 @@
 {
-  "title": "Profil",
+  "title": "Profilul Meu",
   "personal": {
-    "title": "Informații personale",
+    "title": "Informații Personale",
     "name": "Nume",
     "email": "Email",
-    "phone": "Telefon",
-    "office": "Birou"
+    "sede": "Birou",
+    "schedule": "Programul Preferat",
+    "required": "Câmp obligatoriu",
+    "optional": "Opțional",
+    "namePlaceholder": "Ion Popescu",
+    "emailPlaceholder": "ion.popescu@companie.com",
+    "emailHelper": "Folosim email-ul corporativ pentru notificări",
+    "schedulePlaceholder": "08:00 - 17:00",
+    "scheduleHelper": "Opțional: Programul tău obișnuit de lucru",
+    "sedePlaceholder": "Selectează biroul tău"
   },
-  "preferences": {
-    "title": "Preferințe",
-    "language": "Limbă",
-    "notifications": "Notificări",
-    "privacy": "Confidențialitate"
+  "account": {
+    "title": "Informații Cont",
+    "userId": "ID Utilizator",
+    "role": "Rol"
+  },
+  "notifications": {
+    "title": "Notificări Push",
+    "enable": "Activează",
+    "disable": "Dezactivează",
+    "error": "Nu s-a putut activa/dezactiva notificările",
+    "pushApiNotSupported": "Push API nu este suportată"
   },
   "actions": {
-    "save": "Salvează modificările",
-    "edit": "Editează profilul"
+    "save": "Salvează Modificările",
+    "saving": "Se salvează...",
+    "loadError": "Nu s-a putut încărca profilul",
+    "updateSuccess": "Profil actualizat cu succes!",
+    "updateError": "Eroare la actualizarea profilului"
+  },
+  "validation": {
+    "nameMinLength": "Numele trebuie să aibă cel puțin 2 caractere",
+    "emailRequired": "Email-ul este obligatoriu",
+    "emailInvalid": "Te rugăm să introduci un email valid",
+    "sedeRequired": "Biroul este obligatoriu",
+    "formErrors": "Te rugăm să corectezi erorile din formular"
+  },
+  "sede": {
+    "SEDE-1": "Birou Madrid Centru",
+    "SEDE-2": "Birou Madrid Nord",
+    "SEDE-3": "Birou Barcelona"
   }
 }

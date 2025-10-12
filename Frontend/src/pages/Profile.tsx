@@ -306,7 +306,7 @@ export default function Profile() {
 
 async function enablePush(setPushSub: (s: PushSubscription | null) => void, setPushError: (e: string | null) => void, t: (key: string) => string) {
   try {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) throw new Error('Push API no soportada');
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) throw new Error(t('notifications.pushApiNotSupported'));
     const reg = await navigator.serviceWorker.register('/sw.js');
     let sub = await reg.pushManager.getSubscription();
     if (!sub) {

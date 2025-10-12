@@ -41,6 +41,13 @@
     "bookingSuccess": "Booking created successfully! {seats} seat(s) reserved. Go to \"Bookings\" to see your booking.",
     "bookingError": "Error creating booking",
     "searchError": "Error searching matches. Please try again.",
+    "selectSeats": "Select Seats",
+    "availableSeats": "Available seats: {seats}",
+    "selectSeatsDescription": "Choose how many seats you want to book",
+    "selectedSeats": "Selected seats",
+    "seat": "seat",
+    "seats": "seats",
+    "confirmBooking": "Confirm Booking",
     "score": {
       "excellent": "Excellent",
       "good": "Good", 

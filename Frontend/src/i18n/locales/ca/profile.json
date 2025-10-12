@@ -24,7 +24,8 @@
     "title": "Notificacions Push",
     "enable": "Habilitar",
     "disable": "Deshabilitar",
-    "error": "No s'ha pogut habilitar/deshabilitar les notificacions"
+    "error": "No s'ha pogut habilitar/deshabilitar les notificacions",
+    "pushApiNotSupported": "Push API no suportada"
   },
   "actions": {
     "save": "Desar Canvis",

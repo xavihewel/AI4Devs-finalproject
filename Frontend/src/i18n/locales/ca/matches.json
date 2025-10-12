@@ -41,6 +41,13 @@
     "bookingSuccess": "Reserva creada exitosament! {seats} seient(s) reservat(s). Ves a \"Reserves\" per veure la teva reserva.",
     "bookingError": "Error al crear la reserva",
     "searchError": "Error al cercar coincidències. Si us plau torna a intentar.",
+    "selectSeats": "Seleccionar Seients",
+    "availableSeats": "Seients disponibles: {seats}",
+    "selectSeatsDescription": "Tria quants seients vols reservar",
+    "selectedSeats": "Seients seleccionats",
+    "seat": "seient",
+    "seats": "seients",
+    "confirmBooking": "Confirmar Reserva",
     "score": {
       "excellent": "Excel·lent",
       "good": "Bo", 

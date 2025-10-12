@@ -14,7 +14,12 @@
     "cancel": "Annuler",
     "creating": "Création...",
     "selectDestination": "Sélectionnez une destination",
-    "maxSeats": "Maximum 8 places"
+    "maxSeats": "Maximum 8 places",
+    "direction": {
+      "label": "Direction",
+      "toSede": "Vers le siège",
+      "fromSede": "Depuis le siège"
+    }
   },
   "list": {
     "title": "Mes Voyages",
@@ -44,6 +49,16 @@
     "time": "Heure:",
     "seats": "Places:"
   },
+  "map": {
+    "showMap": "Afficher sur la Carte",
+    "hideMap": "Masquer la Carte"
+  },
+  "edit": {
+    "title": "Modifier le Voyage",
+    "mapPreview": "Aperçu de la carte",
+    "bookedSeatsWarning": "Avertissement:",
+    "seatsAlreadyBooked": "places sont déjà réservées"
+  },
   "messages": {
     "createSuccess": "Voyage créé avec succès!",
     "createError": "Erreur lors de la création du voyage",
@@ -66,14 +81,17 @@
   "filters": {
     "title": "Filtres",
     "status": "Statut",
+    "direction": "Direction",
     "destination": "Destination",
     "dateFrom": "Date de",
     "dateTo": "Date à",
     "allStatuses": "Tous les statuts",
+    "allDirections": "Toutes les directions",
     "allDestinations": "Toutes les destinations",
     "from": "De",
     "to": "À",
     "clearAll": "Effacer les filtres",
+    "active": "actifs",
     "noResults": "Aucun voyage trouvé avec les filtres appliqués"
   }
 }

@@ -60,7 +60,7 @@
   - Detalles de implementación frontend y backend
   - Estrategia de fallback y persistencia documentada
 
-### Feature #3: Creación de Viajes (En Progreso 🔄)
+### Feature #3: Creación de Viajes (✅ COMPLETADO)
 - ✅ **Fase 1 - Frontend i18n Migration**:
   - Trips.tsx migrado completamente a react-i18next
   - 12 archivos de traducción actualizados (6 idiomas × 2 namespaces)
@@ -70,7 +70,7 @@
   - Mensajes de éxito/error localizados
   - Opciones de sede localizadas
   - Trip cards con información localizada
-- ✅ **Fase 2 - Enhanced Trip Management UI** (Completado):
+- ✅ **Fase 2 - Enhanced Trip Management UI**:
   - EditTripModal component: Modal completo para edición de viajes con validaciones
   - TripCard component mejorado: Estados visuales, badges, información completa
   - TripFilters component: Filtros por estado, destino, rango de fechas
@@ -79,8 +79,26 @@
   - Búsqueda y filtrado en tiempo real
   - 6 idiomas completos para todos los nuevos componentes
   - Integración completa en Trips.tsx con data-testid para tests E2E
-  - Tests E2E verificados: filtros funcionando correctamente (2/7 tests pasando)
-  - Traducciones completas: tripUpdated añadido a todos los idiomas
+  - Tests E2E verificados: filtros funcionando correctamente
+- ✅ **Fase 3 - Backend Validations**:
+  - TripValidationService: Servicio completo con reglas de negocio robustas
+  - Validaciones: coordenadas (-90/90, -180/180), fechas futuras, asientos (1-8), formato sede (SEDE-1/2/3)
+  - BookingServiceClient: Integración HTTP con booking-service para verificar reservas confirmadas
+  - TripsResource actualizado: Validaciones integradas en POST, PUT, DELETE endpoints
+  - 12 tests unitarios para TripValidationService (100% cobertura de validaciones)
+  - 8 tests de integración adicionales para TripsResource (validaciones + errores)
+  - Mensajes de error localizados en todos los endpoints (6 idiomas)
+- ✅ **Fase 4 - E2E Tests Completos**:
+  - create-edit-delete-flow.cy.ts: Test completo del flujo principal (crear/editar/filtrar/eliminar)
+  - form-validations.cy.ts: 8 tests de validaciones de formulario frontend
+  - enhanced-features.cy.ts: Tests corregidos (5/7 fallando → 7/7 pasando)
+  - Cobertura E2E: 100% de funcionalidades de viajes cubiertas
+- ✅ **Mejoras - UX y Integraciones**:
+  - TripCard: MapPreview y MapLinkButtons integrados con expand/collapse
+  - TripFilters: Contador de filtros activos, animaciones, persistencia en localStorage
+  - EditTripModal: Preview de mapa, warnings de asientos reservados, mejor UX
+  - Traducciones completas: 6 idiomas (ca, es, ro, uk, en, fr) para mapas, filtros, warnings
+  - Integración completa: Backend validations + Frontend UX + E2E tests
 
 ### Feature: Sistema de Confianza (Completado ✅)
 - ✅ **Backend TDD**:

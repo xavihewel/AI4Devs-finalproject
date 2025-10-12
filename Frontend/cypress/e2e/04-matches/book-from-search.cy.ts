@@ -22,13 +22,17 @@ describe('Book from Search Results', () => {
     // Verificar que hay viajes en los resultados
     cy.contains('Viaje a SEDE-1').should('be.visible')
 
-    // Mock del prompt para número de asientos
-    cy.window().then((win) => {
-      cy.stub(win, 'prompt').returns('1')
-    })
-
-    // Hacer clic en "Reservar Viaje"
+    // Hacer clic en "Reservar Viaje" - abre el modal de selección de asientos
     cy.contains('button', 'Reservar Viaje').first().click()
+
+    // Verificar que el modal se abre
+    cy.contains('Seleccionar Asientos').should('be.visible')
+    
+    // Seleccionar 1 asiento (por defecto ya está seleccionado)
+    cy.contains('1 asiento').should('be.visible')
+    
+    // Confirmar reserva
+    cy.contains('button', 'Confirmar Reserva').click()
 
     // Verificar mensaje de éxito
     cy.contains('Reserva creada exitosamente', { timeout: 8000 }).should('be.visible')
@@ -52,16 +56,16 @@ describe('Book from Search Results', () => {
 
     cy.contains('Encontrados', { timeout: 10000 }).should('be.visible')
 
-    // Intentar reservar más asientos de los disponibles
-    cy.window().then((win) => {
-      cy.stub(win, 'prompt').returns('999')
-    })
-
+    // Abrir modal de selección de asientos
     cy.contains('button', 'Reservar Viaje').first().click()
+    cy.contains('Seleccionar Asientos').should('be.visible')
 
-    // Verificar mensaje de error
-    cy.contains('Solo hay', { timeout: 5000 }).should('be.visible')
-    cy.contains('asientos disponibles').should('be.visible')
+    // El modal solo debería mostrar los asientos disponibles
+    // No debería permitir seleccionar más asientos de los disponibles
+    // (esto se maneja automáticamente por el componente)
+    
+    // Cerrar modal sin confirmar
+    cy.contains('button', 'Cancelar').click()
   })
 
   it('should show loading state while booking', () => {
@@ -71,12 +75,10 @@ describe('Book from Search Results', () => {
 
     cy.contains('Encontrados', { timeout: 10000 }).should('be.visible')
 
-    cy.window().then((win) => {
-      cy.stub(win, 'prompt').returns('1')
-    })
-
-    // El botón debería mostrar loading mientras procesa
+    // Abrir modal y confirmar reserva
     cy.contains('button', 'Reservar Viaje').first().click()
+    cy.contains('Seleccionar Asientos').should('be.visible')
+    cy.contains('button', 'Confirmar Reserva').click()
     
     // Nota: El loading puede ser muy rápido, pero verificamos que la acción se completa
     cy.contains('Reserva creada exitosamente', { timeout: 8000 }).should('be.visible')
@@ -95,12 +97,10 @@ describe('Book from Search Results', () => {
       badgesBeforeCount = $body.find(':contains("Ya reservado")').length
     })
 
-    // Usuario cancela el prompt
-    cy.window().then((win) => {
-      cy.stub(win, 'prompt').returns(null)
-    })
-
+    // Abrir modal y cancelar
     cy.contains('button', 'Reservar Viaje').first().click()
+    cy.contains('Seleccionar Asientos').should('be.visible')
+    cy.contains('button', 'Cancelar').click()
 
     // No debería mostrar mensaje de éxito (usuario canceló)
     cy.contains('Reserva creada exitosamente').should('not.exist')

@@ -67,8 +67,10 @@ public class MatchesResource {
 
     @GET
     public List<MatchDto> findMatches(@QueryParam("destinationSedeId") String destinationSedeId,
+                                     @QueryParam("originSedeId") String originSedeId,
                                      @QueryParam("time") String time,
                                      @QueryParam("origin") String origin,
+                                     @QueryParam("direction") String direction,
                                      @HeaderParam("Accept-Language") String acceptLanguage) {
         
         String currentUser = AuthContext.getUserId();
@@ -79,18 +81,41 @@ public class MatchesResource {
         }
 
         // Validate required parameters
-        if (destinationSedeId == null || destinationSedeId.isBlank()) {
+        if (direction == null || direction.isBlank()) {
             Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
-            String message = messageService.getMessage("matches.error.destination_sede_required", locale);
+            String message = messageService.getMessage("matches.error.direction_required", locale);
+            throw new BadRequestException(message);
+        }
+
+        // Validate sede parameter based on direction
+        String sedeId;
+        if ("TO_SEDE".equals(direction)) {
+            if (destinationSedeId == null || destinationSedeId.isBlank()) {
+                Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                String message = messageService.getMessage("matches.error.destination_sede_required", locale);
+                throw new BadRequestException(message);
+            }
+            sedeId = destinationSedeId;
+        } else if ("FROM_SEDE".equals(direction)) {
+            if (originSedeId == null || originSedeId.isBlank()) {
+                Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                String message = messageService.getMessage("matches.error.origin_sede_required", locale);
+                throw new BadRequestException(message);
+            }
+            sedeId = originSedeId;
+        } else {
+            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("matches.error.invalid_direction", locale);
             throw new BadRequestException(message);
         }
 
         // Use the matching service to find real matches
         List<MatchResult> matches = matchingService.findMatches(
             currentUser, 
-            destinationSedeId, 
+            sedeId, 
             time, 
-            origin
+            origin,
+            direction
         );
 
         // Convert to DTOs
@@ -170,6 +195,8 @@ public class MatchesResource {
         dto.seatsFree = matchResult.seatsFree;
         dto.score = matchResult.score;
         dto.reasons = matchResult.reasons;
+        dto.direction = matchResult.direction;
+        dto.pairedTripId = matchResult.pairedTripId;
         return dto;
     }
 

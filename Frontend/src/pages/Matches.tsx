@@ -6,6 +6,7 @@ import { Button, Card, CardContent, Input, Select, LoadingSpinner } from '../com
 import MapPreview from '../components/map/MapPreview';
 import { TrustProfile } from '../components/trust/TrustProfile';
 import { RatingForm } from '../components/trust/RatingForm';
+import { SeatSelectionModalSimple as SeatSelectionModal } from '../components/booking/SeatSelectionModal.simple';
 import { env } from '../env';
 
 export default function Matches() {
@@ -21,6 +22,12 @@ export default function Matches() {
   // Trust system state
   const [showTrustProfile, setShowTrustProfile] = useState<string | null>(null);
   const [showRatingForm, setShowRatingForm] = useState<string | null>(null);
+  
+  // Seat selection modal state
+  const [seatSelectionModal, setSeatSelectionModal] = useState<{
+    isOpen: boolean;
+    match: MatchDto | null;
+  }>({ isOpen: false, match: null });
 
   // Search form state
   const [searchParams, setSearchParams] = useState({
@@ -90,22 +97,13 @@ export default function Matches() {
   };
 
   const handleBooking = async (match: MatchDto) => {
-    const seatsToBook = prompt(t('match.seatsPrompt', { seats: match.seatsFree }));
-    
-    if (!seatsToBook) return; // Usuario canceló
-    
-    const seats = parseInt(seatsToBook, 10);
-    
-    if (isNaN(seats) || seats < 1) {
-      showMessage('error', t('match.invalidSeats'));
-      return;
-    }
-    
-    if (seats > match.seatsFree) {
-      showMessage('error', t('match.notEnoughSeats', { seats: match.seatsFree }));
-      return;
-    }
-    
+    setSeatSelectionModal({ isOpen: true, match });
+  };
+
+  const handleSeatSelection = async (seats: number) => {
+    const match = seatSelectionModal.match;
+    if (!match) return;
+
     try {
       setBookingInProgress(match.tripId);
       await BookingsService.createBooking({
@@ -118,7 +116,8 @@ export default function Matches() {
       
       showMessage('success', t('match.bookingSuccess', { seats }));
       
-      // Recargar búsqueda para actualizar asientos disponibles
+      // Cerrar modal y recargar búsqueda para actualizar asientos disponibles
+      setSeatSelectionModal({ isOpen: false, match: null });
       await handleSearch({ preventDefault: () => {} } as React.FormEvent);
     } catch (error: any) {
       console.error('Error creating booking:', error);
@@ -418,6 +417,15 @@ export default function Matches() {
           </div>
         </div>
       )}
+
+      {/* Seat Selection Modal */}
+      <SeatSelectionModal
+        isOpen={seatSelectionModal.isOpen}
+        onClose={() => setSeatSelectionModal({ isOpen: false, match: null })}
+        onConfirm={handleSeatSelection}
+        maxSeats={seatSelectionModal.match?.seatsFree || 0}
+        loading={bookingInProgress === seatSelectionModal.match?.tripId}
+      />
     </div>
   );
 }

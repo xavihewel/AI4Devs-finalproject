@@ -24,7 +24,8 @@
     "title": "Notificaciones Push",
     "enable": "Habilitar",
     "disable": "Deshabilitar",
-    "error": "No se pudo habilitar/deshabilitar las notificaciones"
+    "error": "No se pudo habilitar/deshabilitar las notificaciones",
+    "pushApiNotSupported": "Push API no soportada"
   },
   "actions": {
     "save": "Guardar Cambios",

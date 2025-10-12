@@ -37,5 +37,8 @@
   },
   "destination": {
     "required": "La destination est obligatoire"
+  },
+  "direction": {
+    "required": "La direction est obligatoire"
   }
 }

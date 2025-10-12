@@ -3,19 +3,29 @@
   "list": {
     "title": "Rezervările mele",
     "empty": "Nu ai rezervări",
-    "bookFirst": "Fă prima ta rezervare"
+    "emptyDescription": "Când faci o rezervare, aceasta va apărea aici.",
+    "emptyHint": "Mergi la \"Căutare\" pentru a găsi călătorii disponibili",
+    "loadingError": "Eroare la încărcarea rezervărilor"
+  },
+  "booking": {
+    "id": "Rezervare #{{id}}",
+    "tripId": "ID Călătorie",
+    "seatsRequested": "Locuri rezervate",
+    "bookingDate": "Data rezervării",
+    "status": "Status",
+    "cancel": "Anulează Rezervarea",
+    "cancelConfirm": "Ești sigur că vrei să anulezi această rezervare?",
+    "cancelSuccess": "Rezervarea a fost anulată cu succes",
+    "cancelError": "Eroare la anularea rezervării"
   },
   "status": {
-    "pending": "În așteptare",
-    "confirmed": "Confirmată",
-    "cancelled": "Anulată"
-  },
-  "actions": {
-    "view": "Vezi",
-    "cancel": "Anulează"
-  },
-  "confirmation": {
-    "title": "Rezervare confirmată",
-    "message": "Rezervarea ta a fost confirmată cu succes"
+    "CONFIRMED": "Confirmată",
+    "PENDING": "În așteptarea confirmării",
+    "CANCELLED": "Anulată",
+    "badges": {
+      "CONFIRMED": "Confirmată",
+      "PENDING": "În așteptare",
+      "CANCELLED": "Anulată"
+    }
   }
 }

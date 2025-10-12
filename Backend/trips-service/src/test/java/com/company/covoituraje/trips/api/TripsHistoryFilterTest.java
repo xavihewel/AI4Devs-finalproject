@@ -36,16 +36,16 @@ class TripsHistoryFilterTest {
         OffsetDateTime pastDate = OffsetDateTime.now().minusDays(5);
         OffsetDateTime futureDate = OffsetDateTime.now().plusDays(5);
         
-        Trip completedTrip = new Trip("driver-001", "40.4168,-3.7038", "SEDE-1", pastDate, 4);
+        Trip completedTrip = new Trip("driver-001", "40.4168,-3.7038", "SEDE-1", pastDate, 4, Trip.Direction.TO_SEDE);
         completedTrip.setId(UUID.randomUUID());
         
-        Trip activeTrip = new Trip("driver-001", "40.4168,-3.7038", "SEDE-1", futureDate, 4);
+        Trip activeTrip = new Trip("driver-001", "40.4168,-3.7038", "SEDE-1", futureDate, 4, Trip.Direction.TO_SEDE);
         activeTrip.setId(UUID.randomUUID());
         
         when(mockRepository.findAll()).thenReturn(Arrays.asList(completedTrip, activeTrip));
         
         // Act: Call list with status=COMPLETED
-        List<TripDto> result = resource.list(null, null, null, "COMPLETED");
+        List<TripDto> result = resource.list(null, null, null, null, "COMPLETED");
         
         // Assert: Only completed trips returned
         assertEquals(1, result.size());
@@ -58,16 +58,16 @@ class TripsHistoryFilterTest {
         OffsetDateTime pastDate = OffsetDateTime.now().minusDays(5);
         OffsetDateTime futureDate = OffsetDateTime.now().plusDays(5);
         
-        Trip completedTrip = new Trip("driver-001", "40.4168,-3.7038", "SEDE-1", pastDate, 4);
+        Trip completedTrip = new Trip("driver-001", "40.4168,-3.7038", "SEDE-1", pastDate, 4, Trip.Direction.TO_SEDE);
         completedTrip.setId(UUID.randomUUID());
         
-        Trip activeTrip = new Trip("driver-001", "40.4168,-3.7038", "SEDE-1", futureDate, 4);
+        Trip activeTrip = new Trip("driver-001", "40.4168,-3.7038", "SEDE-1", futureDate, 4, Trip.Direction.TO_SEDE);
         activeTrip.setId(UUID.randomUUID());
         
         when(mockRepository.findAll()).thenReturn(Arrays.asList(completedTrip, activeTrip));
         
         // Act
-        List<TripDto> result = resource.list(null, null, null, "ACTIVE");
+        List<TripDto> result = resource.list(null, null, null, null, "ACTIVE");
         
         // Assert: Only active trips returned
         assertEquals(1, result.size());
@@ -80,16 +80,16 @@ class TripsHistoryFilterTest {
         OffsetDateTime pastDate = OffsetDateTime.now().minusDays(5);
         OffsetDateTime futureDate = OffsetDateTime.now().plusDays(5);
         
-        Trip completedTrip = new Trip("driver-001", "40.4168,-3.7038", "SEDE-1", pastDate, 4);
+        Trip completedTrip = new Trip("driver-001", "40.4168,-3.7038", "SEDE-1", pastDate, 4, Trip.Direction.TO_SEDE);
         completedTrip.setId(UUID.randomUUID());
         
-        Trip activeTrip = new Trip("driver-001", "40.4168,-3.7038", "SEDE-1", futureDate, 4);
+        Trip activeTrip = new Trip("driver-001", "40.4168,-3.7038", "SEDE-1", futureDate, 4, Trip.Direction.TO_SEDE);
         activeTrip.setId(UUID.randomUUID());
         
         when(mockRepository.findAll()).thenReturn(Arrays.asList(completedTrip, activeTrip));
         
         // Act: Call without status filter
-        List<TripDto> result = resource.list(null, null, null, null);
+        List<TripDto> result = resource.list(null, null, null, null, null);
         
         // Assert: All trips returned
         assertEquals(2, result.size());
@@ -102,7 +102,7 @@ class TripsHistoryFilterTest {
         OffsetDateTime toDate = OffsetDateTime.now().minusDays(1);
         OffsetDateTime pastDate = OffsetDateTime.now().minusDays(5);
         
-        Trip completedTrip = new Trip("driver-001", "40.4168,-3.7038", "SEDE-1", pastDate, 4);
+        Trip completedTrip = new Trip("driver-001", "40.4168,-3.7038", "SEDE-1", pastDate, 4, Trip.Direction.TO_SEDE);
         completedTrip.setId(UUID.randomUUID());
         
         when(mockRepository.findByDateTimeBetween(any(), any())).thenReturn(Arrays.asList(completedTrip));
@@ -111,7 +111,8 @@ class TripsHistoryFilterTest {
         List<TripDto> result = resource.list(
             null, 
             fromDate.toString(), 
-            toDate.toString(), 
+            toDate.toString(),
+            null,
             "COMPLETED"
         );
         

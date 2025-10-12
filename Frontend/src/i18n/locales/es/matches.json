@@ -41,6 +41,13 @@
     "bookingSuccess": "¡Reserva creada exitosamente! {seats} asiento(s) reservado(s). Ve a \"Reservas\" para ver tu reserva.",
     "bookingError": "Error al crear la reserva",
     "searchError": "Error al buscar matches. Intenta nuevamente.",
+    "selectSeats": "Seleccionar Asientos",
+    "availableSeats": "Asientos disponibles: {seats}",
+    "selectSeatsDescription": "Elige cuántos asientos deseas reservar",
+    "selectedSeats": "Asientos seleccionados",
+    "seat": "asiento",
+    "seats": "asientos",
+    "confirmBooking": "Confirmar Reserva",
     "score": {
       "excellent": "Excelente",
       "good": "Bueno", 

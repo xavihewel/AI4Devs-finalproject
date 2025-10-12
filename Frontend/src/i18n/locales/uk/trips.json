@@ -14,7 +14,12 @@
     "cancel": "Скасувати",
     "creating": "Створення...",
     "selectDestination": "Виберіть призначення",
-    "maxSeats": "Максимум 8 місць"
+    "maxSeats": "Максимум 8 місць",
+    "direction": {
+      "label": "Напрямок",
+      "toSede": "До офісу",
+      "fromSede": "З офісу"
+    }
   },
   "list": {
     "title": "Мої Поїздки",
@@ -44,6 +49,16 @@
     "time": "Час:",
     "seats": "Місця:"
   },
+  "map": {
+    "showMap": "Показати на Карті",
+    "hideMap": "Приховати Карту"
+  },
+  "edit": {
+    "title": "Редагувати Поїздку",
+    "mapPreview": "Попередній перегляд карти",
+    "bookedSeatsWarning": "Попередження:",
+    "seatsAlreadyBooked": "місць вже заброньовано"
+  },
   "messages": {
     "createSuccess": "Поїздку успішно створено!",
     "createError": "Помилка створення поїздки",
@@ -66,14 +81,17 @@
   "filters": {
     "title": "Фільтри",
     "status": "Статус",
+    "direction": "Напрямок",
     "destination": "Призначення",
     "dateFrom": "Дата з",
     "dateTo": "Дата до",
     "allStatuses": "Всі статуси",
+    "allDirections": "Всі напрямки",
     "allDestinations": "Всі призначення",
     "from": "З",
     "to": "До",
     "clearAll": "Очистити фільтри",
+    "active": "активні",
     "noResults": "Не знайдено поїздок з застосованими фільтрами"
   }
 }

@@ -2,15 +2,24 @@ package com.company.covoituraje.trips.api;
 
 import com.company.covoituraje.trips.infrastructure.TripRepository;
 import com.company.covoituraje.trips.domain.Trip;
+import com.company.covoituraje.trips.service.TripValidationService;
+import com.company.covoituraje.trips.integration.BookingServiceClient;
+import com.company.covoituraje.shared.i18n.MessageService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ConflictException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,9 +41,19 @@ class TripsResourceTest {
     private EntityManager em;
 
     private TripsResource resource;
+    
+    @Mock
+    private TripValidationService validationService;
+    
+    @Mock
+    private BookingServiceClient bookingServiceClient;
+    
+    @Mock
+    private MessageService messageService;
 
     @BeforeEach
     void setUp() {
+        MockitoAnnotations.openMocks(this);
         createSchema();
 
         var props = new java.util.Properties();
@@ -48,7 +67,7 @@ class TripsResourceTest {
         emf = Persistence.createEntityManagerFactory("trips-pu", props);
         em = emf.createEntityManager();
         TripRepository repo = new TripRepository(em);
-        resource = new TripsResource(repo);
+        resource = new TripsResource(repo, messageService, validationService, bookingServiceClient);
         // Set up test user context
         TripsResource.AuthContext.setUserId("test-user-001");
     }
@@ -122,5 +141,185 @@ class TripsResourceTest {
         // Then: seatsTotal should be 5, seatsFree should be 3 (5 total - 2 occupied)
         assertEquals(5, updatedTrip.seatsTotal);
         assertEquals(3, updatedTrip.seatsFree);
+    }
+    
+    @Test
+    void create_withInvalidCoordinates_shouldThrowBadRequest() {
+        // Given
+        TripCreateDto create = new TripCreateDto();
+        TripDto.Origin origin = new TripDto.Origin();
+        origin.lat = 95.0; // Invalid latitude
+        origin.lng = -3.7038;
+        create.origin = origin;
+        create.destinationSedeId = "SEDE-1";
+        create.dateTime = "2025-10-06T08:30:00+00:00";
+        create.seatsTotal = 3;
+        
+        when(validationService.validateTripCreation(any(), any())).thenReturn(List.of("Latitude must be between -90 and 90"));
+        
+        // When & Then
+        BadRequestException exception = assertThrows(BadRequestException.class, 
+            () -> resource.create(create, "en"));
+        assertEquals("Latitude must be between -90 and 90", exception.getMessage());
+    }
+    
+    @Test
+    void create_withPastDate_shouldThrowBadRequest() {
+        // Given
+        TripCreateDto create = new TripCreateDto();
+        TripDto.Origin origin = new TripDto.Origin();
+        origin.lat = 40.4168;
+        origin.lng = -3.7038;
+        create.origin = origin;
+        create.destinationSedeId = "SEDE-1";
+        create.dateTime = "2020-10-06T08:30:00+00:00"; // Past date
+        create.seatsTotal = 3;
+        
+        when(validationService.validateTripCreation(any(), any())).thenReturn(List.of("Date must be in the future"));
+        
+        // When & Then
+        BadRequestException exception = assertThrows(BadRequestException.class, 
+            () -> resource.create(create, "en"));
+        assertEquals("Date must be in the future", exception.getMessage());
+    }
+    
+    @Test
+    void update_withInvalidSeats_shouldThrowBadRequest() {
+        // Given: Create a valid trip first
+        TripCreateDto create = new TripCreateDto();
+        TripDto.Origin origin = new TripDto.Origin();
+        origin.lat = 40.4168;
+        origin.lng = -3.7038;
+        create.origin = origin;
+        create.destinationSedeId = "SEDE-1";
+        create.dateTime = "2025-10-06T08:30:00+00:00";
+        create.seatsTotal = 4;
+        
+        when(validationService.validateTripCreation(any(), any())).thenReturn(List.of());
+        TripDto createdTrip = resource.create(create, "en");
+        
+        // When: Try to update with invalid seats
+        TripCreateDto update = new TripCreateDto();
+        update.seatsTotal = 0; // Invalid seats
+        
+        when(validationService.validateTripUpdate(any(), any(), any())).thenReturn(List.of("Seats must be between 1 and 8"));
+        
+        // Then
+        BadRequestException exception = assertThrows(BadRequestException.class, 
+            () -> resource.update(createdTrip.id, update, "en"));
+        assertEquals("Seats must be between 1 and 8", exception.getMessage());
+    }
+    
+    @Test
+    void update_withSeatsReductionBelowBooked_shouldThrowBadRequest() {
+        // Given: Create a trip and simulate some bookings
+        TripCreateDto create = new TripCreateDto();
+        TripDto.Origin origin = new TripDto.Origin();
+        origin.lat = 40.4168;
+        origin.lng = -3.7038;
+        create.origin = origin;
+        create.destinationSedeId = "SEDE-1";
+        create.dateTime = "2025-10-06T08:30:00+00:00";
+        create.seatsTotal = 4;
+        
+        when(validationService.validateTripCreation(any(), any())).thenReturn(List.of());
+        TripDto createdTrip = resource.create(create, "en");
+        
+        // Simulate 2 seats being booked
+        Trip trip = em.find(Trip.class, UUID.fromString(createdTrip.id));
+        trip.reserveSeats(2);
+        em.getTransaction().begin();
+        em.merge(trip);
+        em.getTransaction().commit();
+        
+        // When: Try to reduce seats below booked amount
+        TripCreateDto update = new TripCreateDto();
+        update.seatsTotal = 1; // Less than 2 booked seats
+        
+        when(validationService.validateTripUpdate(any(), any(), any()))
+            .thenReturn(List.of("Cannot reduce seats below currently booked seats"));
+        
+        // Then
+        BadRequestException exception = assertThrows(BadRequestException.class, 
+            () -> resource.update(createdTrip.id, update, "en"));
+        assertEquals("Cannot reduce seats below currently booked seats", exception.getMessage());
+    }
+    
+    @Test
+    void delete_withConfirmedBookings_shouldThrowConflict() {
+        // Given: Create a trip
+        TripCreateDto create = new TripCreateDto();
+        TripDto.Origin origin = new TripDto.Origin();
+        origin.lat = 40.4168;
+        origin.lng = -3.7038;
+        create.origin = origin;
+        create.destinationSedeId = "SEDE-1";
+        create.dateTime = "2025-10-06T08:30:00+00:00";
+        create.seatsTotal = 4;
+        
+        when(validationService.validateTripCreation(any(), any())).thenReturn(List.of());
+        TripDto createdTrip = resource.create(create, "en");
+        
+        // When: Try to delete with confirmed bookings
+        when(validationService.validateTripDeletion(any(), any()))
+            .thenReturn(List.of("Cannot delete trip with confirmed bookings"));
+        
+        // Then
+        ConflictException exception = assertThrows(ConflictException.class, 
+            () -> resource.delete(createdTrip.id, "en"));
+        assertEquals("Cannot delete trip with confirmed bookings", exception.getMessage());
+    }
+    
+    @Test
+    void create_withValidData_shouldPassValidation() {
+        // Given
+        TripCreateDto create = new TripCreateDto();
+        TripDto.Origin origin = new TripDto.Origin();
+        origin.lat = 40.4168;
+        origin.lng = -3.7038;
+        create.origin = origin;
+        create.destinationSedeId = "SEDE-1";
+        create.dateTime = "2025-10-06T08:30:00+00:00";
+        create.seatsTotal = 3;
+        
+        when(validationService.validateTripCreation(any(), any())).thenReturn(List.of());
+        
+        // When
+        TripDto result = resource.create(create, "en");
+        
+        // Then
+        assertNotNull(result);
+        assertEquals("SEDE-1", result.destinationSedeId);
+        assertEquals(3, result.seatsTotal);
+        verify(validationService).validateTripCreation(create, "en");
+    }
+    
+    @Test
+    void update_withValidData_shouldPassValidation() {
+        // Given: Create a trip first
+        TripCreateDto create = new TripCreateDto();
+        TripDto.Origin origin = new TripDto.Origin();
+        origin.lat = 40.4168;
+        origin.lng = -3.7038;
+        create.origin = origin;
+        create.destinationSedeId = "SEDE-1";
+        create.dateTime = "2025-10-06T08:30:00+00:00";
+        create.seatsTotal = 4;
+        
+        when(validationService.validateTripCreation(any(), any())).thenReturn(List.of());
+        TripDto createdTrip = resource.create(create, "en");
+        
+        // When: Update with valid data
+        TripCreateDto update = new TripCreateDto();
+        update.seatsTotal = 5;
+        
+        when(validationService.validateTripUpdate(any(), any(), any())).thenReturn(List.of());
+        
+        TripDto result = resource.update(createdTrip.id, update, "en");
+        
+        // Then
+        assertNotNull(result);
+        assertEquals(5, result.seatsTotal);
+        verify(validationService).validateTripUpdate(update, any(Trip.class), "en");
     }
 }

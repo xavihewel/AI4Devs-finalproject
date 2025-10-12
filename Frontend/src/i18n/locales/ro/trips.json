@@ -14,7 +14,12 @@
     "cancel": "Anulează",
     "creating": "Se creează...",
     "selectDestination": "Selectează o destinație",
-    "maxSeats": "Maximum 8 locuri"
+    "maxSeats": "Maximum 8 locuri",
+    "direction": {
+      "label": "Direcție",
+      "toSede": "Către sediu",
+      "fromSede": "De la sediu"
+    }
   },
   "list": {
     "title": "Călătoriile Mele",
@@ -44,6 +49,16 @@
     "time": "Oră:",
     "seats": "Locuri:"
   },
+  "map": {
+    "showMap": "Afișează pe Hartă",
+    "hideMap": "Ascunde Harta"
+  },
+  "edit": {
+    "title": "Editează Călătoria",
+    "mapPreview": "Previzualizare hartă",
+    "bookedSeatsWarning": "Avertisment:",
+    "seatsAlreadyBooked": "locuri sunt deja rezervate"
+  },
   "messages": {
     "createSuccess": "Călătorie creată cu succes!",
     "createError": "Eroare la crearea călătoriei",
@@ -66,14 +81,17 @@
   "filters": {
     "title": "Filtre",
     "status": "Status",
+    "direction": "Direcție",
     "destination": "Destinație",
     "dateFrom": "Data de la",
     "dateTo": "Data până la",
     "allStatuses": "Toate statusurile",
+    "allDirections": "Toate direcțiile",
     "allDestinations": "Toate destinațiile",
     "from": "De la",
     "to": "Până la",
     "clearAll": "Șterge filtrele",
+    "active": "active",
     "noResults": "Nu au fost găsite călătorii cu filtrele aplicate"
   }
 }

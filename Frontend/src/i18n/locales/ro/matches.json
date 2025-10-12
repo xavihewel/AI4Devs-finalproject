@@ -19,6 +19,13 @@
     "arrival": "Sosire",
     "seats": "Locuri",
     "book": "Rezervă",
-    "viewProfile": "Vezi profilul"
+    "viewProfile": "Vezi profilul",
+    "selectSeats": "Selectează Locurile",
+    "availableSeats": "Locuri disponibile: {seats}",
+    "selectSeatsDescription": "Alege câte locuri vrei să rezervi",
+    "selectedSeats": "Locuri selectate",
+    "seat": "loc",
+    "seats": "locuri",
+    "confirmBooking": "Confirmă Rezervarea"
   }
 }

@@ -25,17 +25,22 @@ public class MatchingService {
     }
     
     public List<MatchResult> findMatches(String passengerId, String destinationSedeId, 
-                                       String preferredTime, String originLocation) {
+                                       String preferredTime, String originLocation, String direction) {
         
-        // Get real trip data from trips-service
-        List<TripInfo> availableTrips = getAvailableTripsFromService(destinationSedeId);
+        // Get real trip data from trips-service based on direction
+        List<TripInfo> availableTrips = getAvailableTripsFromService(destinationSedeId, direction);
         
         List<MatchResult> matches = new ArrayList<>();
         
         for (TripInfo trip : availableTrips) {
             if (trip.seatsFree <= 0) continue; // Skip trips with no available seats
             
-            double score = calculateMatchScore(trip, destinationSedeId, preferredTime, originLocation);
+            // Filter by direction first - this is a hard requirement
+            if (direction != null && !direction.isBlank() && !direction.equals(trip.direction)) {
+                continue; // Skip trips with different direction
+            }
+            
+            double score = calculateMatchScore(trip, destinationSedeId, preferredTime, originLocation, direction);
             
             if (score > 0.0) { // Only include trips with some compatibility
                 MatchResult match = new MatchResult();
@@ -46,7 +51,9 @@ public class MatchingService {
                 match.dateTime = trip.dateTime;
                 match.seatsFree = trip.seatsFree;
                 match.score = score;
-                match.reasons = getMatchReasons(trip, destinationSedeId, preferredTime, originLocation, score);
+                match.direction = trip.direction;
+                match.pairedTripId = trip.pairedTripId;
+                match.reasons = getMatchReasons(trip, destinationSedeId, preferredTime, originLocation, direction, score);
                 
                 matches.add(match);
             }
@@ -75,6 +82,20 @@ public class MatchingService {
         }
     }
     
+    private List<TripInfo> getAvailableTripsFromService(String sedeId, String direction) {
+        try {
+            List<TripDto> tripDtos = tripsServiceClient.getAvailableTrips(sedeId, direction);
+            return tripDtos.stream()
+                    .filter(trip -> trip.seatsFree > 0) // Only trips with available seats
+                    .map(this::convertToTripInfo)
+                    .collect(Collectors.toList());
+        } catch (ServiceIntegrationException e) {
+            // Log the error and return empty list as fallback
+            System.err.println("Error fetching trips from trips-service: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+    
     private TripInfo convertToTripInfo(TripDto tripDto) {
         TripInfo tripInfo = new TripInfo();
         tripInfo.id = tripDto.id;
@@ -83,6 +104,8 @@ public class MatchingService {
         tripInfo.dateTime = tripDto.dateTime;
         tripInfo.seatsTotal = tripDto.seatsTotal;
         tripInfo.seatsFree = tripDto.seatsFree;
+        tripInfo.direction = tripDto.direction;
+        tripInfo.pairedTripId = tripDto.pairedTripId;
         
         // Convert origin from DTO format to string format
         if (tripDto.origin != null) {
@@ -94,31 +117,52 @@ public class MatchingService {
         return tripInfo;
     }
     
-    private double calculateMatchScore(TripInfo trip, String destinationSedeId, 
-                                    String preferredTime, String originLocation) {
+    private double calculateMatchScore(TripInfo trip, String sedeId, 
+                                    String preferredTime, String originLocation, String direction) {
         double score = 0.0;
         
-        // 1. Destination match (40% weight)
-        if (destinationSedeId != null && destinationSedeId.equals(trip.destinationSedeId)) {
-            score += 0.4;
+        // 1. Sede match (35% weight) - depends on direction
+        boolean sedeMatch = false;
+        if ("TO_SEDE".equals(direction)) {
+            // For TO_SEDE trips, match destination sede
+            sedeMatch = sedeId != null && sedeId.equals(trip.destinationSedeId);
+        } else if ("FROM_SEDE".equals(direction)) {
+            // For FROM_SEDE trips, we need to check if the trip's origin is from the specified sede
+            // This would require additional logic to determine if trip origin is from a sede
+            // For now, we'll assume the trip's destinationSedeId represents the origin sede for FROM_SEDE trips
+            sedeMatch = sedeId != null && sedeId.equals(trip.destinationSedeId);
         }
         
-        // 2. Time compatibility (30% weight)
+        if (sedeMatch) {
+            score += 0.35;
+        }
+        
+        // 2. Direction match (25% weight) - NEW
+        if (direction != null && direction.equals(trip.direction)) {
+            score += 0.25;
+        }
+        
+        // 3. Time compatibility (25% weight)
         if (preferredTime != null) {
             double timeScore = calculateTimeScore(trip.dateTime, preferredTime);
-            score += timeScore * 0.3;
+            score += timeScore * 0.25;
         }
         
-        // 3. Origin proximity (20% weight)
+        // 4. Origin proximity (10% weight)
         if (originLocation != null) {
             double locationScore = calculateLocationScore(trip.origin, originLocation);
-            score += locationScore * 0.2;
+            score += locationScore * 0.1;
         }
         
-        // 4. Availability bonus (10% weight)
+        // 5. Availability bonus (5% weight)
         if (trip.seatsFree > 0) {
             double availabilityScore = Math.min(1.0, trip.seatsFree / 4.0); // Max score for 4+ seats
-            score += availabilityScore * 0.1;
+            score += availabilityScore * 0.05;
+        }
+        
+        // 6. Paired trip bonus (5% weight) - NEW
+        if (trip.pairedTripId != null && !trip.pairedTripId.isBlank()) {
+            score += 0.05; // Bonus for round-trip availability
         }
         
         return Math.min(1.0, score); // Cap at 1.0
@@ -177,11 +221,16 @@ public class MatchingService {
     }
     
     private List<String> getMatchReasons(TripInfo trip, String destinationSedeId, 
-                                       String preferredTime, String originLocation, double score) {
+                                       String preferredTime, String originLocation, String direction, double score) {
         List<String> reasons = new ArrayList<>();
         
         if (destinationSedeId != null && destinationSedeId.equals(trip.destinationSedeId)) {
             reasons.add("Same destination");
+        }
+        
+        // Add direction match reason
+        if (direction != null && direction.equals(trip.direction)) {
+            reasons.add("Direction match: " + trip.direction);
         }
         
         if (preferredTime != null) {
@@ -208,6 +257,11 @@ public class MatchingService {
         
         if (trip.seatsFree >= 2) {
             reasons.add("Multiple seats available");
+        }
+        
+        // Add paired trip reason
+        if (trip.pairedTripId != null && !trip.pairedTripId.isBlank()) {
+            reasons.add("Paired trip available");
         }
         
         if (score >= 0.8) {

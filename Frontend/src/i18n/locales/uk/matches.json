@@ -19,6 +19,13 @@
     "arrival": "Прибуття",
     "seats": "Місця",
     "book": "Забронювати",
-    "viewProfile": "Переглянути профіль"
+    "viewProfile": "Переглянути профіль",
+    "selectSeats": "Вибрати Місця",
+    "availableSeats": "Доступно місць: {seats}",
+    "selectSeatsDescription": "Оберіть скільки місць ви хочете забронювати",
+    "selectedSeats": "Вибрані місця",
+    "seat": "місце",
+    "seats": "місць",
+    "confirmBooking": "Підтвердити Бронювання"
   }
 }
