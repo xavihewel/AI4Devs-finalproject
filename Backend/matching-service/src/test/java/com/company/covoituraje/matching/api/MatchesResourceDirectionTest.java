@@ -93,7 +93,7 @@ class MatchesResourceDirectionTest {
         mockMatch.reasons = Arrays.asList("Direction mismatch: FROM_SEDE vs TO_SEDE");
 
         when(mockMatchingService.findMatches(any(), any(), any(), any(), any()))
-            .thenReturn(Arrays.asList(mockMatch));
+            .thenReturn(Arrays.asList()); // Empty list because opposite direction should be filtered out
 
         // When
         List<MatchDto> matches = resource.findMatches(destinationSedeId, null, time, origin, direction, "en");

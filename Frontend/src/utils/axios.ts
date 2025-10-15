@@ -54,3 +54,4 @@ export const updateAxiosLanguageHeader = () => {
   axios.defaults.headers.common['Accept-Language'] = currentLanguage;
 };
 
+

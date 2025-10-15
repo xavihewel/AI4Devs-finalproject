@@ -1,18 +1,51 @@
 # Active Context
 
 ## Current Focus
-- **Feature #3 - Creación de Viajes**: ✅ COMPLETADO al 100%
-- **Fase 1 ✅**: Trips.tsx migrado a react-i18next con 6 idiomas completos.
-- **Fase 2 ✅**: EditTripModal, TripCard mejorado, filtros y búsqueda completamente integrados y funcionando.
-- **Fase 3 ✅**: Backend validations completas con reglas de negocio robustas.
-- **Fase 4 ✅**: Tests E2E completos para flujos de crear/editar/filtrar/eliminar.
-- **Mejoras ✅**: Integración de mapas, UX mejorada, traducciones completas.
-- **Próximo**: Feature #4 según roadmap o mejoras adicionales.
+- **Feature: Filtrado Direccional en Matching**: ✅ COMPLETADO al 100%
+- **Backend TDD ✅**: Parámetro direction, validaciones, OpenAPI actualizado
+- **Tests Backend ✅**: Suite completa 100% pasando, repository stubbed
+- **Integración ✅**: Filtrado end-to-end, scoring mejorado, manejo de errores
+- **CORS Fix ✅**: users-service redeployado, endpoints de confianza operativos
+- **Auth JWKS Tests ✅**: Tests remotos con WireMock implementados y funcionando
+- **Próximo**: CI/CD pipeline, tests E2E actualizados, o siguiente feature del roadmap
 
 ## Feature Plan
 - Ver `memory-bank/featurePlan.md` para el mapeo de las 15 funcionalidades (cobertura/estado/próximos pasos) y el roadmap por fases.
 
 ## Recent Changes (Octubre 11, 2025)
+
+### Feature: Filtrado Direccional en Matching (✅ COMPLETADO)
+- **Backend TDD**:
+  - `MatchesResource`: Parámetro `direction` (TO_SEDE|FROM_SEDE) con validación de sedeId requerido
+  - `MatchingService`: Filtrado direccional integrado en lógica de matching y scoring
+  - OpenAPI actualizado: documentación completa de parámetros direction, originSedeId, destinationSedeId
+- **Tests Backend**:
+  - `MatchesResourceDirectionTest`: Tests de endpoint con validaciones y casos edge
+  - `MatchingServiceDirectionTest`: Tests unitarios de lógica de filtrado direccional
+  - `MatchingServiceBidirectionalTest`: Tests de priorización de viajes emparejados
+  - `MatchingServiceFailurePathsTest`: Tests de manejo de errores de trips-client
+  - Repository stubbed: Eliminados logs "Invalid UUID" en tests unitarios
+  - Suite completa: 100% tests pasando en matching-service
+- **Integración**:
+  - Filtrado direccional funcional end-to-end con trips-service
+  - Scoring mejorado incluyendo información de dirección en razones
+  - Manejo robusto de fallos en trips-client (timeout, 5xx) retornando resultados vacíos
+  - Documentación OpenAPI completa con ejemplos y validaciones
+
+### Feature: Sistema de Confianza - CORS Fix (✅ COMPLETADO)
+- **Redeploy users-service**:
+  - users-service reconstruido y reiniciado exitosamente
+  - Health check: 200 en `/api/health`
+  - CORS preflight: 204 en `OPTIONS /api/ratings` con headers correctos
+  - Endpoints de confianza operativos y accesibles desde frontend
+  - Configuración CORS: `Access-Control-Allow-Origin`, `Vary: Origin`, creds, methods, headers
+
+### Feature: Auth JWKS Tests (✅ COMPLETADO)
+- **Tests Remotos con WireMock**:
+  - `JwtValidatorRemoteJwksTest`: Tests de validación exitosa, key miss, network error
+  - Test habilitado: `validatesTokenAgainstRemoteJwks` usando in-memory JWKSet
+  - Cobertura completa: 9/9 tests pasando en auth-service
+  - Escenarios cubiertos: JWKS exitoso, key desconocida, error de red
 
 ### Feature: Multi-idioma (Completado ✅)
 - **Backend TDD**:

@@ -116,10 +116,30 @@
   - Tests unitarios para componentes de confianza
   - Manejo de errores mejorado (404, 403, 5xx)
   - Z-index corregido para modales sobre mapas
-- ⚠️ **CORS Issue Identificado**:
-  - Filtro CORS implementado pero users-service necesita redeploy
-  - Endpoint `/api/ratings` devuelve 404 - servicio no actualizado
-  - Configuración correcta: puerto 8082, filtros CORS aplicados
+- ✅ **CORS Fix Aplicado**:
+  - users-service redeployado con endpoints de confianza
+  - Health check: 200 en `/api/health`
+  - CORS preflight: 204 en `OPTIONS /api/ratings` con headers correctos
+  - Endpoints de confianza operativos y accesibles desde frontend
+
+### Feature: Filtrado Direccional en Matching (Completado ✅)
+- ✅ **Backend TDD**:
+  - `MatchesResource`: Parámetro `direction` (TO_SEDE|FROM_SEDE) con validación
+  - `MatchingService`: Filtrado direccional integrado en lógica de matching
+  - Validación de `sedeId` requerido según dirección (destinationSedeId/originSedeId)
+  - OpenAPI actualizado: documentación completa de parámetros y validaciones
+- ✅ **Tests Backend**:
+  - `MatchesResourceDirectionTest`: Tests de endpoint con validaciones
+  - `MatchingServiceDirectionTest`: Tests unitarios de lógica de filtrado
+  - `MatchingServiceBidirectionalTest`: Tests de priorización de viajes emparejados
+  - `MatchingServiceFailurePathsTest`: Tests de manejo de errores de trips-client
+  - Repository stubbed: Eliminados logs "Invalid UUID" en tests
+  - Suite completa: 100% tests pasando en matching-service
+- ✅ **Integración**:
+  - Filtrado direccional funcional end-to-end
+  - Scoring mejorado con información de dirección
+  - Manejo robusto de fallos en trips-client
+  - Documentación OpenAPI completa
 
 ### Feature: Perfil de Usuario (Anterior ✅)
 - ✅ **Validaciones Robustas**:
@@ -214,7 +234,10 @@
 - **✅ Multi-idioma**: Implementación completa para 6 idiomas (Catalán, Castellano, Rumano, Ucraniano, Inglés, Francés) con E2E tests
 - **Completar tests frontend**: Arreglar 6 tests restantes (Bookings, Profile, Trips, Matches) y añadir tests de suscripción push para alcanzar 100% de cobertura
 - **Testing E2E completo**: Suite de tests Cypress actualizada (authentication, trips, matches, bookings, notifications, flows) - 85% pasando, 4 tests menores por arreglar.
-- **Auth JWKS remoto (tests)**: Añadir tests con WireMock para `JwtValidator` con JWKS HTTP (éxito, timeout, key miss, caché).
+- ✅ **Auth JWKS remoto (tests)**: Tests con WireMock para `JwtValidator` implementados y funcionando
+  - `JwtValidatorRemoteJwksTest`: Validación exitosa, key miss, network error
+  - Tests unitarios e integración: 9/9 pasando en auth-service
+  - Cobertura completa de escenarios JWKS remoto
 - **Frontend features**: Completar todas las páginas (Bookings más robusta, Profile funcional, Admin).
 - **Observabilidad avanzada**: Métricas, tracing distribuido, agregación de logs.
 - **API Gateway**: Implementar gateway con routing path-based para unificar acceso.

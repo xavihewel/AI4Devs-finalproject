@@ -35,3 +35,4 @@ COMMENT ON COLUMN ratings.tags IS 'Array of tags describing the rating (e.g., pu
 COMMENT ON COLUMN ratings.comment IS 'Optional comment for the rating';
 
 
+

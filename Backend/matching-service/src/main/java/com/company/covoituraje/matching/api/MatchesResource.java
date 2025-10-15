@@ -75,14 +75,14 @@ public class MatchesResource {
         
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("matches.error.user_id_required", locale);
             throw new BadRequestException(message);
         }
 
         // Validate required parameters
         if (direction == null || direction.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("matches.error.direction_required", locale);
             throw new BadRequestException(message);
         }
@@ -91,20 +91,20 @@ public class MatchesResource {
         String sedeId;
         if ("TO_SEDE".equals(direction)) {
             if (destinationSedeId == null || destinationSedeId.isBlank()) {
-                Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
                 String message = messageService.getMessage("matches.error.destination_sede_required", locale);
                 throw new BadRequestException(message);
             }
             sedeId = destinationSedeId;
         } else if ("FROM_SEDE".equals(direction)) {
             if (originSedeId == null || originSedeId.isBlank()) {
-                Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
                 String message = messageService.getMessage("matches.error.origin_sede_required", locale);
                 throw new BadRequestException(message);
             }
             sedeId = originSedeId;
         } else {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("matches.error.invalid_direction", locale);
             throw new BadRequestException(message);
         }
@@ -131,7 +131,7 @@ public class MatchesResource {
                                        @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("matches.error.user_id_required", locale);
             throw new BadRequestException(message);
         }
@@ -158,7 +158,7 @@ public class MatchesResource {
                                            @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("matches.error.user_id_required", locale);
             throw new BadRequestException(message);
         }
@@ -166,7 +166,7 @@ public class MatchesResource {
         // For now, only allow users to see their own matches
         // In the future, drivers should be able to see matches for their trips
         if (!currentUser.equals(driverId)) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("matches.error.access_denied", locale);
             throw new ForbiddenException(message);
         }
