@@ -1,5 +1,5 @@
 @startuml
-title MVP Covoituraje Corporativo - Diagrama de Casos de Uso
+title MVP bonÀreaGo - Diagrama de Casos de Uso
 
 skinparam shadowing false
 skinparam usecase {
@@ -21,7 +21,7 @@ actor "SSO / IdP Corporativo" as IdP <<external>>
 actor "Servicio de Notificaciones\n(Email/Push)" as Notif <<external>>
 
 ' ==== Límite del Sistema ====
-rectangle "Sistema de Covoituraje Corporativo (MVP)" as Sistema {
+rectangle "bonÀreaGo (MVP)" as Sistema {
 
   ' --- Autenticación y Perfil ---
   usecase "UC1 - Autenticarse\n(SSO corporativo)" as UC1

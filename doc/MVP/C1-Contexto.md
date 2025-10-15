@@ -1,5 +1,5 @@
 @startuml
-title C1 – Contexto: Covoituraje Corporativo
+title C1 – Contexto: bonÀreaGo
 
 left to right direction
 skinparam rectangle {
@@ -12,7 +12,7 @@ actor "Empleado\n(Conductor/Pasajero)" as EMP
 actor "RRHH / Sostenibilidad" as HR
 actor "Facilities / Seguridad" as SEC
 
-rectangle "Plataforma Covoituraje\n(Dominio Empresa)" as SYS {
+rectangle "bonÀreaGo\n(Dominio Empresa)" as SYS {
   rectangle "Front-end Web/Móvil (SPA)" as FE
   rectangle "Back-end API\n(Servicios de dominio)" as BE
   rectangle "Data Platform\n(Analytics/BI + DWH)" as DWH

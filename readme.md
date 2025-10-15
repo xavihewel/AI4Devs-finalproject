@@ -55,7 +55,7 @@ https://github.com/xavihewel/AI4Devs-finalproject
 
 ### **1.1. Objetivo:**
 
-**bonÀreaGo** es una plataforma interna de covoituraje diseñada para facilitar que los empleados compartan coche en sus desplazamientos laborales, tanto recurrentes como puntuales. El objetivo principal es ofrecer una alternativa eficiente, segura y sostenible al transporte individual, reduciendo costes y emisiones, y mejorando la experiencia y el bienestar de los empleados.
+**bonÀreaGo** es una plataforma interna de compartición de viajes corporativos diseñada para facilitar que los empleados compartan coche en sus desplazamientos laborales, tanto recurrentes como puntuales. El objetivo principal es ofrecer una alternativa eficiente, segura y sostenible al transporte individual, reduciendo costes y emisiones, y mejorando la experiencia y el bienestar de los empleados.
 
 La solución aporta valor en varios niveles:
 
@@ -349,7 +349,7 @@ Eres un analista de software experto. Enumera y describe brevemente las tres his
 # Historia de Usuario 1: Registro de usuario
 
 **Como** empleado de la empresa  
-**Quiero** registrarme en la plataforma de covoituraje  
+**Quiero** registrarme en la plataforma bonÀreaGo  
 **Para** poder acceder y utilizar el sistema para compartir viajes
 
 ## Criterios de aceptación
@@ -407,4 +407,8 @@ Eres un analista de software experto. Enumera y describe brevemente las tres his
 **Pull Request 2**
 
 **Pull Request 3**
+
+## Registro de Prompts
+
+Consulta `Prompts/prompts_xvb.md` para ver las decisiones y acciones clave documentadas durante el proyecto.
 
