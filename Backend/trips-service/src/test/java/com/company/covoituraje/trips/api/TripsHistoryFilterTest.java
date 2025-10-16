@@ -45,7 +45,7 @@ class TripsHistoryFilterTest {
         when(mockRepository.findAll()).thenReturn(Arrays.asList(completedTrip, activeTrip));
         
         // Act: Call list with status=COMPLETED
-        List<TripDto> result = resource.list(null, null, null, null, "COMPLETED");
+        List<TripDto> result = resource.list(null, null, null, "COMPLETED");
         
         // Assert: Only completed trips returned
         assertEquals(1, result.size());
@@ -67,7 +67,7 @@ class TripsHistoryFilterTest {
         when(mockRepository.findAll()).thenReturn(Arrays.asList(completedTrip, activeTrip));
         
         // Act
-        List<TripDto> result = resource.list(null, null, null, null, "ACTIVE");
+        List<TripDto> result = resource.list(null, null, null, "ACTIVE");
         
         // Assert: Only active trips returned
         assertEquals(1, result.size());
@@ -89,7 +89,7 @@ class TripsHistoryFilterTest {
         when(mockRepository.findAll()).thenReturn(Arrays.asList(completedTrip, activeTrip));
         
         // Act: Call without status filter
-        List<TripDto> result = resource.list(null, null, null, null, null);
+        List<TripDto> result = resource.list(null, null, null, null);
         
         // Assert: All trips returned
         assertEquals(2, result.size());
@@ -112,7 +112,6 @@ class TripsHistoryFilterTest {
             null, 
             fromDate.toString(), 
             toDate.toString(),
-            null,
             "COMPLETED"
         );
         

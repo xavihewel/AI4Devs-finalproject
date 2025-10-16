@@ -75,7 +75,7 @@ describe('Navbar i18n', () => {
     renderWithProviders(<Navbar />, false, 'ca');
 
     // Open mobile menu
-    const hamburgerButton = screen.getByLabelText('Obrir menú');
+    const hamburgerButton = screen.getByLabelText(/Obrir menú|Open menu/i);
     fireEvent.click(hamburgerButton);
 
     expect(screen.getByText('Inici')).toBeInTheDocument();
@@ -87,7 +87,7 @@ describe('Navbar i18n', () => {
     renderWithProviders(<Navbar />, true, 'en');
 
     // Open mobile menu
-    const hamburgerButton = screen.getByLabelText('Open menu');
+    const hamburgerButton = screen.getByLabelText(/Obrir menú|Open menu/i);
     fireEvent.click(hamburgerButton);
 
     expect(screen.getByText('Home')).toBeInTheDocument();

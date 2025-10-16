@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { MatchesService, BookingsService } from '../api';
 import type { MatchDto } from '../types/api';
 import { Button, Card, CardContent, Input, Select, LoadingSpinner } from '../components/ui';
+import DirectionFilter from '../components/filters/DirectionFilter';
 import MapPreview from '../components/map/MapPreview';
 import { TrustProfile } from '../components/trust/TrustProfile';
 import { RatingForm } from '../components/trust/RatingForm';
@@ -31,7 +32,9 @@ export default function Matches() {
 
   // Search form state
   const [searchParams, setSearchParams] = useState({
+    direction: 'TO_SEDE' as 'TO_SEDE' | 'FROM_SEDE',
     destinationSedeId: '',
+    originSedeId: '',
     time: '',
     origin: '',
   });
@@ -72,14 +75,21 @@ export default function Matches() {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchParams.destinationSedeId) {
-      alert(t('search.selectDestination'));
-      return;
+    if (searchParams.direction === 'TO_SEDE') {
+      if (!searchParams.destinationSedeId) {
+        alert(t('search.selectDestination'));
+        return;
+      }
+    } else {
+      if (!searchParams.originSedeId) {
+        alert(t('search.selectOriginSede'));
+        return;
+      }
     }
 
     try {
       setSearching(true);
-      const data = await MatchesService.findMatches(searchParams);
+      const data = await MatchesService.findMatches(searchParams as any);
       setMatches(data);
     } catch (error) {
       console.error('Error searching matches:', error);
@@ -156,13 +166,28 @@ export default function Matches() {
       <Card>
         <CardContent>
           <form onSubmit={handleSearch} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Select
-                label={t('search.destination')}
-                value={searchParams.destinationSedeId}
-                onChange={(e) => handleInputChange('destinationSedeId', e.target.value)}
-                options={sedeOptions}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <DirectionFilter
+                label={t('search.direction')}
+                value={searchParams.direction}
+                onChange={(value) => handleInputChange('direction', value)}
               />
+
+              {searchParams.direction === 'TO_SEDE' ? (
+                <Select
+                  label={t('search.destination')}
+                  value={searchParams.destinationSedeId}
+                  onChange={(e) => handleInputChange('destinationSedeId', e.target.value)}
+                  options={sedeOptions}
+                />
+              ) : (
+                <Select
+                  label={t('search.originSede')}
+                  value={searchParams.originSedeId}
+                  onChange={(e) => handleInputChange('originSedeId', e.target.value)}
+                  options={sedeOptions.map(o => ({ ...o, label: t('sede.' + (o.value || 'placeholder')) }))}
+                />
+              )}
 
               <Input
                 label={t('search.time')}
@@ -188,7 +213,12 @@ export default function Matches() {
                 variant="primary"
                 size="lg"
                 loading={searching}
-                disabled={searching || !searchParams.destinationSedeId}
+                disabled={
+                  searching ||
+                  (searchParams.direction === 'TO_SEDE'
+                    ? !searchParams.destinationSedeId
+                    : !searchParams.originSedeId)
+                }
               >
                 {searching ? t('search.searching') : t('search.search')}
               </Button>

@@ -7,7 +7,9 @@ import com.company.covoituraje.trips.integration.BookingServiceClient;
 import com.company.covoituraje.shared.i18n.MessageService;
 import com.company.covoituraje.shared.i18n.LocaleUtils;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -101,6 +103,11 @@ public class TripsResource {
         return mapToDto(trip);
     }
 
+    // Convenience overloads for internal/test usage without Accept-Language
+    public TripDto create(TripCreateDto create) {
+        return create(create, null);
+    }
+
     @GET
     public List<TripDto> list(@QueryParam("destinationSedeId") String destinationSedeId,
                              @QueryParam("from") String from,
@@ -153,6 +160,10 @@ public class TripsResource {
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
     }
 
+    public List<TripDto> list(String destinationSedeId, String from, String to, String status) {
+        return list(destinationSedeId, from, to, status, null);
+    }
+
     private Integer parseTimeToMinutes(String hhmm) {
         if (hhmm == null || hhmm.isBlank()) return null;
         try {
@@ -192,6 +203,10 @@ public class TripsResource {
                     return new NotFoundException(message);
                 });
         return mapToDto(trip);
+    }
+
+    public TripDto getById(String id) {
+        return getById(id, null);
     }
 
     @PUT
@@ -261,6 +276,10 @@ public class TripsResource {
         return mapToDto(trip);
     }
 
+    public TripDto update(String id, TripCreateDto update) {
+        return update(id, update, null);
+    }
+
     @DELETE
     @Path("/{id}")
     public void delete(@PathParam("id") String id, @HeaderParam("Accept-Language") String acceptLanguage) {
@@ -290,10 +309,14 @@ public class TripsResource {
         if (!validationErrors.isEmpty()) {
             Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = String.join("; ", validationErrors);
-            throw new ConflictException(message);
+            throw new ClientErrorException(message, Response.Status.CONFLICT);
         }
 
         repository.delete(trip);
+    }
+
+    public void delete(String id) {
+        delete(id, null);
     }
 
     @POST
@@ -340,6 +363,10 @@ public class TripsResource {
         repository.save(pairedTrip);
         
         return mapToDto(trip);
+    }
+
+    public TripDto pairTrip(String id, String pairedTripId) {
+        return pairTrip(id, pairedTripId, null);
     }
 
     private TripDto mapToDto(Trip trip) {

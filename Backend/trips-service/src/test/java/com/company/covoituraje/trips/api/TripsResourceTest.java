@@ -9,7 +9,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.ConflictException;
+import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
@@ -85,7 +86,7 @@ class TripsResourceTest {
     @Test
     void post_createsTripAndReturnsEntity() {
         TripCreateDto create = new TripCreateDto();
-        TripDto.Origin origin = new TripDto.Origin();
+        TripCreateDto.Origin origin = new TripCreateDto.Origin();
         origin.lat = 40.4168;
         origin.lng = -3.7038;
         create.origin = origin;
@@ -112,7 +113,7 @@ class TripsResourceTest {
     void updateTrip_seatsTotal_recalculatesSeatsFree() {
         // Given: Create a trip with 4 total seats, 2 free (2 occupied)
         TripCreateDto create = new TripCreateDto();
-        TripDto.Origin origin = new TripDto.Origin();
+        TripCreateDto.Origin origin = new TripCreateDto.Origin();
         origin.lat = 40.4168;
         origin.lng = -3.7038;
         create.origin = origin;
@@ -147,7 +148,7 @@ class TripsResourceTest {
     void create_withInvalidCoordinates_shouldThrowBadRequest() {
         // Given
         TripCreateDto create = new TripCreateDto();
-        TripDto.Origin origin = new TripDto.Origin();
+        TripCreateDto.Origin origin = new TripCreateDto.Origin();
         origin.lat = 95.0; // Invalid latitude
         origin.lng = -3.7038;
         create.origin = origin;
@@ -167,7 +168,7 @@ class TripsResourceTest {
     void create_withPastDate_shouldThrowBadRequest() {
         // Given
         TripCreateDto create = new TripCreateDto();
-        TripDto.Origin origin = new TripDto.Origin();
+        TripCreateDto.Origin origin = new TripCreateDto.Origin();
         origin.lat = 40.4168;
         origin.lng = -3.7038;
         create.origin = origin;
@@ -187,7 +188,7 @@ class TripsResourceTest {
     void update_withInvalidSeats_shouldThrowBadRequest() {
         // Given: Create a valid trip first
         TripCreateDto create = new TripCreateDto();
-        TripDto.Origin origin = new TripDto.Origin();
+        TripCreateDto.Origin origin = new TripCreateDto.Origin();
         origin.lat = 40.4168;
         origin.lng = -3.7038;
         create.origin = origin;
@@ -214,7 +215,7 @@ class TripsResourceTest {
     void update_withSeatsReductionBelowBooked_shouldThrowBadRequest() {
         // Given: Create a trip and simulate some bookings
         TripCreateDto create = new TripCreateDto();
-        TripDto.Origin origin = new TripDto.Origin();
+        TripCreateDto.Origin origin = new TripCreateDto.Origin();
         origin.lat = 40.4168;
         origin.lng = -3.7038;
         create.origin = origin;
@@ -249,7 +250,7 @@ class TripsResourceTest {
     void delete_withConfirmedBookings_shouldThrowConflict() {
         // Given: Create a trip
         TripCreateDto create = new TripCreateDto();
-        TripDto.Origin origin = new TripDto.Origin();
+        TripCreateDto.Origin origin = new TripCreateDto.Origin();
         origin.lat = 40.4168;
         origin.lng = -3.7038;
         create.origin = origin;
@@ -265,16 +266,17 @@ class TripsResourceTest {
             .thenReturn(List.of("Cannot delete trip with confirmed bookings"));
         
         // Then
-        ConflictException exception = assertThrows(ConflictException.class, 
+        ClientErrorException exception = assertThrows(ClientErrorException.class, 
             () -> resource.delete(createdTrip.id, "en"));
         assertEquals("Cannot delete trip with confirmed bookings", exception.getMessage());
+        assertEquals(Response.Status.CONFLICT.getStatusCode(), exception.getResponse().getStatus());
     }
     
     @Test
     void create_withValidData_shouldPassValidation() {
         // Given
         TripCreateDto create = new TripCreateDto();
-        TripDto.Origin origin = new TripDto.Origin();
+        TripCreateDto.Origin origin = new TripCreateDto.Origin();
         origin.lat = 40.4168;
         origin.lng = -3.7038;
         create.origin = origin;
@@ -298,7 +300,7 @@ class TripsResourceTest {
     void update_withValidData_shouldPassValidation() {
         // Given: Create a trip first
         TripCreateDto create = new TripCreateDto();
-        TripDto.Origin origin = new TripDto.Origin();
+        TripCreateDto.Origin origin = new TripCreateDto.Origin();
         origin.lat = 40.4168;
         origin.lng = -3.7038;
         create.origin = origin;
@@ -320,6 +322,6 @@ class TripsResourceTest {
         // Then
         assertNotNull(result);
         assertEquals(5, result.seatsTotal);
-        verify(validationService).validateTripUpdate(update, any(Trip.class), "en");
+        verify(validationService).validateTripUpdate(eq(update), any(Trip.class), eq("en"));
     }
 }

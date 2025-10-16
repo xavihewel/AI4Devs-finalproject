@@ -37,7 +37,6 @@ class TripValidationServiceTest {
     void validateTripCreation_WithValidData_ShouldReturnEmptyErrors() {
         // Given
         TripCreateDto createDto = createValidTripDto();
-        when(messageService.getMessage(anyString(), any())).thenReturn("Error message");
         
         // When
         List<String> errors = validationService.validateTripCreation(createDto, "en");
@@ -51,7 +50,7 @@ class TripValidationServiceTest {
         // Given
         TripCreateDto createDto = createValidTripDto();
         createDto.origin.lat = 95.0; // Invalid latitude
-        when(messageService.getMessage("trips.validation.latitude_range", any())).thenReturn("Latitude must be between -90 and 90");
+        when(messageService.getMessage(eq("trips.validation.latitude_range"), any())).thenReturn("Latitude must be between -90 and 90");
         
         // When
         List<String> errors = validationService.validateTripCreation(createDto, "en");
@@ -66,7 +65,7 @@ class TripValidationServiceTest {
         // Given
         TripCreateDto createDto = createValidTripDto();
         createDto.origin.lng = -190.0; // Invalid longitude
-        when(messageService.getMessage("trips.validation.longitude_range", any())).thenReturn("Longitude must be between -180 and 180");
+        when(messageService.getMessage(eq("trips.validation.longitude_range"), any())).thenReturn("Longitude must be between -180 and 180");
         
         // When
         List<String> errors = validationService.validateTripCreation(createDto, "en");
@@ -81,7 +80,7 @@ class TripValidationServiceTest {
         // Given
         TripCreateDto createDto = createValidTripDto();
         createDto.origin = null;
-        when(messageService.getMessage("trips.validation.origin_required", any())).thenReturn("Origin is required");
+        when(messageService.getMessage(eq("trips.validation.origin_required"), any())).thenReturn("Origin is required");
         
         // When
         List<String> errors = validationService.validateTripCreation(createDto, "en");
@@ -96,7 +95,7 @@ class TripValidationServiceTest {
         // Given
         TripCreateDto createDto = createValidTripDto();
         createDto.dateTime = OffsetDateTime.now().minusHours(1).toString(); // Past date
-        when(messageService.getMessage("trips.validation.datetime_future", any())).thenReturn("Date must be in the future");
+        when(messageService.getMessage(eq("trips.validation.datetime_future"), any())).thenReturn("Date must be in the future");
         
         // When
         List<String> errors = validationService.validateTripCreation(createDto, "en");
@@ -111,7 +110,7 @@ class TripValidationServiceTest {
         // Given
         TripCreateDto createDto = createValidTripDto();
         createDto.seatsTotal = 0; // Invalid seats
-        when(messageService.getMessage("trips.validation.seats_range", any())).thenReturn("Seats must be between 1 and 8");
+        when(messageService.getMessage(eq("trips.validation.seats_range"), any())).thenReturn("Seats must be between 1 and 8");
         
         // When
         List<String> errors = validationService.validateTripCreation(createDto, "en");
@@ -126,7 +125,7 @@ class TripValidationServiceTest {
         // Given
         TripCreateDto createDto = createValidTripDto();
         createDto.seatsTotal = 9; // Too many seats
-        when(messageService.getMessage("trips.validation.seats_range", any())).thenReturn("Seats must be between 1 and 8");
+        when(messageService.getMessage(eq("trips.validation.seats_range"), any())).thenReturn("Seats must be between 1 and 8");
         
         // When
         List<String> errors = validationService.validateTripCreation(createDto, "en");
@@ -141,7 +140,7 @@ class TripValidationServiceTest {
         // Given
         TripCreateDto createDto = createValidTripDto();
         createDto.destinationSedeId = "INVALID-SEDE"; // Invalid destination
-        when(messageService.getMessage("trips.validation.destination_format", any())).thenReturn("Destination must be SEDE-1, SEDE-2, or SEDE-3");
+        when(messageService.getMessage(eq("trips.validation.destination_format"), any())).thenReturn("Destination must be SEDE-1, SEDE-2, or SEDE-3");
         
         // When
         List<String> errors = validationService.validateTripCreation(createDto, "en");
@@ -156,7 +155,7 @@ class TripValidationServiceTest {
         // Given
         TripCreateDto createDto = createValidTripDto();
         createDto.destinationSedeId = ""; // Empty destination
-        when(messageService.getMessage("trips.validation.destination_required", any())).thenReturn("Destination is required");
+        when(messageService.getMessage(eq("trips.validation.destination_required"), any())).thenReturn("Destination is required");
         
         // When
         List<String> errors = validationService.validateTripCreation(createDto, "en");
@@ -171,7 +170,6 @@ class TripValidationServiceTest {
         // Given
         TripCreateDto updateDto = createValidTripDto();
         Trip existingTrip = createValidTrip();
-        when(messageService.getMessage(anyString(), any())).thenReturn("Error message");
         
         // When
         List<String> errors = validationService.validateTripUpdate(updateDto, existingTrip, "en");
@@ -189,7 +187,7 @@ class TripValidationServiceTest {
         existingTrip.setSeatsTotal(4);
         existingTrip.setSeatsFree(1); // 3 seats are booked
         
-        when(messageService.getMessage("trips.validation.cannot_reduce_seats_below_booked", any()))
+        when(messageService.getMessage(eq("trips.validation.cannot_reduce_seats_below_booked"), any()))
                 .thenReturn("Cannot reduce seats below currently booked seats");
         
         // When
@@ -205,7 +203,7 @@ class TripValidationServiceTest {
         // Given
         Trip trip = createValidTrip();
         when(bookingServiceClient.hasConfirmedBookings(trip.getId().toString())).thenReturn(true);
-        when(messageService.getMessage("trips.validation.cannot_delete_with_confirmed_bookings", any()))
+        when(messageService.getMessage(eq("trips.validation.cannot_delete_with_confirmed_bookings"), any()))
                 .thenReturn("Cannot delete trip with confirmed bookings");
         
         // When

@@ -37,7 +37,7 @@ class TripsResourceDirectionTest {
         // Given
         TripCreateDto createDto = new TripCreateDto();
         createDto.destinationSedeId = "SEDE-1";
-        createDto.dateTime = "2024-01-15T08:00:00Z";
+        createDto.dateTime = OffsetDateTime.now().plusDays(2).withHour(8).withMinute(0).withSecond(0).withNano(0).toString();
         createDto.seatsTotal = 4;
         createDto.direction = "TO_SEDE";
         
@@ -47,7 +47,7 @@ class TripsResourceDirectionTest {
         createDto.origin = origin;
 
         Trip savedTrip = new Trip("driver-123", "40.4168,-3.7038", "SEDE-1", 
-                                 OffsetDateTime.parse("2024-01-15T08:00:00Z"), 4, Trip.Direction.TO_SEDE);
+                                 OffsetDateTime.parse(createDto.dateTime), 4, Trip.Direction.TO_SEDE);
         when(repository.save(any(Trip.class))).thenReturn(savedTrip);
 
         // Set up auth context
@@ -67,7 +67,7 @@ class TripsResourceDirectionTest {
         // Given
         TripCreateDto createDto = new TripCreateDto();
         createDto.destinationSedeId = "SEDE-1";
-        createDto.dateTime = "2024-01-15T17:00:00Z";
+        createDto.dateTime = OffsetDateTime.now().plusDays(2).withHour(17).withMinute(0).withSecond(0).withNano(0).toString();
         createDto.seatsTotal = 3;
         createDto.direction = "FROM_SEDE";
         
@@ -77,7 +77,7 @@ class TripsResourceDirectionTest {
         createDto.origin = origin;
 
         Trip savedTrip = new Trip("driver-123", "40.4168,-3.7038", "SEDE-1", 
-                                 OffsetDateTime.parse("2024-01-15T17:00:00Z"), 3, Trip.Direction.FROM_SEDE);
+                                 OffsetDateTime.parse(createDto.dateTime), 3, Trip.Direction.FROM_SEDE);
         when(repository.save(any(Trip.class))).thenReturn(savedTrip);
 
         // Set up auth context
@@ -99,7 +99,7 @@ class TripsResourceDirectionTest {
         TripCreateDto updateDto = new TripCreateDto();
         updateDto.direction = "FROM_SEDE";
         updateDto.destinationSedeId = "SEDE-2";
-        updateDto.dateTime = "2024-01-15T18:00:00Z";
+        updateDto.dateTime = OffsetDateTime.now().plusDays(2).withHour(18).withMinute(0).withSecond(0).withNano(0).toString();
         updateDto.seatsTotal = 2;
         
         TripCreateDto.Origin origin = new TripCreateDto.Origin();
@@ -108,7 +108,7 @@ class TripsResourceDirectionTest {
         updateDto.origin = origin;
 
         Trip existingTrip = new Trip("driver-123", "40.4168,-3.7038", "SEDE-1", 
-                                    OffsetDateTime.parse("2024-01-15T08:00:00Z"), 4, Trip.Direction.TO_SEDE);
+                                    OffsetDateTime.now().plusDays(2).withHour(8).withMinute(0).withSecond(0).withNano(0), 4, Trip.Direction.TO_SEDE);
         existingTrip.setId(UUID.fromString(tripId));
         
         when(repository.findById(UUID.fromString(tripId))).thenReturn(Optional.of(existingTrip));
@@ -133,7 +133,7 @@ class TripsResourceDirectionTest {
         UUID pairedTripId = UUID.randomUUID();
         
         Trip trip = new Trip("driver-123", "40.4168,-3.7038", "SEDE-1", 
-                           OffsetDateTime.parse("2024-01-15T08:00:00Z"), 4, Trip.Direction.TO_SEDE, pairedTripId);
+                           OffsetDateTime.now().plusDays(2).withHour(8).withMinute(0).withSecond(0).withNano(0), 4, Trip.Direction.TO_SEDE, pairedTripId);
         trip.setId(UUID.fromString(tripId));
         
         when(repository.findById(UUID.fromString(tripId))).thenReturn(Optional.of(trip));
