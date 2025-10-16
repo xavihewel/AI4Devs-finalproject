@@ -114,17 +114,17 @@ describe('Matches Integration Tests', () => {
       render(<Matches />);
 
       // Fill search form
-      const destinationSelect = screen.getByRole('combobox');
+      const destinationSelect = screen.getAllByRole('combobox')[1];
       await user.selectOptions(destinationSelect, 'SEDE-1');
 
-      const timeInput = screen.getByPlaceholderText('08:30');
+      const timeInput = screen.getByLabelText('search.time');
       await user.type(timeInput, '08:00');
 
-      const originInput = screen.getByPlaceholderText('40.4168,-3.7038');
+      const originInput = screen.getByLabelText('search.origin');
       await user.type(originInput, '40.4168,-3.7038');
 
       // Submit search
-      const searchButton = screen.getByText('Search');
+      const searchButton = screen.getByRole('button');
       await user.click(searchButton);
 
       // Wait for results
@@ -152,10 +152,10 @@ describe('Matches Integration Tests', () => {
       render(<Matches />);
 
       // Perform search and open modal
-      await user.selectOptions(screen.getByRole('combobox'), 'SEDE-1');
-      await user.type(screen.getByPlaceholderText('08:30'), '08:00');
-      await user.type(screen.getByPlaceholderText('40.4168,-3.7038'), '40.4168,-3.7038');
-      await user.click(screen.getByText('Search'));
+      await user.selectOptions(screen.getAllByRole('combobox')[1], 'SEDE-1');
+      await user.type(screen.getByLabelText('search.time'), '08:00');
+      await user.type(screen.getByLabelText('search.origin'), '40.4168,-3.7038');
+      await user.click(screen.getByRole('button'));
 
       await waitFor(() => {
         expect(screen.getByText('Book Trip')).toBeInTheDocument();
@@ -181,10 +181,10 @@ describe('Matches Integration Tests', () => {
       render(<Matches />);
 
       // Perform search and open modal
-      await user.selectOptions(screen.getByRole('combobox'), 'SEDE-1');
-      await user.type(screen.getByPlaceholderText('08:30'), '08:00');
-      await user.type(screen.getByPlaceholderText('40.4168,-3.7038'), '40.4168,-3.7038');
-      await user.click(screen.getByText('Search'));
+      await user.selectOptions(screen.getAllByRole('combobox')[1], 'SEDE-1');
+      await user.type(screen.getByLabelText('search.time'), '08:00');
+      await user.type(screen.getByLabelText('search.origin'), '40.4168,-3.7038');
+      await user.click(screen.getByRole('button'));
 
       await waitFor(() => {
         expect(screen.getByText('Book Trip')).toBeInTheDocument();
@@ -218,10 +218,10 @@ describe('Matches Integration Tests', () => {
       render(<Matches />);
 
       // Perform search and open modal
-      await user.selectOptions(screen.getByRole('combobox'), 'SEDE-1');
-      await user.type(screen.getByPlaceholderText('08:30'), '08:00');
-      await user.type(screen.getByPlaceholderText('40.4168,-3.7038'), '40.4168,-3.7038');
-      await user.click(screen.getByText('Search'));
+      await user.selectOptions(screen.getAllByRole('combobox')[1], 'SEDE-1');
+      await user.type(screen.getByLabelText('search.time'), '08:00');
+      await user.type(screen.getByLabelText('search.origin'), '40.4168,-3.7038');
+      await user.click(screen.getByRole('button'));
 
       await waitFor(() => {
         expect(screen.getByText('Book Trip')).toBeInTheDocument();

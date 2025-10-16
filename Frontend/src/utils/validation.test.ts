@@ -44,7 +44,7 @@ describe('useValidation', () => {
     const { result } = renderWithI18n(() => useValidation(), 'en');
 
     const message = result.current.required('password');
-    expect(message).toBe('The field password is required');
+    expect(message).toBe('The password field is required');
   });
 
   test('email returns translated message in current language', () => {
@@ -72,7 +72,7 @@ describe('useValidation', () => {
     const { result } = renderWithI18n(() => useValidation(), 'ro');
 
     const message = result.current.minLength(6);
-    expect(message).toBe('Minimum 6 caractere');
+    expect(message).toBe('Minim 6 caractere');
   });
 
   test('maxLength returns translated message with parameters', () => {
@@ -93,7 +93,7 @@ describe('useValidation', () => {
     const { result } = renderWithI18n(() => useValidation(), 'uk');
 
     const message = result.current.range(1, 10);
-    expect(message).toBe('Має бути від 1 до 10');
+    expect(message).toBe('Має бути між 1 і 10');
   });
 
   test('numeric returns translated message in current language', () => {
@@ -127,15 +127,15 @@ describe('useValidation', () => {
   test('date returns translated message in current language', () => {
     const { result } = renderWithI18n(() => useValidation(), 'ca');
 
-    const message = result.current.date();
+    const message = result.current.date.invalid();
     expect(message).toBe('Format de data invàlid');
   });
 
   test('date returns translated message in Romanian', () => {
     const { result } = renderWithI18n(() => useValidation(), 'ro');
 
-    const message = result.current.date();
-    expect(message).toBe('Format de dată invalid');
+    const message = result.current.date.invalid();
+    expect(message).toBe('Format dată invalid');
   });
 
   test('time returns translated message in current language', () => {

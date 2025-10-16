@@ -4,36 +4,28 @@ import { BrowserRouter } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../../i18n/config';
 import { Navbar } from './Navbar';
-import { AuthProvider } from '../../auth/AuthProvider';
 
-// Mock AuthProvider
-const MockAuthProvider: React.FC<{ children: React.ReactNode; authenticated?: boolean }> = ({ 
-  children, 
-  authenticated = false 
-}) => {
-  const mockAuth = {
-    authenticated,
-    login: jest.fn(),
-    logout: jest.fn(),
-  };
-
-  return (
-    <AuthProvider value={mockAuth}>
-      {children}
-    </AuthProvider>
-  );
-};
+// Mock useAuth hook
+const mockUseAuth = jest.fn();
+jest.mock('../../auth/AuthProvider', () => ({
+  useAuth: () => mockUseAuth(),
+}));
 
 const renderWithProviders = (component: React.ReactElement, authenticated = false, language = 'ca') => {
   // Set language before rendering
   i18n.changeLanguage(language);
   
+  // Mock the useAuth hook
+  mockUseAuth.mockReturnValue({
+    authenticated,
+    login: jest.fn(),
+    logout: jest.fn(),
+  });
+  
   return render(
     <BrowserRouter>
       <I18nextProvider i18n={i18n}>
-        <MockAuthProvider authenticated={authenticated}>
-          {component}
-        </MockAuthProvider>
+        {component}
       </I18nextProvider>
     </BrowserRouter>
   );
@@ -75,10 +67,10 @@ describe('Navbar i18n', () => {
     renderWithProviders(<Navbar />, false, 'ca');
 
     // Open mobile menu
-    const hamburgerButton = screen.getByLabelText(/Obrir menú|Open menu/i);
+    const hamburgerButton = screen.getByRole('button', { name: /Obrir menú|Open menu/i });
     fireEvent.click(hamburgerButton);
 
-    expect(screen.getByText('Inici')).toBeInTheDocument();
+    expect(screen.getAllByText('Inici')).toHaveLength(2); // Desktop and mobile
     // Only authenticated users see other nav items
     expect(screen.queryByText('Viatges')).not.toBeInTheDocument();
   });
@@ -87,10 +79,11 @@ describe('Navbar i18n', () => {
     renderWithProviders(<Navbar />, true, 'en');
 
     // Open mobile menu
-    const hamburgerButton = screen.getByLabelText(/Obrir menú|Open menu/i);
+    const hamburgerButton = screen.getByRole('button', { name: /Obrir menú|Open menu/i });
     fireEvent.click(hamburgerButton);
 
-    expect(screen.getByText('Home')).toBeInTheDocument();
-    expect(screen.getByText('Trips')).toBeInTheDocument();
+    expect(screen.getAllByText('Home')).toHaveLength(2); // Desktop and mobile
+    // Trips should be visible in both desktop and mobile for authenticated users
+    expect(screen.getAllByText('Trips')).toHaveLength(2); // Desktop and mobile
   });
 });

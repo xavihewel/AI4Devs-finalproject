@@ -10,13 +10,15 @@ jest.mock('../api/users', () => ({
   },
 }));
 
+const mockSubscribePush = jest.fn().mockResolvedValue({ ok: true, status: 200 });
+const mockUnsubscribePush = jest.fn().mockResolvedValue({ ok: true, status: 200 });
+
 jest.mock('../api/notifications', () => ({
-  subscribePush: jest.fn().mockResolvedValue({ ok: true, status: 200 }),
-  unsubscribePush: jest.fn().mockResolvedValue({ ok: true, status: 200 }),
+  subscribePush: mockSubscribePush,
+  unsubscribePush: mockUnsubscribePush,
 }));
 
 const { UsersService } = jest.requireMock('../api/users');
-const notifications = jest.requireMock('../api/notifications');
 
 describe('Profile page', () => {
   beforeEach(() => {
@@ -63,7 +65,7 @@ describe('Profile page', () => {
 
     const nameInput = await screen.findByLabelText('Nombre *');
     const sedeInput = screen.getByLabelText('Sede *');
-    const emailInput = screen.getByLabelText('Email *');
+    const emailInput = screen.getByLabelText('Correo electrónico *');
     const saveBtn = screen.getByRole('button', { name: /Guardar cambios/i });
 
     await userEvent.clear(nameInput);
@@ -113,7 +115,7 @@ describe('Profile page', () => {
     });
     expect(await screen.findByText('Mi Perfil')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Habilitar'));
-    await waitFor(() => expect(notifications.subscribePush).toHaveBeenCalled());
+    await waitFor(() => expect(mockSubscribePush).toHaveBeenCalled());
   });
 
   it('disables push when clicking Deshabilitar', async () => {
@@ -142,7 +144,7 @@ describe('Profile page', () => {
     });
     expect(await screen.findByText('Mi Perfil')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Deshabilitar'));
-    await waitFor(() => expect(notifications.unsubscribePush).toHaveBeenCalled());
+    await waitFor(() => expect(mockUnsubscribePush).toHaveBeenCalled());
   });
 });
 
