@@ -78,19 +78,19 @@ public class BookingResource {
     public BookingDto create(BookingCreateDto request, @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.user_id_required", locale);
             throw new BadRequestException(message);
         }
 
         // Validate request
         if (request.tripId == null || request.tripId.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.trip_id_required", locale);
             throw new BadRequestException(message);
         }
         if (request.seatsRequested == null || request.seatsRequested <= 0) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.valid_seats_required", locale);
             throw new BadRequestException(message);
         }
@@ -100,7 +100,7 @@ public class BookingResource {
         try {
             tripId = UUID.fromString(request.tripId);
         } catch (IllegalArgumentException e) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.invalid_trip_id_format", locale);
             throw new BadRequestException(message);
         }
@@ -117,13 +117,13 @@ public class BookingResource {
             // validationService.validateUserIsNotDriver(request.tripId, currentUser);
         } catch (BookingValidationException e) {
             System.err.println("Booking validation error: " + e.getMessage());
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.validation_failed", locale);
             throw new BadRequestException(message + ": " + e.getMessage());
         } catch (Exception e) {
             System.err.println("Unexpected error during validation: " + e.getMessage());
             e.printStackTrace();
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.validation_error", locale);
             throw new BadRequestException(message + ": " + e.getMessage());
         }
@@ -135,6 +135,11 @@ public class BookingResource {
         return mapToDto(booking);
     }
 
+    // Overload for tests without Accept-Language header
+    public BookingDto create(BookingCreateDto request) {
+        return create(request, null);
+    }
+
     @GET
     public List<BookingDto> listMine(@QueryParam("from") String from,
                                      @QueryParam("to") String to,
@@ -142,7 +147,7 @@ public class BookingResource {
                                      @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.user_id_required", locale);
             throw new BadRequestException(message);
         }
@@ -169,6 +174,11 @@ public class BookingResource {
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
     }
 
+    // Overload for tests without Accept-Language header
+    public List<BookingDto> listMine(String from, String to, String status) {
+        return listMine(from, to, status, null);
+    }
+
     @GET
     @Path("/mine")
     public List<BookingDto> listMineFiltered(@QueryParam("from") String from,
@@ -176,7 +186,7 @@ public class BookingResource {
                                              @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.user_id_required", locale);
             throw new BadRequestException(message);
         }
@@ -195,6 +205,11 @@ public class BookingResource {
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
     }
 
+    // Overload for tests without Accept-Language header
+    public List<BookingDto> listMineFiltered(String from, String to) {
+        return listMineFiltered(from, to, null);
+    }
+
     private java.time.OffsetDateTime parseIsoDatetime(String iso) {
         if (iso == null || iso.isBlank()) return null;
         try {
@@ -209,7 +224,7 @@ public class BookingResource {
     public BookingDto getById(@PathParam("id") String id, @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.user_id_required", locale);
             throw new BadRequestException(message);
         }
@@ -218,21 +233,21 @@ public class BookingResource {
         try {
             bookingId = UUID.fromString(id);
         } catch (IllegalArgumentException e) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.invalid_booking_id_format", locale);
             throw new BadRequestException(message);
         }
 
         Booking booking = repository.findById(bookingId)
                 .orElseThrow(() -> {
-                    Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                    Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
                     String message = messageService.getMessage("bookings.error.booking_not_found", locale);
                     return new NotFoundException(message);
                 });
 
         // Ensure user can only access their own bookings
         if (!currentUser.equals(booking.getPassengerId())) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.access_denied", locale);
             throw new ForbiddenException(message);
         }
@@ -240,12 +255,17 @@ public class BookingResource {
         return mapToDto(booking);
     }
 
+    // Overload for tests without Accept-Language header
+    public BookingDto getById(String id) {
+        return getById(id, null);
+    }
+
     @PUT
     @Path("/{id}/confirm")
     public BookingDto confirm(@PathParam("id") String id, @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.user_id_required", locale);
             throw new BadRequestException(message);
         }
@@ -254,26 +274,26 @@ public class BookingResource {
         try {
             bookingId = UUID.fromString(id);
         } catch (IllegalArgumentException e) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.invalid_booking_id_format", locale);
             throw new BadRequestException(message);
         }
 
         Booking booking = repository.findById(bookingId)
                 .orElseThrow(() -> {
-                    Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                    Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
                     String message = messageService.getMessage("bookings.error.booking_not_found", locale);
                     return new NotFoundException(message);
                 });
 
         if (!currentUser.equals(booking.getPassengerId())) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.access_denied", locale);
             throw new ForbiddenException(message);
         }
 
         if (!booking.isPending()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.only_pending_can_confirm", locale);
             throw new BadRequestException(message);
         }
@@ -285,12 +305,17 @@ public class BookingResource {
         return mapToDto(booking);
     }
 
+    // Overload for tests without Accept-Language header
+    public BookingDto confirm(String id) {
+        return confirm(id, null);
+    }
+
     @PUT
     @Path("/{id}/cancel")
     public BookingDto cancel(@PathParam("id") String id, @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.user_id_required", locale);
             throw new BadRequestException(message);
         }
@@ -299,26 +324,26 @@ public class BookingResource {
         try {
             bookingId = UUID.fromString(id);
         } catch (IllegalArgumentException e) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.invalid_booking_id_format", locale);
             throw new BadRequestException(message);
         }
 
         Booking booking = repository.findById(bookingId)
                 .orElseThrow(() -> {
-                    Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                    Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
                     String message = messageService.getMessage("bookings.error.booking_not_found", locale);
                     return new NotFoundException(message);
                 });
 
         if (!currentUser.equals(booking.getPassengerId())) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.access_denied", locale);
             throw new ForbiddenException(message);
         }
 
         if (booking.isCancelled()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("bookings.error.already_cancelled", locale);
             throw new BadRequestException(message);
         }
@@ -328,6 +353,11 @@ public class BookingResource {
         try { notificationClient.sendBookingCancelled(currentUser, booking.getTripId().toString()); } catch (Exception ignored) {}
         
         return mapToDto(booking);
+    }
+
+    // Overload for tests without Accept-Language header
+    public BookingDto cancel(String id) {
+        return cancel(id, null);
     }
 
     private BookingDto mapToDto(Booking booking) {
