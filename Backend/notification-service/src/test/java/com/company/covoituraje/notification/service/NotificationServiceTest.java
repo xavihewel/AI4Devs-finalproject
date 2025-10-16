@@ -2,11 +2,13 @@ package com.company.covoituraje.notification.service;
 
 import com.company.covoituraje.notification.domain.NotificationSubscription;
 import com.company.covoituraje.notification.repository.NotificationSubscriptionRepository;
+import com.company.covoituraje.shared.i18n.MessageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,6 +20,7 @@ class NotificationServiceTest {
     private NotificationSubscriptionRepository subscriptionRepository;
     private PushNotificationService pushNotificationService;
     private EmailNotificationService emailNotificationService;
+    private MessageService messageService;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -25,6 +28,7 @@ class NotificationServiceTest {
         subscriptionRepository = mock(NotificationSubscriptionRepository.class);
         pushNotificationService = mock(PushNotificationService.class);
         emailNotificationService = mock(EmailNotificationService.class);
+        messageService = mock(MessageService.class);
 
         // Inject mocks via reflection
         var repoField = NotificationService.class.getDeclaredField("subscriptionRepository");
@@ -38,6 +42,10 @@ class NotificationServiceTest {
         var emailField = NotificationService.class.getDeclaredField("emailNotificationService");
         emailField.setAccessible(true);
         emailField.set(notificationService, emailNotificationService);
+
+        var messageField = NotificationService.class.getDeclaredField("messageService");
+        messageField.setAccessible(true);
+        messageField.set(notificationService, messageService);
     }
 
     @Test
@@ -130,14 +138,20 @@ class NotificationServiceTest {
         String email = "user@example.com";
         String tripId = "trip-001";
         int seatsRequested = 2;
+        Locale locale = Locale.forLanguageTag("es");
         NotificationSubscription s = new NotificationSubscription(userId, "https://e", "k", "a");
+        
         when(subscriptionRepository.findActiveByUserId(userId)).thenReturn(List.of(s));
         when(pushNotificationService.sendNotificationWithOutcome(eq(s), anyString(), anyString()))
             .thenReturn(PushNotificationService.SendOutcome.SUCCESS);
+        when(messageService.getMessage("push.booking.confirmed.title", locale))
+            .thenReturn("Reserva confirmada");
+        when(messageService.getMessage("push.booking.confirmed.body", locale, seatsRequested))
+            .thenReturn("Tu reserva de " + seatsRequested + " asientos ha sido confirmada");
 
-        notificationService.sendBookingConfirmation(userId, email, tripId, seatsRequested);
+        notificationService.sendBookingConfirmation(userId, email, tripId, seatsRequested, locale);
 
         verify(pushNotificationService).sendNotificationWithOutcome(eq(s), anyString(), anyString());
-        verify(emailNotificationService).sendBookingConfirmation(email, tripId, seatsRequested);
+        verify(emailNotificationService).sendBookingConfirmation(email, tripId, seatsRequested, locale);
     }
 }
