@@ -70,8 +70,8 @@ services:
       - AUTH_BYPASS_USER_ID=user-001
       - ALLOWED_ORIGINS=*
       # VAPID Keys for Push Notifications
-      - VAPID_PUBLIC_KEY=BHW9bFosH5N-wdRkQLPnZt8yB4-YJ_7Ol-BHr-wNiD4ADNky1D01Sbd7O7DEDJyugJNs3JCCgfv7Pu3g-o8ZydA
-      - VAPID_PRIVATE_KEY=cS7i2NUlX_oa589_Nl7OAJE7vSNj3UfTYkb8gSgZy54
+      - VAPID_PUBLIC_KEY=BM75fK9CbHI0PAhOz2J68KSzO3-JHGJeZw90_LR7bRzPoVvBIaYT928QXeD1EJ3mok1wKsVPtV7KAtATQrmYXpo
+      - VAPID_PRIVATE_KEY=JYLcN53bkOhEQridHNveYU-qupIRrZfi4c-DaEYFJkQ
       - VAPID_SUBJECT=mailto:admin@covoituraje.com
     ports:
       - "8081:8080"
@@ -97,8 +97,8 @@ services:
       - AUTH_BYPASS_USER_ID=user-001
       - ALLOWED_ORIGINS=*
       # VAPID Keys for Push Notifications
-      - VAPID_PUBLIC_KEY=BHW9bFosH5N-wdRkQLPnZt8yB4-YJ_7Ol-BHr-wNiD4ADNky1D01Sbd7O7DEDJyugJNs3JCCgfv7Pu3g-o8ZydA
-      - VAPID_PRIVATE_KEY=cS7i2NUlX_oa589_Nl7OAJE7vSNj3UfTYkb8gSgZy54
+      - VAPID_PUBLIC_KEY=BM75fK9CbHI0PAhOz2J68KSzO3-JHGJeZw90_LR7bRzPoVvBIaYT928QXeD1EJ3mok1wKsVPtV7KAtATQrmYXpo
+      - VAPID_PRIVATE_KEY=JYLcN53bkOhEQridHNveYU-qupIRrZfi4c-DaEYFJkQ
       - VAPID_SUBJECT=mailto:admin@covoituraje.com
     ports:
       - "8082:8080"
@@ -209,8 +209,8 @@ services:
       - AUTH_BYPASS_USER_ID=user-001
       - ALLOWED_ORIGINS=*
       # VAPID Keys for Push Notifications
-      - VAPID_PUBLIC_KEY=BHW9bFosH5N-wdRkQLPnZt8yB4-YJ_7Ol-BHr-wNiD4ADNky1D01Sbd7O7DEDJyugJNs3JCCgfv7Pu3g-o8ZydA
-      - VAPID_PRIVATE_KEY=cS7i2NUlX_oa589_Nl7OAJE7vSNj3UfTYkb8gSgZy54
+      - VAPID_PUBLIC_KEY=BM75fK9CbHI0PAhOz2J68KSzO3-JHGJeZw90_LR7bRzPoVvBIaYT928QXeD1EJ3mok1wKsVPtV7KAtATQrmYXpo
+      - VAPID_PRIVATE_KEY=JYLcN53bkOhEQridHNveYU-qupIRrZfi4c-DaEYFJkQ
       - VAPID_SUBJECT=mailto:admin@covoituraje.com
       # SMTP Configuration
       - SMTP_HOST=mailhog

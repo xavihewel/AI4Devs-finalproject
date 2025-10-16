@@ -48,12 +48,42 @@
     "seat": "seient",
     "seats": "seients",
     "confirmBooking": "Confirmar Reserva",
+    "route": "Ruta",
+    "showMap": "Mostrar Mapa",
+    "hideMap": "Ocultar Mapa",
     "score": {
       "excellent": "Excel·lent",
       "good": "Bo", 
       "regular": "Regular",
-      "low": "Baix"
+      "low": "Baix",
+      "description": "Puntuació de compatibilitat: {score}%"
     }
+  },
+  "filters": {
+    "title": "Filtrar Resultats",
+    "minScore": "Puntuació Mínima",
+    "minSeats": "Seients Mínims",
+    "dateFrom": "Des de Data",
+    "dateTo": "Fins a Data",
+    "sortBy": "Ordenar Per",
+    "sortOrder": "Ordre",
+    "clear": "Netejar Filtres",
+    "activeCount": "{count} filtres actius",
+    "scoreChip": "Puntuació ≥ {score}%",
+    "seatsChip": "Seients ≥ {seats}",
+    "fromChip": "Des de {date}",
+    "toChip": "Fins a {date}",
+    "sort": {
+      "score": "Puntuació",
+      "date": "Data",
+      "seats": "Seients Disponibles"
+    },
+    "order": {
+      "desc": "Descendent",
+      "asc": "Ascendent"
+    },
+    "seat": "seient",
+    "seats": "seients"
   },
   "modals": {
     "trustProfile": {

@@ -19,7 +19,9 @@
     "tryDifferent": "No trips available matching your search criteria.",
     "clearSearch": "Clear Search",
     "initialTitle": "Find your ideal trip",
-    "initialDescription": "Complete the search form to find trips compatible with your location and schedule."
+    "initialDescription": "Complete the search form to find trips compatible with your location and schedule.",
+    "noFilteredResults": "No results match your filters",
+    "tryDifferentFilters": "Try adjusting your filter criteria to see more results."
   },
   "match": {
     "driver": "Driver",
@@ -48,12 +50,42 @@
     "seat": "seat",
     "seats": "seats",
     "confirmBooking": "Confirm Booking",
+    "route": "Route",
+    "showMap": "Show Map",
+    "hideMap": "Hide Map",
     "score": {
       "excellent": "Excellent",
       "good": "Good", 
       "regular": "Regular",
-      "low": "Low"
+      "low": "Low",
+      "description": "Compatibility score: {score}%"
     }
+  },
+  "filters": {
+    "title": "Filter Results",
+    "minScore": "Minimum Score",
+    "minSeats": "Minimum Seats",
+    "dateFrom": "From Date",
+    "dateTo": "To Date",
+    "sortBy": "Sort By",
+    "sortOrder": "Order",
+    "clear": "Clear Filters",
+    "activeCount": "{count} active filters",
+    "scoreChip": "Score ≥ {score}%",
+    "seatsChip": "Seats ≥ {seats}",
+    "fromChip": "From {date}",
+    "toChip": "To {date}",
+    "sort": {
+      "score": "Score",
+      "date": "Date",
+      "seats": "Available Seats"
+    },
+    "order": {
+      "desc": "Descending",
+      "asc": "Ascending"
+    },
+    "seat": "seat",
+    "seats": "seats"
   },
   "modals": {
     "trustProfile": {

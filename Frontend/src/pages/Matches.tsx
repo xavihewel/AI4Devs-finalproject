@@ -4,15 +4,16 @@ import { MatchesService, BookingsService } from '../api';
 import type { MatchDto } from '../types/api';
 import { Button, Card, CardContent, Input, Select, LoadingSpinner } from '../components/ui';
 import DirectionFilter from '../components/filters/DirectionFilter';
-import MapPreview from '../components/map/MapPreview';
+import MatchCard from '../components/matches/MatchCard';
+import MatchFilters, { FilterOptions } from '../components/matches/MatchFilters';
 import { TrustProfile } from '../components/trust/TrustProfile';
 import { RatingForm } from '../components/trust/RatingForm';
 import { SeatSelectionModalSimple as SeatSelectionModal } from '../components/booking/SeatSelectionModal.simple';
-import { env } from '../env';
 
 export default function Matches() {
   const { t } = useTranslation('matches');
   const [matches, setMatches] = useState<MatchDto[]>([]);
+  const [filteredMatches, setFilteredMatches] = useState<MatchDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [searching, setSearching] = useState(false);
   const [bookingInProgress, setBookingInProgress] = useState<string | null>(null);
@@ -39,15 +40,38 @@ export default function Matches() {
     origin: '',
   });
 
+  // Filter state
+  const [filters, setFilters] = useState<FilterOptions>({
+    minScore: 0,
+    minSeats: 1,
+    dateFrom: '',
+    dateTo: '',
+    sortBy: 'score',
+    sortOrder: 'desc'
+  });
+
   const showMessage = (type: 'success' | 'error', text: string) => {
     setMessage({ type, text });
     setTimeout(() => setMessage(null), 4000);
   };
 
-  // Cargar reservas existentes al montar el componente
+  // Cargar reservas existentes y parámetros de búsqueda al montar el componente
   useEffect(() => {
     loadExistingBookings();
+    loadLastSearchParams();
   }, []);
+
+  const loadLastSearchParams = () => {
+    const savedParams = localStorage.getItem('lastSearchParams');
+    if (savedParams) {
+      try {
+        const params = JSON.parse(savedParams);
+        setSearchParams(params);
+      } catch (error) {
+        console.error('Error loading saved search params:', error);
+      }
+    }
+  };
 
   const loadExistingBookings = async () => {
     try {
@@ -91,6 +115,10 @@ export default function Matches() {
       setSearching(true);
       const data = await MatchesService.findMatches(searchParams as any);
       setMatches(data);
+      setFilteredMatches(data);
+      
+      // Save search params to localStorage
+      localStorage.setItem('lastSearchParams', JSON.stringify(searchParams));
     } catch (error) {
       console.error('Error searching matches:', error);
       alert(t('match.searchError'));
@@ -108,6 +136,22 @@ export default function Matches() {
 
   const handleBooking = async (match: MatchDto) => {
     setSeatSelectionModal({ isOpen: true, match });
+  };
+
+  const handleViewProfile = (driverId: string) => {
+    setShowTrustProfile(driverId);
+  };
+
+  const handleRate = (driverId: string) => {
+    setShowRatingForm(driverId);
+  };
+
+  const handleFilteredMatches = (filtered: MatchDto[]) => {
+    setFilteredMatches(filtered);
+  };
+
+  const handleFiltersChange = (newFilters: FilterOptions) => {
+    setFilters(newFilters);
   };
 
   const handleSeatSelection = async (seats: number) => {
@@ -234,127 +278,33 @@ export default function Matches() {
         </div>
       )}
 
-      {/* Results */}
+      {/* Filters */}
       {matches.length > 0 && (
+        <MatchFilters
+          matches={matches}
+          onFilteredMatches={handleFilteredMatches}
+          onFiltersChange={handleFiltersChange}
+        />
+      )}
+
+      {/* Results */}
+      {filteredMatches.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-xl font-semibold text-gray-900">
-            {t('results.title', { count: matches.length })}
+            {t('results.title', { count: filteredMatches.length })}
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {matches.map((match) => (
-              <Card key={match.id}>
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* Score Badge and Booked Status */}
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-center flex-wrap gap-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getScoreColor(match.score)}`}>
-                          {getScoreLabel(match.score)} ({Math.round(match.score * 100)}%)
-                        </span>
-                        {bookedTrips.has(match.tripId) && (
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200 flex items-center gap-1">
-                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                            {t('match.alreadyBooked')}
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-gray-500">
-                          {new Date(match.dateTime).toLocaleDateString()}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {new Date(match.dateTime).toLocaleTimeString()}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Trip Details */}
-                    <div className="space-y-2">
-                      <h3 className="font-semibold text-lg">
-                        {t('match.tripTo', { destination: match.destinationSedeId })}
-                      </h3>
-                      
-                      <div className="space-y-1 text-sm text-gray-600">
-                        <p><strong>{t('match.origin')}:</strong> {match.origin}</p>
-                        <p><strong>{t('match.freeSeats')}:</strong> {match.seatsFree}</p>
-                      </div>
-
-                      {(() => {
-                        // match.origin viene como string "lat,lng"; lo parseamos
-                        const parts = (match.origin || '').split(',').map(s => parseFloat(s.trim()));
-                        const hasCoords = parts.length === 2 && parts.every(n => !isNaN(n));
-                        if (!hasCoords) return null;
-                        const [lat, lng] = parts as [number, number];
-                        return (
-                          <div className="pt-2">
-                            <MapPreview
-                              origin={{ lat, lng }}
-                              height={160}
-                              interactive={false}
-                              tilesUrl={env.mapTilesUrl}
-                            />
-                          </div>
-                        );
-                      })()}
-
-                      {/* Match Reasons */}
-                      {match.reasons && match.reasons.length > 0 && (
-                        <div className="space-y-1">
-                          <p className="text-sm font-medium text-gray-700">{t('match.compatibilityReasons')}:</p>
-                          <ul className="text-xs text-gray-600 space-y-1">
-                            {match.reasons.map((reason, index) => (
-                              <li key={`${match.id}-reason-${index}`} className="flex items-center">
-                                <span className="w-1.5 h-1.5 bg-primary-500 rounded-full mr-2"></span>
-                                {reason}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Action Button */}
-                    <div className="pt-4 border-t border-gray-200">
-                      <Button
-                        variant="primary"
-                        className="w-full"
-                        onClick={() => handleBooking(match)}
-                        disabled={bookingInProgress === match.tripId || match.seatsFree === 0 || bookedTrips.has(match.tripId)}
-                        loading={bookingInProgress === match.tripId}
-                      >
-                        {match.seatsFree === 0
-                          ? t('match.noSeatsAvailable')
-                          : bookedTrips.has(match.tripId)
-                            ? t('match.alreadyBooked')
-                            : t('match.book')}
-                      </Button>
-                      
-                      {/* Trust System Buttons */}
-                      <div className="flex space-x-2 mt-2">
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          className="flex-1"
-                          onClick={() => setShowTrustProfile(match.driverId)}
-                        >
-                          👤 {t('match.viewProfile')}
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          className="flex-1"
-                          onClick={() => setShowRatingForm(match.driverId)}
-                        >
-                          ⭐ {t('match.rate')}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            {filteredMatches.map((match) => (
+              <MatchCard
+                key={match.id}
+                match={match}
+                isBooked={bookedTrips.has(match.tripId)}
+                isBookingInProgress={bookingInProgress === match.tripId}
+                onBook={handleBooking}
+                onViewProfile={handleViewProfile}
+                onRate={handleRate}
+              />
             ))}
           </div>
         </div>
@@ -373,12 +323,28 @@ export default function Matches() {
               <Button
                 variant="secondary"
                 onClick={() => {
-                  setSearchParams({ destinationSedeId: '', time: '', origin: '' });
+                  setSearchParams({ direction: 'TO_SEDE', destinationSedeId: '', originSedeId: '', time: '', origin: '' });
                   setMatches([]);
+                  setFilteredMatches([]);
                 }}
               >
                 {t('results.clearSearch')}
               </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* No Filtered Results */}
+      {!loading && matches.length > 0 && filteredMatches.length === 0 && (
+        <Card>
+          <CardContent>
+            <div className="text-center py-8">
+              <div className="text-4xl mb-4">🔍</div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('results.noFilteredResults')}</h3>
+              <p className="text-gray-500 mb-4">
+                {t('results.tryDifferentFilters')}
+              </p>
             </div>
           </CardContent>
         </Card>

@@ -3,6 +3,8 @@ package com.company.covoituraje.notification.api;
 import com.company.covoituraje.notification.domain.NotificationSubscription;
 import com.company.covoituraje.notification.repository.NotificationSubscriptionRepository;
 import com.company.covoituraje.notification.service.NotificationService;
+import com.company.covoituraje.notification.service.EmailWorker;
+import com.company.covoituraje.notification.service.NotificationEvents;
 import com.company.covoituraje.shared.i18n.LocaleUtils;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -21,6 +23,8 @@ public class NotificationResource {
     private NotificationService notificationService;
     @Inject
     private NotificationSubscriptionRepository subscriptionRepository;
+    @Inject
+    EmailWorker emailWorker;
     
     static final class AuthContext {
         private static final ThreadLocal<String> USER_ID = new ThreadLocal<>();
@@ -119,6 +123,39 @@ public class NotificationResource {
         return Response.ok("{\"status\": \"UP\", \"service\": \"notification-service\"}").build();
     }
 
+    // --- Event endpoints (internal or admin-triggered) ---
+    @POST
+    @Path("/events/booking-confirmed")
+    public Response bookingConfirmed(
+        @HeaderParam("Accept-Language") String acceptLanguage,
+        BookingConfirmedRequest request
+    ) {
+        String userId = AuthContext.getUserId();
+        if (userId == null) {
+            return Response.status(401).entity("{\"error\": \"Unauthorized\"}").build();
+        }
+        java.util.Locale locale = request.locale != null && !request.locale.isBlank() ? java.util.Locale.forLanguageTag(request.locale) : java.util.Locale.ENGLISH;
+        NotificationEvents.BookingConfirmedEvent event = new NotificationEvents.BookingConfirmedEvent(userId, request.email, request.tripId, request.seats, locale);
+        emailWorker.handle(event);
+        return Response.ok("{\"message\": \"Event processed\"}").build();
+    }
+
+    @POST
+    @Path("/events/trip-cancelled")
+    public Response tripCancelled(
+        @HeaderParam("Accept-Language") String acceptLanguage,
+        TripCancelledRequest request
+    ) {
+        String userId = AuthContext.getUserId();
+        if (userId == null) {
+            return Response.status(401).entity("{\"error\": \"Unauthorized\"}").build();
+        }
+        java.util.Locale locale = request.locale != null && !request.locale.isBlank() ? java.util.Locale.forLanguageTag(request.locale) : java.util.Locale.ENGLISH;
+        NotificationEvents.TripCancelledEvent event = new NotificationEvents.TripCancelledEvent(userId, request.email, request.tripId, locale);
+        emailWorker.handle(event);
+        return Response.ok("{\"message\": \"Event processed\"}").build();
+    }
+
     // DTOs
     public static class SubscriptionRequest {
         public String endpoint;
@@ -133,5 +170,18 @@ public class NotificationResource {
     public static class NotificationRequest {
         public String title;
         public String body;
+    }
+
+    public static class BookingConfirmedRequest {
+        public String email;
+        public String tripId;
+        public int seats;
+        public String locale;
+    }
+
+    public static class TripCancelledRequest {
+        public String email;
+        public String tripId;
+        public String locale;
     }
 }

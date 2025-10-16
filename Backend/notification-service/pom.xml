@@ -93,6 +93,20 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+    <!-- AssertJ for fluent assertions in tests -->
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>3.24.2</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- JAX-RS RuntimeDelegate provider for unit tests -->
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-common</artifactId>
+      <version>3.1.5</version>
+      <scope>test</scope>
+    </dependency>
     </dependencies>
 
     <build>

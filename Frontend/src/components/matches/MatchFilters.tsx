@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { MatchDto } from '../../types/api';
 import { Button, Card, CardContent, Input, Select } from '../ui';
+import { MatchFilterService } from './services/MatchFilterService';
+import { ConcreteFilterStrategyFactory } from './factories/FilterStrategyFactory';
+import { ConcreteSortStrategyFactory } from './factories/SortStrategyFactory';
+import { LocalStorageFilterRepository } from './repositories/FilterPersistenceRepository';
 
 export interface FilterOptions {
   minScore: number;
@@ -25,6 +29,13 @@ export default function MatchFilters({
 }: MatchFiltersProps) {
   const { t } = useTranslation('matches');
   
+  // Dependency injection following DIP
+  const filterService = new MatchFilterService(
+    new ConcreteFilterStrategyFactory(),
+    new ConcreteSortStrategyFactory()
+  );
+  const persistenceRepository = new LocalStorageFilterRepository();
+  
   const [filters, setFilters] = useState<FilterOptions>({
     minScore: 0,
     minSeats: 1,
@@ -36,82 +47,31 @@ export default function MatchFilters({
 
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
 
-  // Load filters from localStorage on mount
+  // Load filters from repository on mount
   useEffect(() => {
-    const savedFilters = localStorage.getItem('matchFilters');
+    const savedFilters = persistenceRepository.load();
     if (savedFilters) {
-      try {
-        const parsed = JSON.parse(savedFilters);
-        setFilters(parsed);
-      } catch (error) {
-        console.error('Error loading saved filters:', error);
-      }
+      setFilters(savedFilters);
     }
   }, []);
 
-  // Save filters to localStorage whenever they change
+  // Save filters to repository whenever they change
   useEffect(() => {
-    localStorage.setItem('matchFilters', JSON.stringify(filters));
+    persistenceRepository.save(filters);
   }, [filters]);
 
-  // Apply filters and sorting
+  // Apply filters and sorting using service
   useEffect(() => {
-    let filtered = [...matches];
-
-    // Apply score filter
-    if (filters.minScore > 0) {
-      filtered = filtered.filter(match => match.score >= filters.minScore / 100);
-    }
-
-    // Apply seats filter
-    if (filters.minSeats > 1) {
-      filtered = filtered.filter(match => match.seatsFree >= filters.minSeats);
-    }
-
-    // Apply date filters
-    if (filters.dateFrom) {
-      const fromDate = new Date(filters.dateFrom);
-      filtered = filtered.filter(match => new Date(match.dateTime) >= fromDate);
-    }
-
-    if (filters.dateTo) {
-      const toDate = new Date(filters.dateTo);
-      toDate.setHours(23, 59, 59, 999); // End of day
-      filtered = filtered.filter(match => new Date(match.dateTime) <= toDate);
-    }
-
-    // Apply sorting
-    filtered.sort((a, b) => {
-      let comparison = 0;
-      
-      switch (filters.sortBy) {
-        case 'score':
-          comparison = a.score - b.score;
-          break;
-        case 'date':
-          comparison = new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime();
-          break;
-        case 'seats':
-          comparison = a.seatsFree - b.seatsFree;
-          break;
-      }
-
-      return filters.sortOrder === 'desc' ? -comparison : comparison;
-    });
-
+    const filtered = filterService.processMatches(matches, filters);
     onFilteredMatches(filtered);
     onFiltersChange(filters);
-  }, [matches, filters, onFilteredMatches, onFiltersChange]);
+  }, [matches, filters, onFilteredMatches, onFiltersChange, filterService]);
 
-  // Count active filters
+  // Count active filters using service
   useEffect(() => {
-    let count = 0;
-    if (filters.minScore > 0) count++;
-    if (filters.minSeats > 1) count++;
-    if (filters.dateFrom) count++;
-    if (filters.dateTo) count++;
-    setActiveFiltersCount(count);
-  }, [filters]);
+    const activeFilterNames = filterService.getActiveFilterNames(filters);
+    setActiveFiltersCount(activeFilterNames.length);
+  }, [filters, filterService]);
 
   const handleFilterChange = (key: keyof FilterOptions, value: any) => {
     setFilters(prev => ({
@@ -130,6 +90,7 @@ export default function MatchFilters({
       sortOrder: 'desc'
     };
     setFilters(defaultFilters);
+    persistenceRepository.clear();
   };
 
   const sortOptions = [
@@ -151,15 +112,16 @@ export default function MatchFilters({
             <h3 className="text-lg font-semibold text-gray-900">
               {t('filters.title')}
             </h3>
-            {activeFiltersCount > 0 && (
+              {activeFiltersCount > 0 && (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500" data-testid="active-count">
                   {t('filters.activeCount', { count: activeFiltersCount })}
                 </span>
                 <Button
                   variant="secondary"
                   size="sm"
                   onClick={clearFilters}
+                  data-testid="clear-filters"
                 >
                   {t('filters.clear')}
                 </Button>
@@ -242,9 +204,9 @@ export default function MatchFilters({
 
           {/* Active Filter Chips */}
           {activeFiltersCount > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2" data-testid="active-filters">
               {filters.minScore > 0 && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800" data-testid="score-chip">
                   {t('filters.scoreChip', { score: filters.minScore })}
                   <button
                     onClick={() => handleFilterChange('minScore', 0)}
@@ -255,7 +217,7 @@ export default function MatchFilters({
                 </span>
               )}
               {filters.minSeats > 1 && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800" data-testid="seats-chip">
                   {t('filters.seatsChip', { seats: filters.minSeats })}
                   <button
                     onClick={() => handleFilterChange('minSeats', 1)}
@@ -266,7 +228,7 @@ export default function MatchFilters({
                 </span>
               )}
               {filters.dateFrom && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800" data-testid="date-from-chip">
                   {t('filters.fromChip', { date: new Date(filters.dateFrom).toLocaleDateString() })}
                   <button
                     onClick={() => handleFilterChange('dateFrom', '')}
@@ -277,7 +239,7 @@ export default function MatchFilters({
                 </span>
               )}
               {filters.dateTo && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800" data-testid="date-to-chip">
                   {t('filters.toChip', { date: new Date(filters.dateTo).toLocaleDateString() })}
                   <button
                     onClick={() => handleFilterChange('dateTo', '')}

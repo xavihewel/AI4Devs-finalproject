@@ -12,6 +12,7 @@ export const env = {
   matchingApiBaseUrl: (import.meta.env.VITE_MATCHING_API_BASE_URL ?? import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8084/api') as string,
   VITE_API_NOTIFICATIONS: (import.meta.env.VITE_NOTIFICATIONS_API_BASE_URL ?? 'http://localhost:8085/api') as string,
   VAPID_PUBLIC_KEY: (import.meta.env.VITE_VAPID_PUBLIC_KEY ?? '') as string,
+  vapidPublicKey: (import.meta.env.VITE_VAPID_PUBLIC_KEY ?? '') as string,
   mapTilesUrl: (import.meta.env.VITE_MAP_TILES_URL ?? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png') as string,
   authDisabled: (import.meta.env.VITE_AUTH_DISABLED === 'true') as boolean,
 };

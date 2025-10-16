@@ -4,6 +4,7 @@ import com.company.covoituraje.booking.domain.Booking;
 import com.company.covoituraje.booking.infrastructure.BookingRepository;
 import com.company.covoituraje.booking.service.BookingValidationService;
 import com.company.covoituraje.booking.integration.NotificationServiceClient;
+import com.company.covoituraje.booking.integration.NotificationEventPublisher;
 import com.company.covoituraje.booking.service.BookingValidationException;
 import com.company.covoituraje.booking.integration.TripsServiceClient;
 import com.company.covoituraje.booking.integration.UsersServiceClient;
@@ -25,6 +26,7 @@ public class BookingResource {
     private final BookingRepository repository;
     private final BookingValidationService validationService;
     private final NotificationServiceClient notificationClient;
+    private final NotificationEventPublisher eventPublisher;
     private final MessageService messageService;
     
     static final class AuthContext {
@@ -49,6 +51,7 @@ public class BookingResource {
         this.validationService = new BookingValidationService(tripsServiceClient, usersServiceClient);
         String notificationServiceUrl = System.getenv().getOrDefault("NOTIFICATION_SERVICE_URL", "http://localhost:8085/api");
         this.notificationClient = new NotificationServiceClient(notificationServiceUrl);
+        this.eventPublisher = new NotificationEventPublisher(notificationClient);
         this.messageService = new MessageService();
     }
 
@@ -56,6 +59,7 @@ public class BookingResource {
         this.repository = repository;
         this.validationService = validationService;
         this.notificationClient = notificationClient;
+        this.eventPublisher = new NotificationEventPublisher(notificationClient);
         this.messageService = new MessageService();
     }
 
@@ -64,6 +68,7 @@ public class BookingResource {
         this.validationService = validationService;
         String notificationServiceUrl = System.getenv().getOrDefault("NOTIFICATION_SERVICE_URL", "http://localhost:8085/api");
         this.notificationClient = new NotificationServiceClient(notificationServiceUrl);
+        this.eventPublisher = new NotificationEventPublisher(notificationClient);
         this.messageService = new MessageService();
     }
 
@@ -71,6 +76,7 @@ public class BookingResource {
         this.repository = repository;
         this.validationService = validationService;
         this.notificationClient = notificationClient;
+        this.eventPublisher = new NotificationEventPublisher(notificationClient);
         this.messageService = messageService;
     }
 
@@ -300,7 +306,16 @@ public class BookingResource {
 
         booking.confirm();
         booking = repository.save(booking);
-        try { notificationClient.sendBookingConfirmed(currentUser, booking.getTripId().toString(), booking.getSeatsRequested()); } catch (Exception ignored) {}
+        
+        // Emit booking confirmed event with user email
+        try {
+            // Get user email from users-service (simplified for now - in production would be async)
+            String userEmail = "user-" + currentUser + "@example.com"; // TODO: Get real email from users-service
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
+            eventPublisher.publishBookingConfirmed(currentUser, userEmail, booking.getTripId().toString(), booking.getSeatsRequested(), locale);
+        } catch (Exception e) {
+            System.err.println("Failed to publish booking confirmed event: " + e.getMessage());
+        }
         
         return mapToDto(booking);
     }

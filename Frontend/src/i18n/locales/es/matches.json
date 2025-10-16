@@ -48,12 +48,42 @@
     "seat": "asiento",
     "seats": "asientos",
     "confirmBooking": "Confirmar Reserva",
+    "route": "Ruta",
+    "showMap": "Mostrar Mapa",
+    "hideMap": "Ocultar Mapa",
     "score": {
       "excellent": "Excelente",
       "good": "Bueno", 
       "regular": "Regular",
-      "low": "Bajo"
+      "low": "Bajo",
+      "description": "Puntuación de compatibilidad: {score}%"
     }
+  },
+  "filters": {
+    "title": "Filtrar Resultados",
+    "minScore": "Puntuación Mínima",
+    "minSeats": "Asientos Mínimos",
+    "dateFrom": "Desde Fecha",
+    "dateTo": "Hasta Fecha",
+    "sortBy": "Ordenar Por",
+    "sortOrder": "Orden",
+    "clear": "Limpiar Filtros",
+    "activeCount": "{count} filtros activos",
+    "scoreChip": "Puntuación ≥ {score}%",
+    "seatsChip": "Asientos ≥ {seats}",
+    "fromChip": "Desde {date}",
+    "toChip": "Hasta {date}",
+    "sort": {
+      "score": "Puntuación",
+      "date": "Fecha",
+      "seats": "Asientos Disponibles"
+    },
+    "order": {
+      "desc": "Descendente",
+      "asc": "Ascendente"
+    },
+    "seat": "asiento",
+    "seats": "asientos"
   },
   "modals": {
     "trustProfile": {

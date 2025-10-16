@@ -4,6 +4,7 @@ import com.company.covoituraje.matching.service.MatchingService;
 import com.company.covoituraje.matching.infrastructure.MatchRepository;
 import com.company.covoituraje.matching.integration.TripsServiceClient;
 import com.company.covoituraje.matching.integration.NotificationServiceClient;
+import com.company.covoituraje.matching.integration.NotificationEventPublisher;
 import com.company.covoituraje.shared.i18n.MessageService;
 import com.company.covoituraje.shared.i18n.LocaleUtils;
 import jakarta.ws.rs.*;
@@ -20,6 +21,7 @@ public class MatchesResource {
     private final MatchingService matchingService;
     private final MatchRepository matchRepository;
     private final NotificationServiceClient notificationClient;
+    private final NotificationEventPublisher eventPublisher;
     private final MessageService messageService;
     
     static final class AuthContext {
@@ -40,6 +42,7 @@ public class MatchesResource {
         this.matchRepository = matchRepository;
         String notificationServiceUrl = System.getenv().getOrDefault("NOTIFICATION_SERVICE_URL", "http://localhost:8085/api");
         this.notificationClient = new NotificationServiceClient(notificationServiceUrl);
+        this.eventPublisher = new NotificationEventPublisher(notificationClient);
         this.messageService = new MessageService();
     }
 
@@ -48,6 +51,7 @@ public class MatchesResource {
         this.matchRepository = matchRepository;
         String notificationServiceUrl = System.getenv().getOrDefault("NOTIFICATION_SERVICE_URL", "http://localhost:8085/api");
         this.notificationClient = new NotificationServiceClient(notificationServiceUrl);
+        this.eventPublisher = new NotificationEventPublisher(notificationClient);
         this.messageService = new MessageService();
     }
 
@@ -55,6 +59,7 @@ public class MatchesResource {
         this.matchingService = matchingService;
         this.matchRepository = matchRepository;
         this.notificationClient = notificationClient;
+        this.eventPublisher = new NotificationEventPublisher(notificationClient);
         this.messageService = new MessageService();
     }
 
@@ -62,6 +67,7 @@ public class MatchesResource {
         this.matchingService = matchingService;
         this.matchRepository = matchRepository;
         this.notificationClient = notificationClient;
+        this.eventPublisher = new NotificationEventPublisher(notificationClient);
         this.messageService = messageService;
     }
 
@@ -117,6 +123,27 @@ public class MatchesResource {
             origin,
             direction
         );
+
+        // Emit match found events for high-score matches
+        Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
+        for (MatchResult match : matches) {
+            if (match.score >= 0.7) { // Only notify for good matches
+                try {
+                    // Get user email (simplified for now - in production would be async)
+                    String userEmail = "user-" + currentUser + "@example.com"; // TODO: Get real email from users-service
+                    eventPublisher.publishMatchFound(
+                        currentUser, 
+                        userEmail, 
+                        match.tripId, 
+                        match.driverId, 
+                        match.score, 
+                        locale
+                    );
+                } catch (Exception e) {
+                    System.err.println("Failed to publish match found event: " + e.getMessage());
+                }
+            }
+        }
 
         // Convert to DTOs
         return matches.stream()

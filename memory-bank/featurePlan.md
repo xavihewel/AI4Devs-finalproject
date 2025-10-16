@@ -7,9 +7,9 @@
 | 1 | Registro e inicio de sesión corporativo (SSO) | Sí (OIDC/Keycloak) | Backend OIDC listo; FE login en validación | Re-ejecutar auth E2E tras fix CORS; ajustar FE si necesario |
 | 2 | Perfil de usuario | Sí (Users Service) | ✅ COMPLETADO - API + UI + validaciones + tests | Feature completado con validaciones robustas y E2E |
 | 3 | Creación de viajes | Sí (Trips Service) | API trips con JPA | Completar UI crear/gestionar viajes; tests |
-| 4 | Búsqueda y emparejamiento | Sí (Matching Service) | Matching básico | UI búsqueda + mostrar scoring; filtros básicos |
+| 4 | Búsqueda y emparejamiento | Sí (Matching Service) | ✅ AVANZADO - UI completa + SOLID | Feature completada con arquitectura enterprise (Strategy, Factory, Repository patterns) |
 | 5 | Reserva de plaza | Sí (Booking Service) | ✅ COMPLETADO - TDD backend/frontend + E2E | Reglas implementadas: PENDING status, validación asientos, notificaciones, driver cutoff |
-| 6 | Notificaciones en tiempo real | Parcial (Notifications plan) | Hooks definidos; sin worker | Implementar worker simple email; preparar push later |
+| 6 | Notificaciones en tiempo real | Sí (Notifications plan) | ✅ CONFIGURACIÓN VAPID - Backend/Frontend + VAPID | Tests backend, templates email, tests E2E |
 | 7 | Mapa y geolocalización básica | Sí (OpenStreetMap + React Leaflet) | ✅ COMPLETADO - MapPreview + MapLinkButtons | Componentes integrados en Trips/Matches, tests unitarios y E2E |
 | 8 | Historial de viajes | Parcial (Trips/Bookings list) | ✅ COMPLETADO - Backend/Frontend/Tests/Docs | Feature completado end-to-end con filtros y estadísticas |
 | 9 | Sistema de confianza interno | Plan (Ratings) | ✅ COMPLETADO - Backend TDD + Frontend UI | Backend/frontend implementado, CORS issue para redeploy |
