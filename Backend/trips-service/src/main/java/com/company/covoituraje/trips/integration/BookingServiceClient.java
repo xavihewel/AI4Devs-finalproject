@@ -25,7 +25,10 @@ public class BookingServiceClient {
     }
     
     public BookingServiceClient(String bookingServiceUrl) {
-        this();
+        this.httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+        this.objectMapper = new ObjectMapper();
         this.bookingServiceUrl = bookingServiceUrl;
     }
     

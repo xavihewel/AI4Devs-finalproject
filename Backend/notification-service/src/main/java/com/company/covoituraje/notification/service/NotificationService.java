@@ -52,9 +52,7 @@ public class NotificationService {
         List<NotificationSubscription> subscriptions = subscriptionRepository.findActiveByUserId(userId);
         for (NotificationSubscription subscription : subscriptions) {
             PushNotificationService.SendOutcome outcome = pushNotificationService.sendNotificationWithOutcome(
-                subscription.getEndpoint(), 
-                subscription.getP256dhKey(), 
-                subscription.getAuthKey(), 
+                subscription, 
                 title, 
                 body
             );
@@ -67,9 +65,7 @@ public class NotificationService {
                         Thread.sleep(250L * attempts);
                     } catch (InterruptedException ignored) {}
                     outcome = pushNotificationService.sendNotificationWithOutcome(
-                        subscription.getEndpoint(), 
-                        subscription.getP256dhKey(), 
-                        subscription.getAuthKey(), 
+                        subscription, 
                         title, 
                         body
                     );
