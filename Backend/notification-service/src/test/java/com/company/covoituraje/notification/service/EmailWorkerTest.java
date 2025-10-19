@@ -1,5 +1,8 @@
 package com.company.covoituraje.notification.service;
 
+import com.company.covoituraje.notification.service.NotificationEvents.BookingConfirmedEvent;
+import com.company.covoituraje.notification.service.NotificationEvents.NotificationEvent;
+import com.company.covoituraje.notification.service.NotificationEvents.TripCancelledEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -66,37 +69,95 @@ class EmailWorkerTest {
         assertThat(localeCaptor.getValue().toLanguageTag()).isEqualTo("es");
     }
 
-    // --- Minimal domain event types for TDD ---
-    interface NotificationEvent {}
+    @Test
+    void shouldHandleMultipleEventsSequentially() {
+        // Given
+        BookingConfirmedEvent bookingEvent = new BookingConfirmedEvent(
+                "user-1", "user1@example.com", "trip-123", 2, Locale.ENGLISH
+        );
+        TripCancelledEvent tripEvent = new TripCancelledEvent(
+                "user-2", "user2@example.com", "trip-456", Locale.forLanguageTag("es")
+        );
 
-    static final class BookingConfirmedEvent implements NotificationEvent {
-        final String userId; final String email; final String tripId; final int seats; final Locale locale;
-        BookingConfirmedEvent(String userId, String email, String tripId, int seats, Locale locale) {
-            this.userId = userId; this.email = email; this.tripId = tripId; this.seats = seats; this.locale = locale;
-        }
+        // When
+        worker.handle(bookingEvent);
+        worker.handle(tripEvent);
+
+        // Then
+        verify(notificationService, times(1))
+                .sendBookingConfirmation("user-1", "user1@example.com", "trip-123", 2, Locale.ENGLISH);
+        verify(notificationService, times(1))
+                .sendTripCancellation("user-2", "user2@example.com", "trip-456", Locale.forLanguageTag("es"));
     }
 
-    static final class TripCancelledEvent implements NotificationEvent {
-        final String userId; final String email; final String tripId; final Locale locale;
-        TripCancelledEvent(String userId, String email, String tripId, Locale locale) {
-            this.userId = userId; this.email = email; this.tripId = tripId; this.locale = locale;
-        }
+    @Test
+    void shouldHandleEventsWithDifferentLocales() {
+        // Given
+        BookingConfirmedEvent englishEvent = new BookingConfirmedEvent(
+                "user-1", "user@example.com", "trip-123", 1, Locale.ENGLISH
+        );
+        BookingConfirmedEvent spanishEvent = new BookingConfirmedEvent(
+                "user-2", "user@example.com", "trip-456", 2, Locale.forLanguageTag("es")
+        );
+        BookingConfirmedEvent catalanEvent = new BookingConfirmedEvent(
+                "user-3", "user@example.com", "trip-789", 3, Locale.forLanguageTag("ca")
+        );
+
+        // When
+        worker.handle(englishEvent);
+        worker.handle(spanishEvent);
+        worker.handle(catalanEvent);
+
+        // Then
+        verify(notificationService, times(1))
+                .sendBookingConfirmation("user-1", "user@example.com", "trip-123", 1, Locale.ENGLISH);
+        verify(notificationService, times(1))
+                .sendBookingConfirmation("user-2", "user@example.com", "trip-456", 2, Locale.forLanguageTag("es"));
+        verify(notificationService, times(1))
+                .sendBookingConfirmation("user-3", "user@example.com", "trip-789", 3, Locale.forLanguageTag("ca"));
     }
 
-    /**
-     * TDD stub for EmailWorker to compile tests; the production class will live in main sources.
-     */
-    static final class EmailWorker {
-        private final NotificationService notificationService;
-        EmailWorker(NotificationService notificationService) { this.notificationService = notificationService; }
+    @Test
+    void shouldHandleEventsWithZeroSeats() {
+        // Given
+        BookingConfirmedEvent event = new BookingConfirmedEvent(
+                "user-1", "user@example.com", "trip-123", 0, Locale.ENGLISH
+        );
 
-        void handle(NotificationEvent event) {
-            if (event instanceof BookingConfirmedEvent e) {
-                notificationService.sendBookingConfirmation(e.userId, e.email, e.tripId, e.seats, e.locale);
-            } else if (event instanceof TripCancelledEvent e) {
-                notificationService.sendTripCancellation(e.userId, e.email, e.tripId, e.locale);
-            }
-        }
+        // When
+        worker.handle(event);
+
+        // Then
+        verify(notificationService, times(1))
+                .sendBookingConfirmation("user-1", "user@example.com", "trip-123", 0, Locale.ENGLISH);
+    }
+
+    @Test
+    void shouldHandleEventsWithLargeSeatCounts() {
+        // Given
+        BookingConfirmedEvent event = new BookingConfirmedEvent(
+                "user-1", "user@example.com", "trip-123", 8, Locale.ENGLISH
+        );
+
+        // When
+        worker.handle(event);
+
+        // Then
+        verify(notificationService, times(1))
+                .sendBookingConfirmation("user-1", "user@example.com", "trip-123", 8, Locale.ENGLISH);
+    }
+
+    @Test
+    void shouldNotCallNotificationServiceForUnknownEventTypes() {
+        // Given
+        NotificationEvent unknownEvent = new NotificationEvent() {};
+
+        // When
+        worker.handle(unknownEvent);
+
+        // Then
+        verify(notificationService, never()).sendBookingConfirmation(any(), any(), any(), anyInt(), any());
+        verify(notificationService, never()).sendTripCancellation(any(), any(), any(), any());
     }
 }
 

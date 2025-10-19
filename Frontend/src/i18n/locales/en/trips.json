@@ -15,6 +15,14 @@
     "creating": "Creating...",
     "selectDestination": "Select a destination",
     "maxSeats": "Maximum 8 seats",
+    "helpText": "You can create one-time trips or recurring trips. One-time trips are perfect for special events or occasional travel.",
+    "tripType": {
+      "label": "Trip Type",
+      "oneTime": "One-time trip",
+      "recurring": "Recurring trip",
+      "oneTimeDescription": "Perfect for special events or occasional travel",
+      "recurringDescription": "Regular trips (e.g., daily commute)"
+    },
     "direction": {
       "label": "Direction",
       "toSede": "To headquarters",

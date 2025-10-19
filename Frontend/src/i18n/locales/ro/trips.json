@@ -15,6 +15,14 @@
     "creating": "Se creează...",
     "selectDestination": "Selectează o destinație",
     "maxSeats": "Maximum 8 locuri",
+    "helpText": "Poți crea călătorii unice sau recurente. Călătoriile unice sunt perfecte pentru evenimente speciale sau călătorii ocazionale.",
+    "tripType": {
+      "label": "Tipul Călătoriei",
+      "oneTime": "Călătorie unică",
+      "recurring": "Călătorie recurentă",
+      "oneTimeDescription": "Perfectă pentru evenimente speciale sau călătorii ocazionale",
+      "recurringDescription": "Călătorii regulate (ex. navetă zilnică)"
+    },
     "direction": {
       "label": "Direcție",
       "toSede": "Către sediu",

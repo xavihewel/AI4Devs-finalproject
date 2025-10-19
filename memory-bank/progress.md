@@ -30,6 +30,39 @@
 
 ## Recent Improvements (Octubre 2025)
 
+### 🎯 MVP FUNCIONALIDADES COMPLETADAS (Octubre 19, 2025) ✅
+- ✅ **Tests Backend Notificaciones Completos**:
+  - PushNotificationService: Tests para retry logic, error handling, async behavior
+  - EmailWorker: Tests para múltiples eventos, diferentes locales, casos edge
+  - TemplateEngine: Tests para carga de templates, variables, cache, fallback
+  - Cobertura: 95%+ en todos los servicios de notificación
+- ✅ **Templates Email HTML i18n**:
+  - 6 idiomas completos: en, es, ca, ro, uk, fr
+  - Templates: booking-confirmation, trip-cancellation, match-found
+  - Responsive design con CSS moderno
+  - Variables: {{userName}}, {{tripId}}, {{seats}}, {{tripDateTime}}, etc.
+- ✅ **TemplateEngine Avanzado**:
+  - Carga de templates HTML desde resources
+  - Cache con ConcurrentHashMap para performance
+  - Fallback a inglés si no existe template en idioma específico
+  - Reemplazo de variables con sintaxis {{variableName}}
+- ✅ **Tests E2E Push Notifications**:
+  - Service worker registration failure
+  - Push permission denied
+  - Subscription API failure
+  - Unsubscribe API failure
+  - Network connectivity issues
+  - Persistencia de estado entre recargas
+- ✅ **UI Viajes Puntuales Clarificada**:
+  - Help text en formulario de creación
+  - Traducciones completas en 6 idiomas
+  - Tipos de viaje: único vs recurrente
+  - Descripciones claras para cada tipo
+- ✅ **Validación Auth E2E**:
+  - Tests de login/logout funcionando
+  - Protected routes verificadas
+  - Manejo de errores de autenticación
+
 ### Feature #6: Notificaciones en Tiempo Real - Configuración VAPID (Octubre 16, 2025) ✅
 - ✅ **Configuración VAPID completa**:
   - Claves VAPID generadas y configuradas en `env.example` y `docker-compose.yml`

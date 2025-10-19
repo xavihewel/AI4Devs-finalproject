@@ -15,6 +15,14 @@
     "creating": "Création...",
     "selectDestination": "Sélectionnez une destination",
     "maxSeats": "Maximum 8 places",
+    "helpText": "Vous pouvez créer des voyages uniques ou récurrents. Les voyages uniques sont parfaits pour des événements spéciaux ou des déplacements occasionnels.",
+    "tripType": {
+      "label": "Type de Voyage",
+      "oneTime": "Voyage unique",
+      "recurring": "Voyage récurrent",
+      "oneTimeDescription": "Parfait pour des événements spéciaux ou des déplacements occasionnels",
+      "recurringDescription": "Voyages réguliers (ex. trajet quotidien)"
+    },
     "direction": {
       "label": "Direction",
       "toSede": "Vers le siège",
