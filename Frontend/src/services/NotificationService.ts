@@ -83,8 +83,8 @@ export class NotificationService {
         body: JSON.stringify({
           endpoint: subscription.endpoint,
           keys: {
-            p256dh: this.arrayBufferToBase64(subscription.getKey('p256dh')),
-            auth: this.arrayBufferToBase64(subscription.getKey('auth')),
+            p256dh: this.arrayBufferToBase64(subscription.getKey('p256dh')!),
+            auth: this.arrayBufferToBase64(subscription.getKey('auth')!),
           },
         }),
       });

@@ -62,6 +62,7 @@ function RouteDisplay({ route }: { route: RouteResponse | null }) {
         opacity: 0.8,
         dashArray: '5, 5',
       }}
+      data-testid={`polyline-${positions.length}`}
     />
   );
 }
@@ -164,20 +165,23 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
         doubleClickZoom={interactive}
         zoomControl={interactive}
         style={{ height: '100%', width: '100%' }}
+        data-testid="map-container"
       >
-        <TileLayer url={tilesUrl} attribution='&copy; OpenStreetMap contributors' />
+        <TileLayer url={tilesUrl} attribution='&copy; OpenStreetMap contributors' data-testid="tile-layer" />
         {origin && (
           <CircleMarker 
             center={[origin.lat, origin.lng]} 
             radius={8} 
-            pathOptions={{ color: '#2563EB', fillColor: '#3B82F6', fillOpacity: 0.7 }} 
+            pathOptions={{ color: '#2563EB', fillColor: '#3B82F6', fillOpacity: 0.7 }}
+            data-testid={`circle-marker-${origin.lat}-${origin.lng}`}
           />
         )}
         {destination && (
           <CircleMarker 
             center={[destination.lat, destination.lng]} 
             radius={8} 
-            pathOptions={{ color: '#059669', fillColor: '#10B981', fillOpacity: 0.7 }} 
+            pathOptions={{ color: '#059669', fillColor: '#10B981', fillOpacity: 0.7 }}
+            data-testid={`circle-marker-${destination.lat}-${destination.lng}`}
           />
         )}
         {showRoute && <RouteDisplay route={route} />}

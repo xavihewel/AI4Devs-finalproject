@@ -2,7 +2,9 @@
   "title": "Cercar Viatges",
   "search": {
     "title": "Cerca viatges",
+    "direction": "Direcció",
     "destination": "Destinació",
+    "originSede": "Sede d'Origen",
     "destinationPlaceholder": "Selecciona destinació...",
     "time": "Hora Preferida (HH:MM)",
     "timePlaceholder": "08:30",
@@ -11,7 +13,8 @@
     "originHelper": "Format: latitud,longitud",
     "search": "Cercar Viatges",
     "searching": "Cercant...",
-    "selectDestination": "Si us plau selecciona una destinació"
+    "selectDestination": "Si us plau selecciona una destinació",
+    "selectOriginSede": "Si us plau selecciona una sede d'origen"
   },
   "results": {
     "title": "Trobats {count} viatges compatibles",

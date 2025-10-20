@@ -35,6 +35,9 @@ export const useValidation = () => {
     destination: {
       required: () => t('destination.required'),
     },
+    direction: {
+      required: () => t('direction.required'),
+    },
   };
 };
 

@@ -2,7 +2,9 @@
   "title": "Buscar Viajes",
   "search": {
     "title": "Buscar viajes",
+    "direction": "Dirección",
     "destination": "Destino",
+    "originSede": "Sede de Origen",
     "destinationPlaceholder": "Seleccionar destino...",
     "time": "Hora Preferida (HH:MM)",
     "timePlaceholder": "08:30",
@@ -11,7 +13,8 @@
     "originHelper": "Formato: latitud,longitud",
     "search": "Buscar Viajes",
     "searching": "Buscando...",
-    "selectDestination": "Por favor selecciona un destino"
+    "selectDestination": "Por favor selecciona un destino",
+    "selectOriginSede": "Por favor selecciona una sede de origen"
   },
   "results": {
     "title": "Encontrados {count} viajes compatibles",

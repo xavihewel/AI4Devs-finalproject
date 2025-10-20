@@ -2,7 +2,9 @@
   "title": "Search Trips",
   "search": {
     "title": "Search trips",
+    "direction": "Direction",
     "destination": "Destination",
+    "originSede": "Origin Sede",
     "destinationPlaceholder": "Select destination...",
     "time": "Preferred Time (HH:MM)",
     "timePlaceholder": "08:30",
@@ -11,7 +13,8 @@
     "originHelper": "Format: latitude,longitude",
     "search": "Search Trips",
     "searching": "Searching...",
-    "selectDestination": "Please select a destination"
+    "selectDestination": "Please select a destination",
+    "selectOriginSede": "Please select an origin sede"
   },
   "results": {
     "title": "Found {count} compatible trips",

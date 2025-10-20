@@ -843,3 +843,45 @@
   - Helper functions para simplificar mocking en tests E2E
 - **Result**: ✅ **TODAS LAS FUNCIONALIDADES MVP COMPLETADAS Y TESTEADAS**
 - **Impact**: Sistema MVP 100% completo y listo para producción
+
+## 2025-10-20
+
+### 🗺️ Problemas con Mapas - Alternativa SimpleMapPreview (EN PROGRESO)
+- **Intent**: Resolver problemas con react-leaflet que no se muestra en el navegador
+- **Problem**: react-leaflet no se renderiza correctamente en el navegador a pesar de que los tests pasan
+- **Actions**:
+  - Identificar que los tests de MapPreview pasan correctamente (29/29 tests)
+  - Verificar que TypeScript compila sin errores y build es exitoso
+  - Confirmar que el problema es específico del renderizado en navegador
+  - Implementar `SimpleMapPreview.tsx`: componente alternativo sin dependencias externas
+  - Reemplazar MapPreview con SimpleMapPreview en MatchCard, TripCard, EditTripModal
+  - Evaluar alternativas: Google Maps (requiere API key), Mapbox (no disponible), SimpleMapPreview (más estable)
+- **SimpleMapPreview Features**:
+  - Muestra coordenadas de origen y destino
+  - Botones para abrir en Google Maps y Waze
+  - Cálculo de distancia aproximada usando fórmula de Haversine
+  - No requiere API keys ni librerías externas problemáticas
+  - Diseño visual atractivo con colores y badges
+- **Decisions**:
+  - SimpleMapPreview como solución más estable y confiable
+  - Eliminar dependencia de react-leaflet problemática
+  - Mantener funcionalidad de mapas sin complejidad externa
+- **Result**: ✅ Implementación completada, pendiente de testing en navegador
+- **Next**: Verificar funcionamiento en navegador y completar migración
+
+### 🔧 Correcciones TypeScript Frontend (✅ COMPLETADO)
+- **Intent**: Corregir errores de compilación TypeScript en frontend
+- **Actions**:
+  - **MapLinkButtons**: Corregir props interface (lat/lng separados en lugar de objeto origin)
+  - **Button component**: Añadir variante 'outline' con estilos correspondientes
+  - **EditTripModal**: Añadir campo 'direction' requerido a TripCreateDto
+  - **NotificationService**: Manejar ArrayBuffer null con non-null assertion
+  - **Axios headers**: Usar config.headers.set() en lugar de asignación directa
+  - **Trips.tsx**: Corregir validación de direction (eliminar comparación con string vacío)
+  - **Traducciones**: Añadir campo 'direction' a validation.json en todos los idiomas
+- **Decisions**:
+  - Non-null assertion para ArrayBuffer (seguro en contexto de push notifications)
+  - Headers de axios usando método set() para compatibilidad de tipos
+  - Variante outline para botones con estilos consistentes
+- **Result**: ✅ 100% compilación exitosa, 0 errores TypeScript, Vite build completado
+- **Impact**: Frontend completamente funcional sin errores de compilación

@@ -83,7 +83,7 @@ export default function Trips() {
     }
 
     // Validar dirección
-    if (!formData.direction || formData.direction === '') {
+    if (!formData.direction) {
       errors.direction = validation.direction.required();
     }
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TripDto } from '../../types/api';
 import { Button, Card, CardContent } from '../ui';
-import MapPreview from '../map/MapPreview';
+import SimpleMapPreview from '../map/SimpleMapPreview';
 import MapLinkButtons from '../map/MapLinkButtons';
 import { env } from '../../env';
 
@@ -145,21 +145,20 @@ export const TripCard: React.FC<TripCardProps> = ({
                   {showMap ? t('trips:map.hideMap') : t('trips:map.showMap')}
                 </Button>
                 {showMap && (
-                  <MapLinkButtons
-                    origin={{ lat: trip.origin.lat, lng: trip.origin.lng }}
-                    destination={trip.destinationSedeId}
-                  />
+                    <MapLinkButtons
+                      lat={trip.origin.lat}
+                      lng={trip.origin.lng}
+                    />
                 )}
               </div>
               
               {/* Map preview (collapsible) */}
               {showMap && (
                 <div className="border rounded-lg overflow-hidden">
-                  <MapPreview
+                  <SimpleMapPreview
                     origin={{ lat: trip.origin.lat, lng: trip.origin.lng }}
                     height={200}
                     interactive={true}
-                    tilesUrl={env.mapTilesUrl}
                   />
                 </div>
               )}

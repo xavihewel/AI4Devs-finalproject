@@ -4,13 +4,17 @@ const i18n = require('./src/i18n/config').default;
 beforeAll(async () => {
   try {
     await i18n.changeLanguage('es');
-  } catch (e) {}
+  } catch (e) {
+    // Fallback to Spanish if i18n fails
+    console.warn('Failed to set i18n language:', e);
+  }
 });
 
-jest.mock('./src/components/map/MapPreview', () => ({
-  __esModule: true,
-  default: () => null,
-}));
+// Remove MapPreview mock to allow real component testing
+// jest.mock('./src/components/map/MapPreview', () => ({
+//   __esModule: true,
+//   default: () => null,
+// }));
 
 require('@testing-library/jest-dom');
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { MatchDto } from '../../types/api';
 import { Button, Card, CardContent } from '../ui';
-import MapPreview from '../map/MapPreview';
+import SimpleMapPreview from '../map/SimpleMapPreview';
 import MapLinkButtons from '../map/MapLinkButtons';
 import ScoreBadge from './ScoreBadge';
 import { env } from '../../env';
@@ -110,15 +110,14 @@ export default function MatchCard({
                 
                 {showMap && (
                   <div className="space-y-2">
-                    <MapPreview
+                    <SimpleMapPreview
                       origin={coordinates}
                       height={160}
                       interactive={false}
-                      tilesUrl={env.mapTilesUrl}
                     />
                     <MapLinkButtons
-                      origin={coordinates}
-                      destination={match.destinationSedeId}
+                      lat={coordinates.lat}
+                      lng={coordinates.lng}
                     />
                   </div>
                 )}

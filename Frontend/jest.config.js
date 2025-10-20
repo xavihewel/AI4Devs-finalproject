@@ -22,10 +22,5 @@ export default {
   transformIgnorePatterns: [
     '/node_modules/(?!keycloak-js)/'
   ],
-  preset: 'ts-jest/presets/default-esm',
-  globals: {
-    'ts-jest': {
-      useESM: true
-    }
-  }
+  preset: 'ts-jest/presets/default-esm'
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TripDto, TripCreateDto } from '../../types/api';
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select, LoadingSpinner } from '../ui';
-import MapPreview from '../map/MapPreview';
+import SimpleMapPreview from '../map/SimpleMapPreview';
 import { useValidation } from '../../utils/validation';
 import { env } from '../../env';
 
@@ -36,6 +36,7 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
     destinationSedeId: '',
     dateTime: '',
     seatsTotal: 1,
+    direction: 'TO_SEDE',
   });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -54,6 +55,7 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
         destinationSedeId: trip.destinationSedeId || '',
         dateTime: localDateTime,
         seatsTotal: trip.seatsTotal || 1,
+        direction: trip.direction || 'TO_SEDE',
       });
       setFormErrors({});
       setTouched({});
@@ -281,11 +283,10 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
                 
                 {showMapPreview && formData.origin.lat !== 0 && formData.origin.lng !== 0 && (
                   <div className="border rounded-lg overflow-hidden">
-                    <MapPreview
+                    <SimpleMapPreview
                       origin={{ lat: formData.origin.lat, lng: formData.origin.lng }}
                       height={200}
                       interactive={true}
-                      tilesUrl={env.mapTilesUrl}
                     />
                   </div>
                 )}

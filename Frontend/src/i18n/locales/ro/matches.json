@@ -2,7 +2,9 @@
   "title": "Căutare Călătorii",
   "search": {
     "title": "Caută călătorii",
+    "direction": "Direcție",
     "destination": "Destinație",
+    "originSede": "Sediul de Origine",
     "destinationPlaceholder": "Selectează destinația...",
     "time": "Ora Preferată (HH:MM)",
     "timePlaceholder": "08:30",
@@ -11,7 +13,8 @@
     "originHelper": "Format: latitudine,longitudine",
     "search": "Caută Călătorii",
     "searching": "Căutare...",
-    "selectDestination": "Te rog selectează o destinație"
+    "selectDestination": "Te rog selectează o destinație",
+    "selectOriginSede": "Te rog selectează un sediu de origine"
   },
   "results": {
     "title": "Găsite {count} călătorii compatibile",

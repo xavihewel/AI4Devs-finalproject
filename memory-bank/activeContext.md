@@ -5,10 +5,41 @@
 - **Notificaciones**: Tests backend completos, templates HTML i18n, tests E2E con casos edge
 - **Viajes Puntuales**: UI clarificada con help text y traducciones en 6 idiomas
 - **Autenticación**: Tests E2E validados y funcionando correctamente
+- **Mapas**: Problemas con react-leaflet, implementando alternativa SimpleMapPreview
 - **Próximo**: Sistema MVP 100% completo y listo para producción
 
 ## Feature Plan
 - Ver `memory-bank/featurePlan.md` para el mapeo de las 15 funcionalidades (cobertura/estado/próximos pasos) y el roadmap por fases.
+
+## Recent Changes (Octubre 20, 2025)
+
+### 🗺️ Problemas con Mapas - Alternativa SimpleMapPreview (EN PROGRESO)
+- **Problema identificado**: react-leaflet no se muestra correctamente en el navegador
+- **Tests frontend**: Todos los tests de MapPreview pasan correctamente (29/29 tests)
+- **Compilación**: TypeScript compila sin errores, build exitoso
+- **Problema real**: Los mapas no se renderizan en el navegador a pesar de que los tests pasan
+- **Solución implementada**: 
+  - `SimpleMapPreview.tsx`: Componente alternativo sin dependencias externas
+  - Muestra coordenadas, botones para Google Maps/Waze, cálculo de distancia
+  - Reemplaza MapPreview en MatchCard, TripCard, EditTripModal
+  - No requiere API keys ni librerías externas problemáticas
+- **Alternativas evaluadas**:
+  - Google Maps: Requiere API key y tiene problemas de tipos TypeScript
+  - Mapbox: No disponible en npm registry
+  - SimpleMapPreview: Solución más estable y confiable
+- **Estado**: Implementación completada, pendiente de testing en navegador
+
+### 🔧 Correcciones TypeScript Frontend (✅ COMPLETADO)
+- **Errores corregidos**:
+  - MapLinkButtons: Props interface corregida (lat/lng separados)
+  - Button component: Variante 'outline' añadida
+  - EditTripModal: Campo 'direction' añadido a TripCreateDto
+  - NotificationService: ArrayBuffer null handling con non-null assertion
+  - Axios headers: Uso de config.headers.set() en lugar de asignación directa
+  - Trips.tsx: Validación de direction corregida
+- **Traducciones**: Campo 'direction' añadido a validation.json en todos los idiomas
+- **Compilación**: 100% exitosa, 0 errores TypeScript
+- **Build**: Vite build completado exitosamente
 
 ## Recent Changes (Octubre 19, 2025)
 

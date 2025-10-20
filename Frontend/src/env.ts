@@ -14,6 +14,7 @@ export const env = {
   VAPID_PUBLIC_KEY: (import.meta.env.VITE_VAPID_PUBLIC_KEY ?? '') as string,
   vapidPublicKey: (import.meta.env.VITE_VAPID_PUBLIC_KEY ?? '') as string,
   mapTilesUrl: (import.meta.env.VITE_MAP_TILES_URL ?? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png') as string,
+  googleMapsApiKey: (import.meta.env.VITE_GOOGLE_MAPS_API_KEY ?? '') as string,
   authDisabled: (import.meta.env.VITE_AUTH_DISABLED === 'true') as boolean,
 };
 
