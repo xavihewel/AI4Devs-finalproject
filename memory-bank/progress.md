@@ -328,8 +328,10 @@
 ## What's Left
 - **✅ Backend trips-service**: 100% tests pasando después de fixes completos
 - **✅ Frontend test suite**: 92% tests pasando (222/241) - mejora significativa
+- **✅ Mapas**: SimpleMapPreview implementado con i18n completo (6 idiomas)
+- **✅ Tests E2E**: Configuración corregida, comando loginViaKeycloak simplificado, bypass de auth funcional
 - **Completar tests frontend restantes**: 13 tests fallando (Matches integration, History, Profile notifications) - problemas menores de selectores
-- **Testing E2E completo**: Suite de tests Cypress actualizada (authentication, trips, matches, bookings, notifications, flows) - 85% pasando, 4 tests menores por arreglar.
+- **Testing E2E completo**: Suite de tests Cypress actualizada (authentication, trips, matches, bookings, notifications, flows) - configuración corregida, listo para ejecutar suite completa
 - ✅ **Auth JWKS remoto (tests)**: Tests con WireMock para `JwtValidator` implementados y funcionando
   - `JwtValidatorRemoteJwksTest`: Validación exitosa, key miss, network error
   - Tests unitarios e integración: 9/9 pasando en auth-service

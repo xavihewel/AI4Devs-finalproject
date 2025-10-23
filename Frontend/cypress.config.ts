@@ -2,7 +2,7 @@ import { defineConfig } from 'cypress'
 
 export default defineConfig({
   e2e: {
-    baseUrl: process.env.CYPRESS_BASE_URL || 'http://localhost:5173',
+    baseUrl: process.env.CYPRESS_BASE_URL || 'http://localhost:5174',
     viewportWidth: 1280,
     viewportHeight: 720,
     video: false,
@@ -17,7 +17,7 @@ export default defineConfig({
       keycloakRealm: 'covoituraje',
       apiUrl: 'http://localhost:8081',
       oidcClientId: 'covoituraje-frontend',
-      oidcRedirectUri: process.env.CYPRESS_BASE_URL || 'http://localhost:5173/callback',
+      oidcRedirectUri: process.env.CYPRESS_BASE_URL || 'http://localhost:5174/callback',
     },
     
     // Retry failed tests

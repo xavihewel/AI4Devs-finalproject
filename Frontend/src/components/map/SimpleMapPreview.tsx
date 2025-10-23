@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface LatLng {
   lat: number;
@@ -21,15 +22,17 @@ export const SimpleMapPreview: React.FC<SimpleMapPreviewProps> = ({
   destination,
   height = 180,
   interactive = false,
-  ariaLabel = 'Vista previa de mapa',
+  ariaLabel,
   showRoute = false,
   onRouteLoaded,
   onRouteError,
 }) => {
+  const { t } = useTranslation('map');
+
   if (!origin && !destination) {
     return (
       <div 
-        aria-label={ariaLabel} 
+        aria-label={ariaLabel || t('noCoordinates')} 
         style={{ 
           height, 
           width: '100%', 
@@ -41,7 +44,7 @@ export const SimpleMapPreview: React.FC<SimpleMapPreviewProps> = ({
           color: '#6b7280'
         }}
       >
-        No hay coordenadas para mostrar el mapa.
+        {t('noCoordinates')}
       </div>
     );
   }
@@ -70,7 +73,7 @@ export const SimpleMapPreview: React.FC<SimpleMapPreviewProps> = ({
         textAlign: 'center'
       }}>
         <div style={{ marginBottom: '20px' }}>
-          <h3 style={{ margin: '0 0 10px 0', color: '#374151' }}>Ubicación del Viaje</h3>
+          <h3 style={{ margin: '0 0 10px 0', color: '#374151' }}>{t('location')}</h3>
           
           {origin && (
             <div style={{ 
@@ -80,7 +83,7 @@ export const SimpleMapPreview: React.FC<SimpleMapPreviewProps> = ({
               borderRadius: '6px',
               border: '1px solid #93c5fd'
             }}>
-              <div style={{ fontWeight: 'bold', color: '#1e40af', marginBottom: '5px' }}>📍 Origen</div>
+              <div style={{ fontWeight: 'bold', color: '#1e40af', marginBottom: '5px' }}>{t('origin')}</div>
               <div style={{ fontSize: '14px', color: '#374151' }}>
                 Lat: {origin.lat.toFixed(6)}, Lng: {origin.lng.toFixed(6)}
               </div>
@@ -97,7 +100,7 @@ export const SimpleMapPreview: React.FC<SimpleMapPreviewProps> = ({
                     cursor: 'pointer'
                   }}
                 >
-                  Google Maps
+                  {t('googleMaps')}
                 </button>
                 <button
                   onClick={() => openInWaze(origin.lat, origin.lng)}
@@ -111,7 +114,7 @@ export const SimpleMapPreview: React.FC<SimpleMapPreviewProps> = ({
                     cursor: 'pointer'
                   }}
                 >
-                  Waze
+                  {t('waze')}
                 </button>
               </div>
             </div>
@@ -125,7 +128,7 @@ export const SimpleMapPreview: React.FC<SimpleMapPreviewProps> = ({
               borderRadius: '6px',
               border: '1px solid #6ee7b7'
             }}>
-              <div style={{ fontWeight: 'bold', color: '#047857', marginBottom: '5px' }}>🎯 Destino</div>
+              <div style={{ fontWeight: 'bold', color: '#047857', marginBottom: '5px' }}>{t('destination')}</div>
               <div style={{ fontSize: '14px', color: '#374151' }}>
                 Lat: {destination.lat.toFixed(6)}, Lng: {destination.lng.toFixed(6)}
               </div>
@@ -142,7 +145,7 @@ export const SimpleMapPreview: React.FC<SimpleMapPreviewProps> = ({
                     cursor: 'pointer'
                   }}
                 >
-                  Google Maps
+                  {t('googleMaps')}
                 </button>
                 <button
                   onClick={() => openInWaze(destination.lat, destination.lng)}
@@ -156,7 +159,7 @@ export const SimpleMapPreview: React.FC<SimpleMapPreviewProps> = ({
                     cursor: 'pointer'
                   }}
                 >
-                  Waze
+                  {t('waze')}
                 </button>
               </div>
             </div>
@@ -170,16 +173,16 @@ export const SimpleMapPreview: React.FC<SimpleMapPreviewProps> = ({
               borderRadius: '6px',
               border: '1px solid #fbbf24'
             }}>
-              <div style={{ fontWeight: 'bold', color: '#92400e', marginBottom: '5px' }}>🛣️ Ruta</div>
+              <div style={{ fontWeight: 'bold', color: '#92400e', marginBottom: '5px' }}>{t('route')}</div>
               <div style={{ fontSize: '14px', color: '#374151' }}>
-                Distancia aproximada: {calculateDistance(origin, destination).toFixed(1)} km
+                {t('approximateDistance', { distance: calculateDistance(origin, destination).toFixed(1) })}
               </div>
             </div>
           )}
         </div>
 
         <div style={{ fontSize: '12px', color: '#6b7280' }}>
-          Haz clic en los botones para abrir en Google Maps o Waze
+          {t('clickButtons')}
         </div>
       </div>
     </div>

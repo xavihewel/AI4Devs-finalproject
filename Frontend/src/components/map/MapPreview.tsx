@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { routingApiService, LatLng, RouteResponse } from '../../api/routing';
 
 // Import react-leaflet components
@@ -72,12 +73,13 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
   destination,
   height = 180,
   interactive = false,
-  ariaLabel = 'Vista previa de mapa',
+  ariaLabel,
   tilesUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   showRoute = false,
   onRouteLoaded,
   onRouteError,
 }) => {
+  const { t } = useTranslation('map');
   const [route, setRoute] = useState<RouteResponse | null>(null);
   const [isLoadingRoute, setIsLoadingRoute] = useState(false);
 
@@ -118,7 +120,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
   if (!center) {
     return (
       <div 
-        aria-label={ariaLabel} 
+        aria-label={ariaLabel || t('noCoordinates')} 
         style={{ 
           height, 
           width: '100%', 
@@ -130,7 +132,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
           color: '#6b7280'
         }}
       >
-        No hay coordenadas para mostrar el mapa.
+        {t('noCoordinates')}
       </div>
     );
   }
@@ -154,7 +156,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
             color: '#374151'
           }}
         >
-          Cargando ruta...
+          {t('loadingRoute')}
         </div>
       )}
       <MapContainer

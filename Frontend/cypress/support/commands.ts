@@ -24,6 +24,12 @@ declare global {
        * @example cy.getByCy('submit-button')
        */
       getByCy(selector: string): Chainable<JQuery<HTMLElement>>
+      
+      /**
+       * Alias for loginViaKeycloak for backward compatibility
+       * @example cy.login()
+       */
+      login(): Chainable<void>
     }
   }
 }
@@ -45,25 +51,21 @@ Cypress.Commands.add('loginViaKeycloak', (username: string, password: string) =>
     [username, password],
     () => {
       cy.visit('/')
+      cy.wait(2000) // Wait for app to load
 
-      // Click login button (robust against re-render)
-      cy.get('body', { timeout: 10000 }).then(($body) => {
+      // Check if already authenticated
+      cy.get('body').then(($body) => {
         const text = $body.text()
-        if (text.includes('Iniciar Sesión')) {
-          cy.contains('Iniciar Sesión', { timeout: 10000 })
-            .should('be.visible')
-            .click({ force: true })
-        } else if (text.includes('Comenzar Ahora')) {
-          cy.contains('Comenzar Ahora', { timeout: 10000 })
-            .should('be.visible')
-            .click({ force: true })
-        } else if (text.includes('Cerrar Sesión')) {
+        if (text.includes('Cerrar Sesión') || text.includes('Logout')) {
           // already authenticated
           return
-        } else {
-          cy.contains(/Iniciar Sesión|Comenzar Ahora|Cerrar Sesión/, { timeout: 10000 }).should('be.visible')
         }
       })
+
+      // Simple approach: look for login button and click it
+      cy.get('button').contains(/Iniciar Sesión|Login/, { timeout: 15000 })
+        .should('be.visible')
+        .click({ force: true })
 
       // Handle Keycloak login page via cy.origin
       cy.origin(
@@ -121,6 +123,13 @@ Cypress.Commands.add('logout', () => {
  */
 Cypress.Commands.add('getByCy', (selector: string) => {
   return cy.get(`[data-cy="${selector}"]`)
+})
+
+/**
+ * Alias for loginViaKeycloak for backward compatibility
+ */
+Cypress.Commands.add('login', () => {
+  cy.loginViaKeycloak('test.user', 'password123')
 })
 
 // Prevent TypeScript errors

@@ -137,7 +137,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'ca', // Default language
+    lng: 'es', // Default language
     fallbackLng: 'en',
     defaultNS: 'common',
     supportedLngs: ['ca', 'es', 'ro', 'uk', 'en', 'fr'],
