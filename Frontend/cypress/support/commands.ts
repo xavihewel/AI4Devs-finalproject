@@ -40,58 +40,112 @@ declare global {
  */
 Cypress.Commands.add('loginViaKeycloak', (username: string, password: string) => {
   const isBypass = Cypress.env('authDisabled') === true || Cypress.env('authDisabled') === 'true'
+  
   if (isBypass) {
-    // In bypass mode, there is no real Keycloak session; just ensure app is loaded
+    cy.log('🔓 Auth bypass enabled - skipping Keycloak login')
     cy.visit('/')
     cy.wait(500)
     return
   }
 
+  cy.log(`🔐 Attempting login for user: ${username}`)
+
   cy.session(
     [username, password],
     () => {
+      cy.log('📍 Step 1: Visiting home page')
       cy.visit('/')
       cy.wait(2000) // Wait for app to load
 
       // Check if already authenticated
-      cy.get('body').then(($body) => {
+      cy.log('📍 Step 2: Checking if already authenticated')
+      cy.get('body', { timeout: 10000 }).then(($body) => {
         const text = $body.text()
         if (text.includes('Cerrar Sesión') || text.includes('Logout')) {
-          // already authenticated
+          cy.log('✅ Already authenticated, skipping login')
           return
+        }
+        cy.log('❌ Not authenticated, proceeding with login')
+      })
+
+      // Multiple strategies to find and click login button
+      cy.log('📍 Step 3: Looking for login button')
+      cy.get('body').then(($body) => {
+        const bodyText = $body.text()
+        
+        // Strategy 1: Look for "Iniciar Sesión" button
+        if (bodyText.includes('Iniciar Sesión')) {
+          cy.log('✅ Found "Iniciar Sesión" button')
+          cy.contains('button', 'Iniciar Sesión', { timeout: 5000 })
+            .should('be.visible')
+            .click({ force: true })
+        }
+        // Strategy 2: Look for "Login" button
+        else if (bodyText.includes('Login')) {
+          cy.log('✅ Found "Login" button')
+          cy.contains('button', 'Login', { timeout: 5000 })
+            .should('be.visible')
+            .click({ force: true })
+        }
+        // Strategy 3: Look for "Comenzar Ahora" button
+        else if (bodyText.includes('Comenzar Ahora')) {
+          cy.log('✅ Found "Comenzar Ahora" button')
+          cy.contains('button', 'Comenzar Ahora', { timeout: 5000 })
+            .should('be.visible')
+            .click({ force: true })
+        }
+        // Strategy 4: Fallback - any button with login text
+        else {
+          cy.log('⚠️ Using fallback strategy - looking for any login button')
+          cy.get('button').contains(/Iniciar Sesión|Login|Comenzar Ahora/i, { timeout: 10000 })
+            .first()
+            .should('be.visible')
+            .click({ force: true })
         }
       })
 
-      // Simple approach: look for login button and click it
-      cy.get('button').contains(/Iniciar Sesión|Login/, { timeout: 15000 })
-        .should('be.visible')
-        .click({ force: true })
-
       // Handle Keycloak login page via cy.origin
+      cy.log('📍 Step 4: Handling Keycloak login page')
       cy.origin(
         Cypress.env('keycloakUrl'),
         { args: { username, password } },
         ({ username, password }) => {
+          cy.log(`🔑 Entering credentials for ${username}`)
           cy.url({ timeout: 15000 }).should('include', '/realms/')
-          cy.get('input[name="username"]', { timeout: 10000 }).should('be.visible')
-          cy.get('input[name="username"]').clear().type(username)
-          cy.get('input[name="password"]').clear().type(password)
+          
+          cy.get('input[name="username"]', { timeout: 10000 })
+            .should('be.visible')
+            .clear()
+            .type(username)
+          
+          cy.get('input[name="password"]')
+            .should('be.visible')
+            .clear()
+            .type(password)
+          
           cy.get('input[type="submit"]').click()
+          cy.log('✅ Credentials submitted')
         }
       )
 
       // Verify back to app and authenticated UI appears
+      cy.log('📍 Step 5: Verifying redirect back to app')
       cy.url({ timeout: 20000 }).should('include', Cypress.config('baseUrl'))
-      cy.contains(/Crear Viaje|Cerrar Sesión/, { timeout: 20000 }).should('be.visible')
+      
+      cy.log('📍 Step 6: Verifying authenticated UI')
+      cy.contains(/Crear Viaje|Cerrar Sesión/i, { timeout: 20000 }).should('be.visible')
 
       // Give extra time for AuthProvider to update state after callback
       cy.wait(1000)
 
       // Reload the page to ensure state is fresh
+      cy.log('📍 Step 7: Reloading page to ensure fresh state')
       cy.reload()
 
       // Confirm authenticated state
-      cy.contains(/Crear Viaje|Cerrar Sesión/, { timeout: 10000 }).should('be.visible')
+      cy.log('📍 Step 8: Confirming authenticated state')
+      cy.contains(/Crear Viaje|Cerrar Sesión/i, { timeout: 10000 }).should('be.visible')
+      cy.log('✅ Login successful!')
     },
     {
       validate() {
@@ -100,8 +154,10 @@ Cypress.Commands.add('loginViaKeycloak', (username: string, password: string) =>
           cy.visit('/')
           return
         }
+        cy.log('🔍 Validating session')
         cy.visit('/')
-        cy.contains(/Crear Viaje|Cerrar Sesión/, { timeout: 10000 }).should('be.visible')
+        cy.contains(/Crear Viaje|Cerrar Sesión/i, { timeout: 10000 }).should('be.visible')
+        cy.log('✅ Session valid')
       },
     }
   )

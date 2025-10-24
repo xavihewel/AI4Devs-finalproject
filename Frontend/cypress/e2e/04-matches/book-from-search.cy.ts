@@ -13,7 +13,7 @@ describe('Book from Search Results', () => {
     cy.contains('Buscar Viajes').should('be.visible')
 
     // Buscar viajes para SEDE-1
-    cy.get('select').first().select('SEDE-1')
+    cy.get('select').eq(1).select('SEDE-1')
     cy.contains('button', 'Buscar Viajes').click()
 
     // Esperar resultados
@@ -51,7 +51,7 @@ describe('Book from Search Results', () => {
 
   it('should validate seats availability when booking', () => {
     cy.visit('/matches')
-    cy.get('select').first().select('SEDE-1')
+    cy.get('select').eq(1).select('SEDE-1')
     cy.contains('button', 'Buscar Viajes').click()
 
     cy.contains('Encontrados', { timeout: 10000 }).should('be.visible')
@@ -70,7 +70,7 @@ describe('Book from Search Results', () => {
 
   it('should show loading state while booking', () => {
     cy.visit('/matches')
-    cy.get('select').first().select('SEDE-1')
+    cy.get('select').eq(1).select('SEDE-1')
     cy.contains('button', 'Buscar Viajes').click()
 
     cy.contains('Encontrados', { timeout: 10000 }).should('be.visible')
@@ -86,7 +86,7 @@ describe('Book from Search Results', () => {
 
   it('should cancel booking when user cancels prompt', () => {
     cy.visit('/matches')
-    cy.get('select').first().select('SEDE-1')
+    cy.get('select').eq(1).select('SEDE-1')
     cy.contains('button', 'Buscar Viajes').click()
 
     cy.contains('Encontrados', { timeout: 10000 }).should('be.visible')
@@ -128,7 +128,7 @@ describe('Book from Search Results', () => {
 
     // Ir a buscar y verificar que aparece el badge
     cy.visit('/matches')
-    cy.get('select').first().select('SEDE-1')
+    cy.get('select').eq(1).select('SEDE-1')
     cy.contains('button', 'Buscar Viajes').click()
 
     cy.contains('Encontrados', { timeout: 10000 }).should('be.visible')

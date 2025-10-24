@@ -12,8 +12,11 @@ describe('Seat Selection Modal', () => {
     cy.visit('/matches')
     cy.contains('Buscar Viajes').should('be.visible')
 
+    // Wait for selects to be loaded
+    cy.get('select').should('have.length.at.least', 2);
+    
     // Buscar viajes para SEDE-1
-    cy.get('select').first().select('SEDE-1')
+    cy.get('select').eq(1).select('SEDE-1')
     cy.contains('button', 'Buscar Viajes').click()
 
     // Esperar resultados
@@ -30,7 +33,7 @@ describe('Seat Selection Modal', () => {
 
   it('should show seat selection buttons for available seats', () => {
     cy.visit('/matches')
-    cy.get('select').first().select('SEDE-1')
+    cy.get('select').eq(1).select('SEDE-1')
     cy.contains('button', 'Buscar Viajes').click()
     cy.contains('Encontrados', { timeout: 10000 }).should('be.visible')
 
@@ -54,7 +57,7 @@ describe('Seat Selection Modal', () => {
 
   it('should allow seat selection and confirm booking', () => {
     cy.visit('/matches')
-    cy.get('select').first().select('SEDE-1')
+    cy.get('select').eq(1).select('SEDE-1')
     cy.contains('button', 'Buscar Viajes').click()
     cy.contains('Encontrados', { timeout: 10000 }).should('be.visible')
 
@@ -79,7 +82,7 @@ describe('Seat Selection Modal', () => {
 
   it('should close modal when cancel is clicked', () => {
     cy.visit('/matches')
-    cy.get('select').first().select('SEDE-1')
+    cy.get('select').eq(1).select('SEDE-1')
     cy.contains('button', 'Buscar Viajes').click()
     cy.contains('Encontrados', { timeout: 10000 }).should('be.visible')
 
@@ -99,7 +102,7 @@ describe('Seat Selection Modal', () => {
 
   it('should close modal when X button is clicked', () => {
     cy.visit('/matches')
-    cy.get('select').first().select('SEDE-1')
+    cy.get('select').eq(1).select('SEDE-1')
     cy.contains('button', 'Buscar Viajes').click()
     cy.contains('Encontrados', { timeout: 10000 }).should('be.visible')
 
@@ -116,7 +119,7 @@ describe('Seat Selection Modal', () => {
 
   it('should show loading state during booking', () => {
     cy.visit('/matches')
-    cy.get('select').first().select('SEDE-1')
+    cy.get('select').eq(1).select('SEDE-1')
     cy.contains('button', 'Buscar Viajes').click()
     cy.contains('Encontrados', { timeout: 10000 }).should('be.visible')
 
@@ -136,7 +139,7 @@ describe('Seat Selection Modal', () => {
   it('should handle different number of available seats', () => {
     // Este test verifica que el modal se adapta al número de asientos disponibles
     cy.visit('/matches')
-    cy.get('select').first().select('SEDE-1')
+    cy.get('select').eq(1).select('SEDE-1')
     cy.contains('button', 'Buscar Viajes').click()
     cy.contains('Encontrados', { timeout: 10000 }).should('be.visible')
 
@@ -154,7 +157,7 @@ describe('Seat Selection Modal', () => {
 
   it('should update selection summary when different seats are selected', () => {
     cy.visit('/matches')
-    cy.get('select').first().select('SEDE-1')
+    cy.get('select').eq(1).select('SEDE-1')
     cy.contains('button', 'Buscar Viajes').click()
     cy.contains('Encontrados', { timeout: 10000 }).should('be.visible')
 
@@ -177,7 +180,7 @@ describe('Seat Selection Modal', () => {
 
   it('should be keyboard accessible', () => {
     cy.visit('/matches')
-    cy.get('select').first().select('SEDE-1')
+    cy.get('select').eq(1).select('SEDE-1')
     cy.contains('button', 'Buscar Viajes').click()
     cy.contains('Encontrados', { timeout: 10000 }).should('be.visible')
 

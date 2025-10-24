@@ -39,8 +39,11 @@ describe('Enhanced Trip Features (Fase 2)', () => {
     cy.visit('/trips')
     cy.get('[data-testid="trips-page"]', { timeout: 15000 }).should('be.visible')
     
-    // Filter by destination
-    cy.get('select').eq(1).select('SEDE-1')
+    // Wait for selects to be loaded
+    cy.get('select').should('have.length.at.least', 3);
+    
+    // Filter by destination (third select has SEDE options)
+    cy.get('select').eq(2).select('SEDE-1')
     
     // Should show filtered results or no results message
     cy.get('body').then(($body) => {
@@ -57,9 +60,12 @@ describe('Enhanced Trip Features (Fase 2)', () => {
     cy.visit('/trips')
     cy.get('[data-testid="trips-page"]', { timeout: 15000 }).should('be.visible')
     
+    // Wait for selects to be loaded
+    cy.get('select').should('have.length.at.least', 3);
+    
     // Apply some filters
     cy.get('select').first().select('ACTIVE')
-    cy.get('select').eq(1).select('SEDE-1')
+    cy.get('select').eq(2).select('SEDE-1')
     
     // Clear filters
     cy.contains('Limpiar filtros').click()
