@@ -17,63 +17,72 @@ describe('Trip Form Validations - Complete', () => {
   })
 
   it('should validate latitude range', () => {
+    // Find latitude input by label and placeholder
+    cy.get('label').contains('Latitud').parent().find('input[type="number"]').as('latInput')
+    
     // Test latitude out of range (too high)
-    cy.get('input[placeholder="40.4168"]').clear().type('95')
-    cy.get('input[placeholder="40.4168"]').blur()
+    cy.get('@latInput').clear().type('95')
+    cy.get('@latInput').blur()
     cy.contains('debe estar entre -90 y 90').should('be.visible')
     
     // Test latitude out of range (too low)
-    cy.get('input[placeholder="40.4168"]').clear().type('-95')
-    cy.get('input[placeholder="40.4168"]').blur()
+    cy.get('@latInput').clear().type('-95')
+    cy.get('@latInput').blur()
     cy.contains('debe estar entre -90 y 90').should('be.visible')
     
     // Test valid latitude
-    cy.get('input[placeholder="40.4168"]').clear().type('40.4168')
-    cy.get('input[placeholder="40.4168"]').blur()
+    cy.get('@latInput').clear().type('40.4168')
+    cy.get('@latInput').blur()
     cy.contains('debe estar entre -90 y 90').should('not.exist')
   })
 
   it('should validate longitude range', () => {
+    // Find longitude input by label
+    cy.get('label').contains('Longitud').parent().find('input[type="number"]').as('lngInput')
+    
     // Test longitude out of range (too high)
-    cy.get('input[placeholder="-3.7038"]').clear().type('185')
-    cy.get('input[placeholder="-3.7038"]').blur()
+    cy.get('@lngInput').clear().type('185')
+    cy.get('@lngInput').blur()
     cy.contains('debe estar entre -180 y 180').should('be.visible')
     
     // Test longitude out of range (too low)
-    cy.get('input[placeholder="-3.7038"]').clear().type('-185')
-    cy.get('input[placeholder="-3.7038"]').blur()
+    cy.get('@lngInput').clear().type('-185')
+    cy.get('@lngInput').blur()
     cy.contains('debe estar entre -180 y 180').should('be.visible')
     
     // Test valid longitude
-    cy.get('input[placeholder="-3.7038"]').clear().type('-3.7038')
-    cy.get('input[placeholder="-3.7038"]').blur()
+    cy.get('@lngInput').clear().type('-3.7038')
+    cy.get('@lngInput').blur()
     cy.contains('debe estar entre -180 y 180').should('not.exist')
   })
 
   it('should validate seats range', () => {
+    // Find seats input by label
+    cy.get('label').contains('Asientos').parent().find('input[type="number"]').as('seatsInput')
+    
     // Test too few seats
-    cy.get('input[type="number"][min="1"][max="8"]').clear().type('0')
-    cy.get('input[type="number"][min="1"][max="8"]').blur()
+    cy.get('@seatsInput').clear().type('0')
+    cy.get('@seatsInput').blur()
     cy.contains(/al menos 1 asiento|más de 8 asientos/i, { timeout: 10000 }).should('be.visible')
     
     // Test too many seats
-    cy.get('input[type="number"][min="1"][max="8"]').clear().type('9')
-    cy.get('input[type="number"][min="1"][max="8"]').blur()
+    cy.get('@seatsInput').clear().type('9')
+    cy.get('@seatsInput').blur()
     cy.contains(/al menos 1 asiento|más de 8 asientos/i, { timeout: 10000 }).should('be.visible')
     
     // Test valid seats
-    cy.get('input[type="number"][min="1"][max="8"]').clear().type('4')
-    cy.get('input[type="number"][min="1"][max="8"]').blur()
+    cy.get('@seatsInput').clear().type('4')
+    cy.get('@seatsInput').blur()
     cy.contains(/al menos 1 asiento|más de 8 asientos/i).should('not.exist')
   })
 
   it('should validate future dates only', () => {
     // Fill valid coordinates first
-    cy.get('input[placeholder="40.4168"]').clear().type('40.4168')
-    cy.get('input[placeholder="-3.7038"]').clear().type('-3.7038')
-    cy.get('select').first().select('TO_SEDE')
-    cy.get('select').eq(1).select('SEDE-1')
-    cy.get('input[type="number"][min="1"][max="8"]').clear().type('2')
+    cy.get('label').contains('Latitud').parent().find('input[type="number"]').clear().type('40.4168')
+    cy.get('label').contains('Longitud').parent().find('input[type="number"]').clear().type('-3.7038')
+    cy.get('[data-testid="direction-select"]').select('TO_SEDE')
+    cy.get('[data-testid="destination-select"]').select('SEDE-1')
+    cy.get('label').contains('Asientos').parent().find('input[type="number"]').clear().type('2')
     
     // Test past date
     const pastDate = new Date()
@@ -96,13 +105,13 @@ describe('Trip Form Validations - Complete', () => {
 
   it('should validate required fields', () => {
     // Test missing latitude
-    cy.get('input[placeholder="40.4168"]').clear()
-    cy.get('input[placeholder="40.4168"]').blur()
+    cy.get('label').contains('Latitud').parent().find('input[type="number"]').clear()
+    cy.get('label').contains('Latitud').parent().find('input[type="number"]').blur()
     cy.contains(/latitud.*obligatori/i, { timeout: 10000 }).should('be.visible')
     
     // Test missing longitude
-    cy.get('input[placeholder="-3.7038"]').clear()
-    cy.get('input[placeholder="-3.7038"]').blur()
+    cy.get('label').contains('Longitud').parent().find('input[type="number"]').clear()
+    cy.get('label').contains('Longitud').parent().find('input[type="number"]').blur()
     cy.contains(/longitud.*obligatori/i, { timeout: 10000 }).should('be.visible')
     
     // Test missing direction
@@ -121,8 +130,8 @@ describe('Trip Form Validations - Complete', () => {
     cy.contains(/fecha.*hora.*obligatori/i, { timeout: 10000 }).should('be.visible')
     
     // Test missing seats
-    cy.get('input[type="number"][min="1"][max="8"]').clear()
-    cy.get('input[type="number"][min="1"][max="8"]').blur()
+    cy.get('label').contains('Asientos').parent().find('input[type="number"]').clear()
+    cy.get('label').contains('Asientos').parent().find('input[type="number"]').blur()
     cy.contains(/asiento.*obligatori/i, { timeout: 10000 }).should('be.visible')
   })
 
@@ -139,8 +148,8 @@ describe('Trip Form Validations - Complete', () => {
 
   it('should allow submit with valid data', () => {
     // Fill form with valid data
-    cy.get('input[placeholder="40.4168"]').clear().type('40.4168')
-    cy.get('input[placeholder="-3.7038"]').clear().type('-3.7038')
+    cy.get('label').contains('Latitud').parent().find('input[type="number"]').clear().type('40.4168')
+    cy.get('label').contains('Longitud').parent().find('input[type="number"]').clear().type('-3.7038')
     cy.get('[data-testid="direction-select"]').select('TO_SEDE')
     cy.get('[data-testid="destination-select"]').select('SEDE-1')
     
@@ -150,7 +159,7 @@ describe('Trip Form Validations - Complete', () => {
     const futureDateTimeString = futureDate.toISOString().slice(0, 16)
     cy.get('input[type="datetime-local"]').clear().type(futureDateTimeString)
     
-    cy.get('input[type="number"][min="1"][max="8"]').clear().type('2')
+    cy.get('label').contains('Asientos').parent().find('input[type="number"]').clear().type('2')
     
     // Submit form
     cy.contains('button', 'Crear').click()
@@ -166,13 +175,13 @@ describe('Trip Form Validations - Complete', () => {
 
   it('should clear errors when valid data is entered', () => {
     // First create an error
-    cy.get('input[placeholder="40.4168"]').clear().type('95')
-    cy.get('input[placeholder="40.4168"]').blur()
+    cy.get('label').contains('Latitud').parent().find('input[type="number"]').clear().type('95')
+    cy.get('label').contains('Latitud').parent().find('input[type="number"]').blur()
     cy.contains('debe estar entre -90 y 90').should('be.visible')
     
     // Then fix it
-    cy.get('input[placeholder="40.4168"]').clear().type('40.4168')
-    cy.get('input[placeholder="40.4168"]').blur()
+    cy.get('label').contains('Latitud').parent().find('input[type="number"]').clear().type('40.4168')
+    cy.get('label').contains('Latitud').parent().find('input[type="number"]').blur()
     cy.contains('debe estar entre -90 y 90').should('not.exist')
   })
 })

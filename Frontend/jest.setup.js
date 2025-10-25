@@ -25,8 +25,8 @@ if (typeof global.TextEncoder === 'undefined') {
   global.TextDecoder = TextDecoder;
 }
 
-// Ensure test env
-process.env.NODE_ENV = 'test';
+// Ensure test env - React development mode for testing only
+process.env.NODE_ENV = 'development';
 
 // Mock env.ts to avoid import.meta issues
 jest.mock('./src/env', () => ({

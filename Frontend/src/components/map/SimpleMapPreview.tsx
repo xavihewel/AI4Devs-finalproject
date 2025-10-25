@@ -33,6 +33,7 @@ export const SimpleMapPreview: React.FC<SimpleMapPreviewProps> = ({
     return (
       <div 
         aria-label={ariaLabel || t('noCoordinates')} 
+        data-testid="map-container"
         style={{ 
           height, 
           width: '100%', 
@@ -58,7 +59,11 @@ export const SimpleMapPreview: React.FC<SimpleMapPreviewProps> = ({
   };
 
   return (
-    <div aria-label={ariaLabel} style={{ height, width: '100%', borderRadius: 8, overflow: 'hidden', position: 'relative' }}>
+    <div 
+      aria-label={ariaLabel} 
+      data-testid="map-container"
+      style={{ height, width: '100%', borderRadius: 8, overflow: 'hidden', position: 'relative' }}
+    >
       <div style={{
         height: '100%',
         width: '100%',

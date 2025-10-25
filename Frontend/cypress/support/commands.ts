@@ -30,6 +30,12 @@ declare global {
        * @example cy.login()
        */
       login(): Chainable<void>
+      
+      /**
+       * Smart authentication helper that handles both authenticated and non-authenticated states
+       * @example cy.ensureAuthenticated()
+       */
+      ensureAuthenticated(): Chainable<void>
     }
   }
 }
@@ -186,6 +192,38 @@ Cypress.Commands.add('getByCy', (selector: string) => {
  */
 Cypress.Commands.add('login', () => {
   cy.loginViaKeycloak('test.user', 'password123')
+})
+
+/**
+ * Smart authentication helper that handles both authenticated and non-authenticated states
+ * This replaces the problematic beforeEach logic in individual tests
+ */
+Cypress.Commands.add('ensureAuthenticated', () => {
+  const isBypass = Cypress.env('authDisabled') === true || Cypress.env('authDisabled') === 'true'
+  
+  if (isBypass) {
+    cy.log('🔓 Auth bypass enabled - skipping authentication')
+    cy.visit('/')
+    cy.wait(500)
+    return
+  }
+
+  cy.log('🔐 Ensuring user is authenticated')
+  cy.visit('/')
+  cy.wait(2000) // Wait for app to load
+
+  // Check if already authenticated
+  cy.get('body', { timeout: 10000 }).then(($body) => {
+    const text = $body.text()
+    if (text.includes('Cerrar Sesión') || text.includes('Logout') || text.includes('Crear Viaje')) {
+      cy.log('✅ Already authenticated, skipping login')
+      return
+    }
+    
+    // Not authenticated, proceed with login
+    cy.log('❌ Not authenticated, proceeding with login')
+    cy.loginViaKeycloak('testuser', 'testpassword')
+  })
 })
 
 // Prevent TypeScript errors

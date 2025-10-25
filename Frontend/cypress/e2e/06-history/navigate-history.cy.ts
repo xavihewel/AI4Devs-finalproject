@@ -1,28 +1,7 @@
 describe('History Page', () => {
   beforeEach(() => {
-    // Login before each test
-    cy.visit('/');
-    cy.wait(2000); // Wait for app to load
-    
-    // Check if already authenticated (authDisabled mode)
-    cy.get('body', { timeout: 10000 }).then(($body) => {
-      const text = $body.text();
-      if (text.includes('Cerrar Sesión') || text.includes('Logout') || text.includes('Crear Viaje')) {
-        cy.log('Already authenticated, skipping login');
-        return;
-      }
-      
-      // Not authenticated, proceed with login
-      cy.log('Not authenticated, proceeding with login');
-      cy.get('button').contains('Iniciar Sesión').click();
-      cy.origin('http://localhost:8080', () => {
-        cy.get('#username').type('testuser');
-        cy.get('#password').type('testpassword');
-        cy.get('input[type="submit"]').click();
-      });
-      cy.url().should('include', '/callback');
-      cy.wait(2000);
-    });
+    // Use the smart authentication helper
+    cy.ensureAuthenticated();
   });
 
   it('should navigate to history page', () => {

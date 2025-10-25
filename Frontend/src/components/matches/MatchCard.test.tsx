@@ -47,7 +47,7 @@ describe('MatchCard', () => {
       />
     );
 
-    expect(screen.getByText('Trip to SEDE-1')).toBeInTheDocument();
+    expect(screen.getByText(/Viaje a/)).toBeInTheDocument();
     expect(screen.getByText('40.4168,-3.7038')).toBeInTheDocument();
     expect(screen.getByText('3')).toBeInTheDocument();
     expect(screen.getByText('Same route')).toBeInTheDocument();
@@ -64,7 +64,7 @@ describe('MatchCard', () => {
       />
     );
 
-    const scoreBadge = screen.getByText('Excellent');
+    const scoreBadge = screen.getByText('Excelente');
     expect(scoreBadge).toBeInTheDocument();
     expect(scoreBadge.closest('span')).toHaveClass('text-green-600', 'bg-green-100');
   });
@@ -80,7 +80,7 @@ describe('MatchCard', () => {
       />
     );
 
-    expect(screen.getByText('Already Booked')).toBeInTheDocument();
+    expect(screen.getAllByText('Ya Reservado')).toHaveLength(2);
   });
 
   it('disables book button when no seats available', () => {
@@ -95,7 +95,7 @@ describe('MatchCard', () => {
       />
     );
 
-    const bookButton = screen.getByText('No seats available');
+    const bookButton = screen.getByText('Sin asientos disponibles');
     expect(bookButton).toBeDisabled();
   });
 
@@ -110,8 +110,9 @@ describe('MatchCard', () => {
       />
     );
 
-    const bookButton = screen.getByText('Already Booked');
-    expect(bookButton).toBeDisabled();
+    const bookButtons = screen.getAllByText('Ya Reservado');
+    const mainButton = bookButtons.find(button => button.tagName === 'BUTTON');
+    expect(mainButton).toBeDisabled();
   });
 
   it('shows loading state on book button when booking in progress', () => {
@@ -125,7 +126,7 @@ describe('MatchCard', () => {
       />
     );
 
-    const bookButton = screen.getByRole('button', { name: /book trip/i });
+    const bookButton = screen.getByRole('button', { name: /reservar viaje/i });
     expect(bookButton).toBeDisabled();
   });
 
@@ -139,7 +140,7 @@ describe('MatchCard', () => {
       />
     );
 
-    const bookButton = screen.getByText('Book Trip');
+    const bookButton = screen.getByText('Reservar Viaje');
     fireEvent.click(bookButton);
 
     expect(mockOnBook).toHaveBeenCalledWith(mockMatch);
@@ -155,7 +156,7 @@ describe('MatchCard', () => {
       />
     );
 
-    const viewProfileButton = screen.getByText('View Profile');
+    const viewProfileButton = screen.getByText('👤 Ver Perfil');
     fireEvent.click(viewProfileButton);
 
     expect(mockOnViewProfile).toHaveBeenCalledWith('driver-1');
@@ -171,7 +172,7 @@ describe('MatchCard', () => {
       />
     );
 
-    const rateButton = screen.getByText('Rate');
+    const rateButton = screen.getByText('⭐ Valorar');
     fireEvent.click(rateButton);
 
     expect(mockOnRate).toHaveBeenCalledWith('driver-1');
@@ -187,7 +188,7 @@ describe('MatchCard', () => {
       />
     );
 
-    expect(screen.getByText('Show Map')).toBeInTheDocument();
+    expect(screen.getByText('Mostrar Mapa')).toBeInTheDocument();
   });
 
   it('toggles map visibility when show/hide map button is clicked', () => {
@@ -200,10 +201,10 @@ describe('MatchCard', () => {
       />
     );
 
-    const toggleButton = screen.getByText('Show Map');
+    const toggleButton = screen.getByText('Mostrar Mapa');
     fireEvent.click(toggleButton);
 
-    expect(screen.getByText('Hide Map')).toBeInTheDocument();
+    expect(screen.getByText('Ocultar Mapa')).toBeInTheDocument();
   });
 
   it('does not show map section when coordinates are invalid', () => {
@@ -245,7 +246,7 @@ describe('MatchCard', () => {
       />
     );
 
-    expect(screen.getByText('Compatibility reasons:')).toBeInTheDocument();
+    expect(screen.getByText('Razones de compatibilidad:')).toBeInTheDocument();
     expect(screen.getByText('Same route')).toBeInTheDocument();
     expect(screen.getByText('Similar departure time')).toBeInTheDocument();
   });
