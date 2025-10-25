@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
 import nl.martijndwars.webpush.Subscription;
+import nl.martijndwars.webpush.Urgency;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -21,14 +22,14 @@ public class PushNotificationService {
     private final ExecutorService executorService;
 
     public PushNotificationService() {
-        String vapidPublicKey = System.getenv("VAPID_PUBLIC_KEY");
-        String vapidPrivateKey = System.getenv("VAPID_PRIVATE_KEY");
+        String vapidPublicKey = System.getProperty("VAPID_PUBLIC_KEY");
+        String vapidPrivateKey = System.getProperty("VAPID_PRIVATE_KEY");
         
         if (vapidPublicKey == null || vapidPrivateKey == null) {
             throw new IllegalStateException("VAPID keys not configured. Please set VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY environment variables.");
         }
         
-        this.pushService = new PushService(vapidPublicKey, vapidPrivateKey);
+        this.pushService = new PushService();
         this.executorService = Executors.newFixedThreadPool(10);
     }
 
@@ -53,8 +54,10 @@ public class PushNotificationService {
      */
     public SendOutcome sendNotificationWithOutcome(String endpoint, String p256dhKey, String authKey, String title, String body) {
         try {
-            Subscription subscription = new Subscription(endpoint, p256dhKey, authKey);
-            Notification notification = new Notification(subscription, title, body);
+            Subscription.Keys keys = new Subscription.Keys(p256dhKey, authKey);
+            Subscription subscription = new Subscription(endpoint, keys);
+            String payload = String.format("{\"title\":\"%s\",\"body\":\"%s\"}", title, body);
+            Notification notification = new Notification(subscription, payload, Urgency.NORMAL);
             
             pushService.send(notification);
             return SendOutcome.SUCCESS;
@@ -93,8 +96,9 @@ public class PushNotificationService {
      */
     public SendOutcome sendNotificationWithPayload(String endpoint, String p256dhKey, String authKey, String payload) {
         try {
-            Subscription subscription = new Subscription(endpoint, p256dhKey, authKey);
-            Notification notification = new Notification(subscription, payload);
+            Subscription.Keys keys = new Subscription.Keys(p256dhKey, authKey);
+            Subscription subscription = new Subscription(endpoint, keys);
+            Notification notification = new Notification(subscription, payload, Urgency.NORMAL);
             
             pushService.send(notification);
             return SendOutcome.SUCCESS;

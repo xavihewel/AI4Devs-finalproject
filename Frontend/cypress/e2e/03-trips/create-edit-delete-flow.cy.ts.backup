@@ -14,8 +14,8 @@ describe('Complete Trip Flow: Create, Edit, Filter, Delete', () => {
     // Fill trip form with valid data
     cy.get('input[type="number"][placeholder="40.4168"]').clear().type('41.3851')
     cy.get('input[type="number"][placeholder="-3.7038"]').clear().type('2.1734')
-    cy.get('[data-testid="direction-select"]').select('TO_SEDE')
-    cy.get('[data-testid="destination-select"]').select('SEDE-1')
+    cy.get('select').first().select('TO_SEDE')
+    cy.get('select').eq(1).select('SEDE-1')
     
     // Set future date and time
     const futureDate = new Date()
@@ -27,24 +27,17 @@ describe('Complete Trip Flow: Create, Edit, Filter, Delete', () => {
     cy.get('input[type="number"][min="1"][max="8"]').clear().type('4')
     
     // Submit form
-    cy.contains('Crear viaje').click()
+    cy.contains('Crear').click()
     
-    // 3. Verify trip was created successfully by checking it appears in the list
-    // (More reliable than checking the temporary success message)
-    cy.contains('SEDE-1', { timeout: 15000 }).should('be.visible')
-    cy.contains('4 asientos', { timeout: 15000 }).should('be.visible')
-    
-    // Optional: Check for success message if visible (but don't fail if not)
-    cy.get('body').then(($body) => {
-      if ($body.text().includes('¡Viaje creado exitosamente!')) {
-        cy.contains('¡Viaje creado exitosamente!').should('be.visible')
-      }
-    })
+    // 3. Verify trip appears in list
+    cy.contains('Viaje creado exitosamente').should('be.visible')
+    cy.get('.space-y-6').should('exist')
+    cy.contains('SEDE-1').should('be.visible')
+    cy.contains('4 asientos').should('be.visible')
     
     // 4. Apply status filter (ACTIVE)
-    cy.get('[data-testid="trip-filters"]').within(() => {
-      cy.get('select').eq(0).select('ACTIVE') // Status filter
-    })
+    cy.get('select').first().select('ACTIVE')
+    cy.contains('Buscar').click()
     
     // Verify filtered results
     cy.get('body').then(($body) => {
@@ -56,9 +49,8 @@ describe('Complete Trip Flow: Create, Edit, Filter, Delete', () => {
     })
     
     // 5. Apply destination filter
-    cy.get('[data-testid="trip-filters"]').within(() => {
-      cy.get('select').eq(2).select('SEDE-1') // Destination filter
-    })
+    cy.get('select').eq(1).select('SEDE-1')
+    cy.contains('Buscar').click()
     
     // Verify destination filter works
     cy.get('body').then(($body) => {
@@ -102,7 +94,7 @@ describe('Complete Trip Flow: Create, Edit, Filter, Delete', () => {
         cy.contains('Editar').click()
         
         // Verify update success
-        cy.contains('¡Viaje actualizado exitosamente!').should('be.visible')
+        cy.contains('Viaje actualizado exitosamente').should('be.visible')
         
         // Verify trip shows updated seats
         cy.contains('5 asientos').should('be.visible')
@@ -113,8 +105,8 @@ describe('Complete Trip Flow: Create, Edit, Filter, Delete', () => {
     cy.contains('Limpiar filtros').click()
     
     // Verify filters are reset
-    cy.get('[data-testid="direction-select"]').should('have.value', '')
-    cy.get('[data-testid="destination-select"]').should('have.value', '')
+    cy.get('select').first().should('have.value', '')
+    cy.get('select').eq(1).should('have.value', '')
     cy.get('input[type="date"]').first().should('have.value', '')
     cy.get('input[type="date"]').last().should('have.value', '')
     
@@ -133,7 +125,7 @@ describe('Complete Trip Flow: Create, Edit, Filter, Delete', () => {
         cy.contains('Cancelar').first().click()
         
         // Verify deletion success
-        cy.contains('¡Viaje cancelado exitosamente!').should('be.visible')
+        cy.contains('Viaje cancelado exitosamente').should('be.visible')
         
         // Verify trip is removed from list
         cy.contains('No tienes viajes creados').should('be.visible')
@@ -160,12 +152,9 @@ describe('Complete Trip Flow: Create, Edit, Filter, Delete', () => {
     cy.visit('/trips')
     cy.get('[data-testid="trips-page"]', { timeout: 15000 }).should('be.visible')
     
-    // Apply some filters using generic selectors
-    cy.get('[data-testid="trip-filters"]').within(() => {
-      cy.get('select').eq(0).select('ACTIVE') // Status filter
-      cy.get('select').eq(1).select('TO_SEDE') // Direction filter  
-      cy.get('select').eq(2).select('SEDE-1') // Destination filter
-    })
+    // Apply some filters
+    cy.get('select').first().select('ACTIVE')
+    cy.get('select').eq(1).select('SEDE-1')
     
     // Navigate away and back
     cy.visit('/matches')

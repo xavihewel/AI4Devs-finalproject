@@ -14,14 +14,14 @@ describe('Trips Edit & Delete', () => {
 
     cy.get('input[placeholder="40.4168"]', { timeout: 15000 }).clear().type('40.4168')
     cy.get('input[placeholder="-3.7038"]', { timeout: 15000 }).clear().type('-3.7038')
-    cy.get('[data-testid="direction-select"]').select('TO_SEDE')
-    cy.get('[data-testid="destination-select"]').select('SEDE-1')
+    cy.get('select').first().select('TO_SEDE')
+    cy.get('select').eq(1).select('SEDE-1')
     const dt = new Date(Date.now() + 90 * 60 * 1000).toISOString().slice(0,16)
     cy.get('input[type="datetime-local"]', { timeout: 15000 }).type(dt)
     cy.get('input[type="number"][min="1"][max="8"]', { timeout: 15000 }).clear().type('2')
     cy.contains('button', 'Crear').click()
 
-    cy.contains('¡Viaje creado exitosamente!', { timeout: 15000 }).should('be.visible')
+    cy.contains('Viaje creado exitosamente', { timeout: 10000 }).should('be.visible')
 
     // Buscar botón de editar en el TripCard
     cy.get('body').then(($body) => {
@@ -37,7 +37,7 @@ describe('Trips Edit & Delete', () => {
         cy.contains('button', 'Editar').click()
         
         // Verificar mensaje de éxito
-        cy.contains('¡Viaje actualizado exitosamente!', { timeout: 15000 }).should('be.visible')
+        cy.contains('Viaje actualizado exitosamente', { timeout: 10000 }).should('be.visible')
       }
     })
 
@@ -51,7 +51,7 @@ describe('Trips Edit & Delete', () => {
         cy.contains('button', 'Cancelar').first().click()
         
         // Verificar mensaje de éxito
-        cy.contains('¡Viaje cancelado exitosamente!', { timeout: 15000 }).should('be.visible')
+        cy.contains('Viaje cancelado exitosamente', { timeout: 10000 }).should('be.visible')
       }
     })
   })

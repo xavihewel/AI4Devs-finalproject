@@ -22,7 +22,7 @@ describe('Enhanced Trip Features (Fase 2)', () => {
     cy.get('[data-testid="trips-page"]', { timeout: 15000 }).should('be.visible')
     
     // Filter by active status
-    cy.get('[data-testid="direction-select"]').select('ACTIVE')
+    cy.get('select').first().select('ACTIVE')
     
     // Should show filtered results or no results message
     cy.get('body').then(($body) => {
@@ -43,7 +43,7 @@ describe('Enhanced Trip Features (Fase 2)', () => {
     cy.get('select').should('have.length.at.least', 2);
     
     // Filter by destination (second select has SEDE options)
-    cy.get('[data-testid="destination-select"]').select('SEDE-1')
+    cy.get('select').eq(1).select('SEDE-1')
     
     // Should show filtered results or no results message
     cy.get('body').then(($body) => {
@@ -64,15 +64,15 @@ describe('Enhanced Trip Features (Fase 2)', () => {
     cy.get('select').should('have.length.at.least', 3);
     
     // Apply some filters
-    cy.get('[data-testid="direction-select"]').select('ACTIVE')
+    cy.get('select').first().select('ACTIVE')
     cy.get('select').eq(2).select('SEDE-1')
     
     // Clear filters
     cy.contains('Limpiar filtros').click()
     
     // Filters should be reset
-    cy.get('[data-testid="direction-select"]').should('have.value', '')
-    cy.get('[data-testid="destination-select"]').should('have.value', '')
+    cy.get('select').first().should('have.value', '')
+    cy.get('select').eq(1).should('have.value', '')
   })
 
   it('should display trip cards with enhanced information', () => {

@@ -397,6 +397,7 @@ export default function Trips() {
                 options={directionOptions}
                 error={touched.direction ? formErrors.direction : undefined}
                 required
+                data-testid="direction-select"
               />
 
               <Select
@@ -407,6 +408,7 @@ export default function Trips() {
                 options={sedeOptions}
                 error={touched.destinationSedeId ? formErrors.destinationSedeId : undefined}
                 required
+                data-testid="destination-select"
               />
 
               <Input

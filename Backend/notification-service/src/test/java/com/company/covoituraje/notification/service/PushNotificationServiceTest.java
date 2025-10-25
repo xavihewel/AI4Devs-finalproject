@@ -28,6 +28,10 @@ class PushNotificationServiceTest {
         System.setProperty("VAPID_PUBLIC_KEY", "test-public-key");
         System.setProperty("VAPID_PRIVATE_KEY", "test-private-key");
         
+        // Set environment variables for the test
+        System.setProperty("VAPID_PUBLIC_KEY", "test-public-key");
+        System.setProperty("VAPID_PRIVATE_KEY", "test-private-key");
+        
         // Create service instance
         pushNotificationService = new PushNotificationService();
     }

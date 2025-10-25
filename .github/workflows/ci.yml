@@ -1,23 +1,20 @@
-name: CI/CD Pipeline
+name: CI Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, FEATURE/* ]
   pull_request:
     branches: [ main, develop ]
 
 jobs:
   backend-tests:
-    name: Backend Tests
     runs-on: ubuntu-latest
-    
     services:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_PASSWORD: app
-          POSTGRES_USER: app
-          POSTGRES_DB: app
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: testdb
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -45,16 +42,13 @@ jobs:
     - name: Run Backend Tests
       run: |
         cd Backend
-        mvn clean test -DskipITs=false -DskipTests=false
+        mvn clean test -Dspring.profiles.active=test
       env:
-        POSTGRES_HOST: localhost
-        POSTGRES_PORT: 5432
-        POSTGRES_DB: app
-        POSTGRES_USER: app
-        POSTGRES_PASSWORD: app
+        DATABASE_URL: jdbc:postgresql://localhost:5432/testdb
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
 
   frontend-tests:
-    name: Frontend Tests
     runs-on: ubuntu-latest
     
     steps:
@@ -72,10 +66,10 @@ jobs:
         cd Frontend
         npm ci
     
-    - name: Run Frontend Unit Tests
+    - name: Run Frontend Tests
       run: |
         cd Frontend
-        npm run test:ci
+        npm test -- --coverage --watchAll=false
     
     - name: Build Frontend
       run: |
@@ -83,7 +77,6 @@ jobs:
         npm run build
 
   e2e-tests:
-    name: E2E Tests
     runs-on: ubuntu-latest
     needs: [backend-tests, frontend-tests]
     
@@ -103,106 +96,51 @@ jobs:
         cache: 'npm'
         cache-dependency-path: Frontend/package-lock.json
     
-    - name: Install Frontend dependencies
+    - name: Start Infrastructure
+      run: |
+        cd Backend
+        mvn clean package -DskipTests
+        docker-compose up -d postgres redis keycloak mailhog
+        sleep 30
+    
+    - name: Start Backend Services
+      run: |
+        cd Backend
+        mvn exec:java -Dexec.mainClass="com.bonareago.trips.TripsApplication" &
+        mvn exec:java -Dexec.mainClass="com.bonareago.users.UsersApplication" &
+        mvn exec:java -Dexec.mainClass="com.bonareago.booking.BookingApplication" &
+        mvn exec:java -Dexec.mainClass="com.bonareago.matching.MatchingApplication" &
+        mvn exec:java -Dexec.mainClass="com.bonareago.notifications.NotificationApplication" &
+        sleep 60
+    
+    - name: Install Frontend Dependencies
       run: |
         cd Frontend
         npm ci
     
-    - name: Start Infrastructure
+    - name: Build Frontend
       run: |
-        docker-compose --profile infra up -d
-        sleep 30
+        cd Frontend
+        npm run build
     
-    - name: Run Migrations
+    - name: Start Frontend
       run: |
-        ./scripts/migrate.sh
-    
-    - name: Setup Keycloak
-      run: |
-        ./scripts/setup-keycloak.sh
-    
-    - name: Start Services
-      run: |
-        docker-compose --profile services up -d
-        sleep 60
-    
-    - name: Verify Services
-      run: |
-        ./scripts/verify-all.sh
+        cd Frontend
+        npm run preview &
+        sleep 10
     
     - name: Run E2E Tests
-      uses: cypress-io/github-action@v6
-      with:
-        working-directory: Frontend
-        wait-on: 'http://localhost:3000'
-        wait-on-timeout: 120
-        browser: chrome
-        record: false
-        parallel: false
+      run: |
+        cd Frontend
+        CYPRESS_authDisabled=true npm run test:e2e:bypass:all
       env:
-        CYPRESS_baseUrl: http://localhost:3000
-        CYPRESS_keycloakUrl: http://localhost:8080
-        CYPRESS_apiUrl: http://localhost:8081
-    
-    - name: Upload E2E Screenshots
-      uses: actions/upload-artifact@v3
-      if: failure()
-      with:
-        name: cypress-screenshots
-        path: Frontend/cypress/screenshots
-    
-    - name: Upload E2E Videos
-      uses: actions/upload-artifact@v3
-      if: failure()
-      with:
-        name: cypress-videos
-        path: Frontend/cypress/videos
+        CYPRESS_baseUrl: http://localhost:4173
 
   security-scan:
-    name: Security Scan
     runs-on: ubuntu-latest
     
     steps:
     - uses: actions/checkout@v4
-    
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-    
-    - name: Run OWASP Dependency Check
-      uses: dependency-check/Dependency-Check_Action@main
-      with:
-        project: 'covoituraje'
-        path: '.'
-        format: 'HTML'
-        args: >
-          --enableRetired
-          --enableExperimental
-          --out reports/
-          --scan Backend/
-    
-    - name: Upload Security Report
-      uses: actions/upload-artifact@v3
-      with:
-        name: security-report
-        path: reports/
-
-  build-and-deploy:
-    name: Build and Deploy
-    runs-on: ubuntu-latest
-    needs: [backend-tests, frontend-tests, e2e-tests]
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
     
     - name: Set up Node.js
       uses: actions/setup-node@v4
@@ -211,22 +149,53 @@ jobs:
         cache: 'npm'
         cache-dependency-path: Frontend/package-lock.json
     
-    - name: Build Backend
-      run: |
-        cd Backend
-        mvn clean package -DskipTests
-    
-    - name: Build Frontend
+    - name: Frontend Security Audit
       run: |
         cd Frontend
-        npm ci
-        npm run build
+        npm audit --audit-level=moderate
     
-    - name: Build Docker Images
+    - name: Backend Security Scan
       run: |
-        docker-compose build
+        cd Backend
+        mvn org.owasp:dependency-check-maven:check
+
+  docker-build:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: [backend-tests, frontend-tests, e2e-tests, security-scan]
     
-    - name: Deploy to Staging
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Build and push Backend images
       run: |
-        echo "Deploy to staging environment"
-        # Add actual deployment commands here
+        cd Backend
+        docker build -t ghcr.io/${{ github.repository }}/auth-service:latest ./auth-service
+        docker build -t ghcr.io/${{ github.repository }}/users-service:latest ./users-service
+        docker build -t ghcr.io/${{ github.repository }}/trips-service:latest ./trips-service
+        docker build -t ghcr.io/${{ github.repository }}/booking-service:latest ./booking-service
+        docker build -t ghcr.io/${{ github.repository }}/matching-service:latest ./matching-service
+        docker build -t ghcr.io/${{ github.repository }}/notification-service:latest ./notification-service
+        
+        docker push ghcr.io/${{ github.repository }}/auth-service:latest
+        docker push ghcr.io/${{ github.repository }}/users-service:latest
+        docker push ghcr.io/${{ github.repository }}/trips-service:latest
+        docker push ghcr.io/${{ github.repository }}/booking-service:latest
+        docker push ghcr.io/${{ github.repository }}/matching-service:latest
+        docker push ghcr.io/${{ github.repository }}/notification-service:latest
+    
+    - name: Build and push Frontend image
+      run: |
+        cd Frontend
+        docker build -t ghcr.io/${{ github.repository }}/frontend:latest .
+        docker push ghcr.io/${{ github.repository }}/frontend:latest

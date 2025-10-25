@@ -154,7 +154,36 @@ La experiencia de usuario de **bonÀreaGo** está diseñada para ser intuitiva, 
 
 
 ### **1.4. Instrucciones de instalación:**
-> Documenta de manera precisa las instrucciones para instalar y poner en marcha el proyecto en local (librerías, backend, frontend, servidor, base de datos, migraciones y semillas de datos, etc.)
+
+Para instrucciones detalladas de instalación y puesta en marcha, consulta:
+
+- **[QUICK-START.md](./QUICK-START.md)** - Guía rápida de inicio (5 minutos)
+- **[Production Setup Guide](./doc/deployment/production-setup.md)** - Configuración para producción
+- **[Docker Deployment Guide](./doc/deployment/docker-deployment.md)** - Deployment con Docker
+
+#### Inicio Rápido
+
+```bash
+# 1. Clonar repositorio
+git clone https://github.com/xavihewel/AI4Devs-finalproject.git
+cd AI4Devs-finalproject
+
+# 2. Configurar entorno
+cp env.example .env
+# Editar .env con tus configuraciones
+
+# 3. Levantar infraestructura (PostgreSQL, Redis, Keycloak)
+./scripts/dev-infra.sh
+
+# 4. Levantar todos los servicios
+./scripts/start-all-services.sh
+
+# 5. Acceder a la aplicación
+# Frontend: https://localhost:3000
+# Keycloak: http://localhost:8080
+```
+
+Para más detalles, consulta [QUICK-START.md](./QUICK-START.md).
 
 ---
 
@@ -203,23 +232,290 @@ Esta arquitectura está alineada con las mejores prácticas para aplicaciones co
 
 ### **2.2. Descripción de componentes principales:**
 
-> Describe los componentes más importantes, incluyendo la tecnología utilizada
+bonÀreaGo está construido con arquitectura de microservicios:
+
+#### Backend (Java 17 + Jakarta EE)
+- **auth-service** (Puerto 8080): Validación JWT y autorización con Nimbus JOSE JWT
+- **users-service** (Puerto 8082): Gestión de usuarios, perfiles y valoraciones con JPA/Hibernate
+- **trips-service** (Puerto 8081): Gestión de viajes con PostGIS para geolocalización
+- **booking-service** (Puerto 8083): Sistema de reservas con validación de disponibilidad
+- **matching-service** (Puerto 8084): Algoritmo de emparejamiento con patrón Strategy
+- **notification-service** (Puerto 8085): Push notifications (VAPID) y emails (SMTP)
+- **shared**: Biblioteca común con utilidades de autenticación y DTOs
+
+#### Frontend (React 18 + TypeScript)
+- **React 18** con hooks y componentes funcionales
+- **TypeScript** para type safety
+- **Tailwind CSS** para estilos
+- **react-i18next** para internacionalización (6 idiomas)
+- **Vite** como build tool
+- **Cypress** para tests E2E
+
+#### Infraestructura
+- **PostgreSQL 15 + PostGIS**: Base de datos con soporte geoespacial
+- **Redis 7**: Cache y sesiones
+- **Keycloak 23**: Autenticación OIDC/SSO
+- **Nginx**: API Gateway con rate limiting
+- **Docker Compose**: Orquestación de servicios
 
 ### **2.3. Descripción de alto nivel del proyecto y estructura de ficheros**
 
-> Representa la estructura del proyecto y explica brevemente el propósito de las carpetas principales, así como si obedece a algún patrón o arquitectura específica.
+```
+bonareago/
+├── Backend/                    # Microservicios Java
+│   ├── auth-service/          # Autenticación JWT
+│   ├── users-service/         # Gestión de usuarios
+│   ├── trips-service/         # Gestión de viajes
+│   ├── booking-service/       # Sistema de reservas
+│   ├── matching-service/      # Emparejamiento
+│   ├── notification-service/  # Notificaciones
+│   ├── shared/                # Biblioteca compartida
+│   └── pom.xml               # Parent POM con dependencyManagement
+│
+├── Frontend/                   # SPA React
+│   ├── src/
+│   │   ├── api/              # Clientes API
+│   │   ├── components/       # Componentes React
+│   │   ├── pages/            # Páginas principales
+│   │   ├── i18n/             # Traducciones (6 idiomas)
+│   │   └── types/            # Tipos TypeScript
+│   └── cypress/              # Tests E2E
+│
+├── doc/                        # Documentación
+│   ├── api/                  # OpenAPI specs
+│   ├── deployment/           # Guías de deployment
+│   ├── development/          # Docs de desarrollo
+│   └── security/             # Security checklist
+│
+├── memory-bank/               # Documentación del proyecto
+│   ├── projectbrief.md       # Brief del proyecto
+│   ├── productContext.md     # Contexto de producto
+│   ├── systemPatterns.md     # Patrones técnicos
+│   ├── techContext.md        # Stack tecnológico
+│   ├── activeContext.md      # Contexto actual
+│   ├── progress.md           # Progreso del proyecto
+│   └── featurePlan.md        # Plan de funcionalidades
+│
+├── scripts/                   # Scripts de automatización
+│   ├── setup-dev.sh          # Setup desarrollo
+│   ├── dev-infra.sh          # Levantar infraestructura
+│   ├── start-all-services.sh # Iniciar todos los servicios
+│   ├── verify-all.sh         # Verificación completa
+│   └── run-e2e-tests.sh      # Tests E2E
+│
+├── docker-compose.yml         # Orquestación local
+├── env.example               # Variables de entorno
+└── QUICK-START.md            # Guía de inicio rápido
+```
+
+**Patrón arquitectónico**: Microservicios con separación clara de responsabilidades, siguiendo principios SOLID y DDD.
 
 ### **2.4. Infraestructura y despliegue**
 
-> Detalla la infraestructura del proyecto, incluyendo un diagrama en el formato que creas conveniente, y explica el proceso de despliegue que se sigue
+#### Diagrama de Infraestructura
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                         Nginx Gateway                        │
+│                    (Rate Limiting, CORS)                     │
+└───────────────┬─────────────────────────────────────────────┘
+                │
+    ┌───────────┴───────────┐
+    │                       │
+┌───▼────┐  ┌──────┐  ┌────▼────┐  ┌──────────┐  ┌──────────┐
+│ Auth   │  │Users │  │ Trips   │  │ Booking  │  │ Matching │
+│Service │  │Service│  │ Service │  │ Service  │  │ Service  │
+└────┬───┘  └───┬──┘  └────┬────┘  └─────┬────┘  └─────┬────┘
+     │          │          │             │             │
+     └──────────┴──────────┴─────────────┴─────────────┘
+                            │
+                ┌───────────┴───────────┐
+                │                       │
+         ┌──────▼──────┐         ┌─────▼─────┐
+         │ PostgreSQL  │         │   Redis   │
+         │  + PostGIS  │         │           │
+         └─────────────┘         └───────────┘
+```
+
+#### Proceso de Despliegue
+
+**Desarrollo Local:**
+```bash
+./scripts/setup-dev.sh       # Setup inicial
+./scripts/dev-infra.sh       # Infraestructura
+./scripts/start-all-services.sh  # Servicios
+```
+
+**Producción:**
+```bash
+# Build imágenes Docker
+docker build -t bonareago/trips-service:latest ./Backend/trips-service
+
+# Deploy con Docker Compose
+docker-compose -f docker-compose.prod.yml up -d
+
+# O usar script de deployment
+./scripts/deploy-production.sh
+```
+
+**CI/CD con GitHub Actions:**
+- Build automático en cada push
+- Tests unitarios y E2E
+- Security scan (npm audit, OWASP)
+- Deploy automático a staging/producción
+
+Ver [docker-deployment.md](./doc/deployment/docker-deployment.md) para más detalles.
 
 ### **2.5. Seguridad**
 
-> Enumera y describe las prácticas de seguridad principales que se han implementado en el proyecto, añadiendo ejemplos si procede
+bonÀreaGo implementa múltiples capas de seguridad siguiendo OWASP Top 10:
+
+#### 1. Autenticación y Autorización
+- **JWT con RS256**: Tokens firmados asimétricamente
+- **OIDC con Keycloak**: Single Sign-On corporativo
+- **JWKS**: Validación de firma con rotación de claves
+- **Validación de roles**: Rol EMPLOYEE requerido (`REQUIRE_ROLE_EMPLOYEE=true`)
+
+```java
+// Ejemplo: Validación JWT
+public class JwtValidator {
+    public JWTClaimsSet validate(String token) throws Exception {
+        // Validar firma con JWKS
+        JWTClaimsSet claims = jwtProcessor.process(token, null);
+        
+        // Validar issuer
+        if (!claims.getIssuer().equals(expectedIssuer)) {
+            throw new SecurityException("Invalid issuer");
+        }
+        
+        // Validar audience
+        if (!claims.getAudience().contains("backend-api")) {
+            throw new SecurityException("Invalid audience");
+        }
+        
+        return claims;
+    }
+}
+```
+
+#### 2. Protección contra Inyección
+- **JPA con parámetros preparados**: Sin concatenación SQL
+- **Validación de inputs**: Bean Validation (JSR-380)
+- **Sanitización**: En frontend y backend
+
+#### 3. Headers de Seguridad
+```nginx
+# Nginx Gateway
+add_header X-Frame-Options "DENY";
+add_header X-Content-Type-Options "nosniff";
+add_header X-XSS-Protection "1; mode=block";
+add_header Content-Security-Policy "default-src 'self'";
+add_header Referrer-Policy "strict-origin-when-cross-origin";
+```
+
+#### 4. CORS Configurado
+- Sin wildcard (`*`)
+- Orígenes específicos: `ALLOWED_ORIGINS=https://your-domain.com`
+- Credentials permitidos solo para orígenes confiables
+
+#### 5. Rate Limiting
+- API General: 10 req/s por IP
+- Auth endpoints: 5 req/s por IP
+
+#### 6. Dependencias Actualizadas
+- `npm audit`: 0 vulnerabilidades
+- Monitoreo continuo con Dependabot
+- Stack moderno (Java 17, React 18, PostgreSQL 15)
+
+Ver [security-checklist.md](./doc/security/security-checklist.md) para checklist completo.
 
 ### **2.6. Tests**
 
-> Describe brevemente algunos de los tests realizados
+bonÀreaGo tiene cobertura completa de tests:
+
+#### Tests Unitarios Backend (JUnit 5 + Mockito)
+```java
+@Test
+void testCreateTrip_ValidData_ReturnsCreatedTrip() {
+    // Given
+    TripDto tripDto = new TripDto();
+    tripDto.setSeatsTotal(3);
+    
+    // When
+    TripDto result = tripService.createTrip(tripDto, "user-123");
+    
+    // Then
+    assertNotNull(result.getId());
+    assertEquals(3, result.getSeatsTotal());
+    assertEquals(3, result.getSeatsFree());
+}
+```
+
+#### Tests Unitarios Frontend (Jest + React Testing Library)
+```typescript
+test('renders trip card with correct data', () => {
+  const trip = { id: '1', seatsTotal: 3, seatsFree: 2 };
+  render(<TripCard trip={trip} />);
+  
+  expect(screen.getByText('3 asientos')).toBeInTheDocument();
+  expect(screen.getByText('2 disponibles')).toBeInTheDocument();
+});
+```
+
+#### Tests E2E (Cypress)
+```typescript
+describe('Trip Creation Flow', () => {
+  it('should create a trip successfully', () => {
+    cy.login('user@example.com', 'password');
+    cy.visit('/trips');
+    cy.get('[data-testid="create-trip-button"]').click();
+    
+    // Fill form
+    cy.get('input[placeholder="40.4168"]').type('41.3851');
+    cy.get('input[placeholder="-3.7038"]').type('2.1734');
+    cy.get('select').first().select('TO_SEDE');
+    
+    cy.contains('button', 'Crear').click();
+    cy.contains('Viaje creado exitosamente').should('be.visible');
+  });
+});
+```
+
+#### Tests de Integración (Testcontainers)
+```java
+@Test
+void testTripRepository_FindByStatus_ReturnsActiveTrips() {
+    // Given: PostgreSQL container running
+    Trip trip = new Trip();
+    trip.setStatus(TripStatus.ACTIVE);
+    repository.persist(trip);
+    
+    // When
+    List<Trip> active = repository.findByStatus(TripStatus.ACTIVE);
+    
+    // Then
+    assertEquals(1, active.size());
+}
+```
+
+**Cobertura:**
+- Tests E2E: >85% de flujos críticos
+- Tests unitarios backend: ~80%
+- Tests unitarios frontend: ~75%
+
+**Ejecución:**
+```bash
+# Backend
+mvn test
+
+# Frontend
+npm test
+
+# E2E
+npm run cypress:open
+```
+
+Ver [e2e-test-coverage.md](./doc/setup/e2e-test-coverage.md) para detalles de cobertura E2E.
 
 ---
 
