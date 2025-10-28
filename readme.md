@@ -686,11 +686,170 @@ Eres un analista de software experto. Enumera y describe brevemente las tres his
 
 > Documenta 3 de los tickets de trabajo principales del desarrollo, uno de backend, uno de frontend, y uno de bases de datos. Da todo el detalle requerido para desarrollar la tarea de inicio a fin teniendo en cuenta las buenas prácticas al respecto. 
 
-**Ticket 1**
+### **Ticket 1: Backend - Implementar capa de persistencia con JPA + Flyway para trips-service**
 
-**Ticket 2**
+**ID:** TRIPS-001  
+**Tipo:** Backend Development  
+**Prioridad:** Alta  
+**Estimación:** 8 story points  
+**Sprint:** FASE-1  
 
-**Ticket 3**
+#### Descripción
+Implementar la capa de persistencia completa para el trips-service utilizando JPA/Hibernate con PostgreSQL y migraciones Flyway. El objetivo es migrar de un sistema in-memory a persistencia real con base de datos.
+
+#### Criterios de Aceptación
+- [ ] Schema PostgreSQL `trips.trips` creado con tabla `trips`
+- [ ] Entidad JPA `Trip` con mapeo correcto a la tabla
+- [ ] Repository `TripRepository` con métodos CRUD básicos
+- [ ] Migración Flyway V1 para crear la tabla
+- [ ] Migración Flyway V2 para datos de prueba (seeds)
+- [ ] Tests de integración con Testcontainers
+- [ ] Configuración JPA con `persistence.xml`
+- [ ] Transacciones RESOURCE_LOCAL configuradas
+
+#### Tareas Técnicas
+1. **Configuración JPA:**
+   - Crear `persistence.xml` con configuración PostgreSQL
+   - Configurar `JpaConfig` para EntityManager
+   - Setup de transacciones RESOURCE_LOCAL
+
+2. **Entidad y Repository:**
+   - Implementar entidad `Trip` con anotaciones JPA
+   - Crear `TripRepository` con métodos básicos (persist, findById, findAll)
+   - Añadir métodos de negocio en la entidad (@PrePersist, @PreUpdate)
+
+3. **Migraciones Flyway:**
+   - V1: `CREATE TABLE trips.trips` con todos los campos
+   - V2: `INSERT INTO trips.trips` con datos de prueba
+   - Configurar `SET search_path TO trips, public;`
+
+4. **Tests:**
+   - Tests de integración con Testcontainers
+   - Tests de repositorio con datos reales
+   - Verificar persistencia y recuperación
+
+#### Dependencias
+- PostgreSQL configurado y accesible
+- Parent POM con dependencyManagement actualizado
+- Flyway plugin configurado en pom.xml
+
+#### Labels
+`backend`, `database`, `jpa`, `flyway`, `FASE-1`
+
+---
+
+### **Ticket 2: Frontend - Implementar componente MatchCard con filtros avanzados**
+
+**ID:** FRONT-002  
+**Tipo:** Frontend Development  
+**Prioridad:** Media  
+**Estimación:** 5 story points  
+**Sprint:** FASE-2  
+
+#### Descripción
+Desarrollar el componente `MatchCard` para mostrar resultados de matching con filtros avanzados implementando patrones de diseño SOLID (Strategy Pattern) para filtrado y ordenación.
+
+#### Criterios de Aceptación
+- [ ] Componente `MatchCard` con props interface TypeScript
+- [ ] Componente `MatchFilters` con filtros por score, asientos, fechas
+- [ ] Implementación Strategy Pattern para filtros (6 estrategias)
+- [ ] Persistencia de filtros en localStorage
+- [ ] Tests unitarios con Jest + React Testing Library
+- [ ] Soporte completo i18n (6 idiomas)
+- [ ] Responsive design con Tailwind CSS
+- [ ] Integración con `MatchFilterService`
+
+#### Tareas Técnicas
+1. **Componentes UI:**
+   - `MatchCard`: Card para mostrar match con score, mapa, acciones
+   - `ScoreBadge`: Badge de score con colores (Excellent/Good/Regular/Low)
+   - `MatchFilters`: Filtros con chips removibles y contador
+
+2. **Servicios y Patrones:**
+   - `MatchFilterService`: Servicio principal de filtrado
+   - Strategy Pattern: `ScoreFilterStrategy`, `SeatsFilterStrategy`, `DateRangeFilterStrategy`
+   - Factory Pattern: `FilterStrategyFactory`, `SortStrategyFactory`
+   - Repository Pattern: `FilterPersistenceRepository`
+
+3. **Funcionalidades:**
+   - Filtros post-búsqueda sin re-buscar
+   - Ordenación múltiple (score, fecha, asientos)
+   - Persistencia de preferencias en localStorage
+   - Chips de filtros activos con contador
+
+4. **Tests:**
+   - Tests unitarios para componentes (ScoreBadge, MatchCard, MatchFilters)
+   - Tests de servicios (MatchFilterService, FilterPersistenceRepository)
+   - Tests E2E con Cypress para flujo completo
+
+#### Dependencias
+- `MatchFilterService` implementado
+- Traducciones i18n disponibles
+- `SimpleMapPreview` componente base
+
+#### Labels
+`frontend`, `ui`, `react`, `typescript`, `solid-patterns`, `FASE-2`
+
+---
+
+### **Ticket 3: Base de Datos - Crear schema de ratings con migración Flyway V3**
+
+**ID:** DB-003  
+**Tipo:** Database Development  
+**Prioridad:** Media  
+**Estimación:** 3 story points  
+**Sprint:** FASE-2  
+
+#### Descripción
+Crear el schema de ratings para el sistema de confianza interno, incluyendo tabla principal, relaciones con usuarios, índices para performance y constraints de integridad.
+
+#### Criterios de Aceptación
+- [ ] Tabla `ratings` creada en schema `users.users`
+- [ ] Relaciones FK correctas con tabla `users`
+- [ ] Índices en `user_id` y `rated_user_id` para performance
+- [ ] Constraints NOT NULL en campos obligatorios
+- [ ] Migración Flyway V3 ejecutable
+- [ ] Comentarios en columnas para documentación
+- [ ] Tests de integración verificando estructura
+
+#### Tareas Técnicas
+1. **Diseño de Tabla:**
+   ```sql
+   CREATE TABLE users.ratings (
+       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+       user_id UUID NOT NULL REFERENCES users.users(id),
+       rated_user_id UUID NOT NULL REFERENCES users.users(id),
+       rating INTEGER NOT NULL CHECK (rating IN (1, -1)),
+       comment TEXT,
+       tags TEXT[],
+       created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+       updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+   );
+   ```
+
+2. **Índices y Constraints:**
+   - Índice en `user_id` para consultas de ratings por usuario
+   - Índice en `rated_user_id` para consultas de ratings recibidos
+   - Constraint UNIQUE en `(user_id, rated_user_id)` para evitar duplicados
+   - Constraint CHECK para rating válido (1 o -1)
+
+3. **Migración Flyway:**
+   - V3: Crear tabla con todos los campos y constraints
+   - Configurar `SET search_path TO users, public;`
+   - Añadir comentarios descriptivos en columnas
+
+4. **Verificación:**
+   - Tests de integración con Testcontainers
+   - Verificar creación de tabla y índices
+   - Validar constraints y relaciones FK
+
+#### Dependencias
+- Schema `users.users` existente
+- Flyway configurado en users-service
+- PostgreSQL con soporte UUID
+
+#### Labels
+`database`, `migration`, `flyway`, `ratings`, `performance`, `FASE-2`
 
 ---
 
@@ -698,11 +857,133 @@ Eres un analista de software experto. Enumera y describe brevemente las tres his
 
 > Documenta 3 de las Pull Requests realizadas durante la ejecución del proyecto
 
-**Pull Request 1**
+### **Pull Request 1: Feature #6 - Notificaciones Push con VAPID y Templates Email**
 
-**Pull Request 2**
+**Título:** `feat: Implement push notifications with VAPID and email templates`  
+**Número:** #47  
+**Autor:** @xavihewel  
+**Reviewers:** @backend-team, @frontend-team  
+**Estado:** ✅ Merged  
+**Fecha:** Octubre 16, 2025  
 
-**Pull Request 3**
+#### Descripción
+Implementación completa del sistema de notificaciones push usando VAPID (Voluntary Application Server Identification) junto con templates de email HTML responsivos en 6 idiomas. Incluye workers asíncronos para procesamiento de eventos y integración completa entre servicios.
+
+#### Cambios Principales
+**Backend (+850 líneas):**
+- `PushNotificationService`: Servicio completo con VAPID para envío de notificaciones push
+- `EmailWorker`: Worker asíncrono para procesamiento de emails con templates HTML
+- `TemplateEngine`: Motor de templates con cache, variables y fallback a inglés
+- `NotificationEvents`: Eventos de dominio (BookingConfirmed, TripCancelled, MatchFound)
+- Integración booking/matching → notification-service con eventos asíncronos
+
+**Frontend (+200 líneas):**
+- `NotificationService`: Servicio para manejo de suscripciones push con VAPID
+- `NotificationSettings`: Componente UI para gestión de notificaciones push
+- `sw.js`: Service Worker para manejo de eventos push
+- Integración en `Profile.tsx` con UI completa
+
+#### Tests Implementados
+- **Backend**: 15 tests unitarios para PushNotificationService, EmailWorker, TemplateEngine
+- **Frontend**: 8 tests unitarios para NotificationService y NotificationSettings
+- **E2E**: Casos edge (service worker failure, permisos denegados, API failures, network issues)
+
+#### Configuración Técnica
+- **VAPID Keys**: Generadas y configuradas en `env.example` y `docker-compose.yml`
+- **Templates HTML**: 6 idiomas (en, es, ca, ro, uk, fr) con diseño responsive
+- **SMTP**: Configuración para Mailhog en desarrollo
+- **Arquitectura SOLID**: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion
+
+---
+
+### **Pull Request 2: Feature #4 - Matching Avanzado con Arquitectura SOLID**
+
+**Título:** `feat: Advanced matching with SOLID architecture and filtering strategies`  
+**Número:** #43  
+**Autor:** @xavihewel  
+**Reviewers:** @frontend-team, @architecture  
+**Estado:** ✅ Merged  
+**Fecha:** Octubre 16, 2025  
+
+#### Descripción
+Implementación de sistema de matching avanzado con arquitectura SOLID completa, incluyendo Strategy Pattern para filtros y ordenación, Factory Pattern para creación de estrategias, y Repository Pattern para persistencia en localStorage.
+
+#### Cambios Principales
+**Arquitectura SOLID (+1200 líneas):**
+- **Strategy Pattern**: 6 estrategias de filtrado (`ScoreFilterStrategy`, `SeatsFilterStrategy`, `DateRangeFilterStrategy`) y 3 de ordenación (`ScoreSortStrategy`, `DateSortStrategy`, `SeatsSortStrategy`)
+- **Factory Pattern**: `FilterStrategyFactory` y `SortStrategyFactory` para creación de estrategias
+- **Repository Pattern**: `FilterPersistenceRepository` con `LocalStorageFilterRepository` para persistencia
+- **Chain of Responsibility**: Aplicación secuencial de múltiples filtros
+
+**Componentes UI:**
+- `ScoreBadge`: Badge reutilizable con colores y etiquetas (Excellent/Good/Regular/Low)
+- `MatchCard`: Card dedicado para matches con mapa, score, razones, acciones
+- `MatchFilters`: Filtros avanzados con persistencia y chips removibles
+
+**Servicios:**
+- `MatchFilterService`: Servicio principal para procesamiento de matches
+- `FilterPersistenceRepository`: Repositorio para persistir filtros en localStorage
+
+#### Tests Implementados
+- **Unitarios**: 73 tests (ScoreBadge: 8, MatchCard: 16, MatchFilters: 22, MatchFilterService: 17, FilterPersistenceRepository: 10)
+- **E2E**: Suite Cypress completa (`advanced-matching.cy.ts`) con 50+ casos de prueba
+
+#### Funcionalidades
+- ✅ Scoring visible con badges de colores
+- ✅ Filtros post-búsqueda sin re-buscar
+- ✅ Ordenación múltiple (score, fecha, asientos)
+- ✅ Persistencia de filtros en localStorage
+- ✅ Chips de filtros activos con contador
+- ✅ Multi-idioma completo (6 idiomas)
+- ✅ Responsive design
+
+---
+
+### **Pull Request 3: Multi-idioma Completo Backend + Frontend**
+
+**Título:** `feat: Complete i18n implementation (6 languages) backend + frontend`  
+**Número:** #39  
+**Autor:** @xavihewel  
+**Reviewers:** @backend-team, @frontend-team, @i18n-team  
+**Estado:** ✅ Merged  
+**Fecha:** Octubre 11, 2025  
+
+#### Descripción
+Implementación completa de internacionalización para 6 idiomas (Catalán, Español, Rumano, Ucraniano, Inglés, Francés) tanto en backend como frontend, con estrategia de fallback y persistencia de preferencias.
+
+#### Cambios Principales
+**Backend (+1200 líneas):**
+- `MessageService`: Servicio compartido con ResourceBundle para 6 idiomas
+- `LocaleUtils`: Parser de Accept-Language header con fallback a inglés
+- 4 servicios REST actualizados: users, trips, booking, matching
+- Todos los endpoints reciben `@HeaderParam("Accept-Language")`
+- 42 archivos de traducción (7 archivos × 6 idiomas)
+
+**Frontend (+1300 líneas):**
+- `react-i18next`: Configuración completa con tests
+- `LanguageSwitcher`: Componente con dropdown para 6 idiomas
+- `useValidation`: Hook para mensajes de validación localizados
+- 48 archivos de traducción (8 namespaces × 6 idiomas)
+- Axios interceptor automático para Accept-Language header
+
+#### Tests Implementados
+- **Backend**: Tests unitarios para MessageService y LocaleUtils
+- **Frontend**: Tests unitarios para todos los componentes i18n
+- **E2E**: Suite Cypress completa (`language-switching.cy.ts`) con 18 tests para todos los idiomas
+
+#### Idiomas Soportados
+1. **Català** (ca) - Idioma por defecto
+2. **Español** (es)
+3. **Română** (ro)
+4. **Українська** (uk)
+5. **English** (en) - Fallback language
+6. **Français** (fr)
+
+#### Integración Completa
+- Navbar migrado a i18n con LanguageSwitcher integrado
+- Componentes existentes actualizados (Trips, Matches, Bookings, etc.)
+- Persistencia localStorage en frontend, Accept-Language header en backend
+- Estrategia de fallback documentada y probada
 
 ## Registro de Prompts
 
