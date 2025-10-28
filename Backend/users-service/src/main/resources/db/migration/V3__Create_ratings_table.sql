@@ -38,3 +38,4 @@ COMMENT ON COLUMN ratings.comment IS 'Optional comment for the rating';
 
 
 
+
