@@ -81,7 +81,7 @@ class BookingBusinessRulesTest {
         try {
             when(usersServiceClient.userExists(anyString())).thenReturn(true);
             when(tripsServiceClient.hasAvailableSeats(anyString(), anyInt())).thenReturn(true);
-            doNothing().when(notificationClient).sendBookingConfirmed(anyString(), anyString(), anyInt());
+            doNothing().when(notificationClient).bookingConfirmed(any());
             doNothing().when(notificationClient).sendBookingCancelled(anyString(), anyString());
         } catch (Exception e) {
             // Mock setup - exceptions handled in individual tests
@@ -157,7 +157,7 @@ class BookingBusinessRulesTest {
 
         // Assert
         assertEquals("CONFIRMED", confirmed.status);
-        verify(notificationClient).sendBookingConfirmed("test-user-001", createRequest.tripId, 1);
+        verify(notificationClient).bookingConfirmed(any());
     }
 
     @Test

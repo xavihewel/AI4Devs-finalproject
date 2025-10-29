@@ -13,10 +13,7 @@ export const setupAxiosInterceptors = () => {
       const currentLanguage = i18n.language || 'ca';
       
       // Add Accept-Language header
-      config.headers = {
-        ...config.headers,
-        'Accept-Language': currentLanguage,
-      };
+      config.headers.set('Accept-Language', currentLanguage);
       
       return config;
     },
@@ -53,4 +50,5 @@ export const updateAxiosLanguageHeader = () => {
   const currentLanguage = getCurrentLanguage();
   axios.defaults.headers.common['Accept-Language'] = currentLanguage;
 };
+
 

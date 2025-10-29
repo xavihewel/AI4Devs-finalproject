@@ -30,7 +30,7 @@ class MatchesResourceTest {
 
     @Test
     void myMatches_returnsUserMatches() {
-        java.util.List<MatchDto> list = resource.getMyMatches(null, null);
+        java.util.List<MatchDto> list = resource.getMyMatches(null, null, "en");
         assertNotNull(list);
     }
 }

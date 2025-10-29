@@ -40,7 +40,7 @@ describe('Profile Validation', () => {
 
     // Clear required fields
     const nameInput = screen.getByLabelText('Nombre *');
-    const emailInput = screen.getByLabelText('Email *');
+    const emailInput = screen.getByLabelText('Correo electrónico *');
     const sedeSelect = screen.getByLabelText('Sede *');
 
     await userEvent.clear(nameInput);
@@ -74,7 +74,7 @@ describe('Profile Validation', () => {
 
     await screen.findByDisplayValue('Test User');
 
-    const emailInput = screen.getByLabelText('Email *');
+    const emailInput = screen.getByLabelText('Correo electrónico *');
     await userEvent.clear(emailInput);
     await userEvent.type(emailInput, 'invalid-email');
 

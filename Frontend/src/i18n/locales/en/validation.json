@@ -37,5 +37,8 @@
   },
   "destination": {
     "required": "Destination is required"
+  },
+  "direction": {
+    "required": "Direction is required"
   }
 }

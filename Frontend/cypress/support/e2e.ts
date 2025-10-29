@@ -16,6 +16,11 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 
+// Force Spanish language for all tests
+Cypress.on('window:before:load', (win) => {
+  win.localStorage.setItem('i18nextLng', 'es');
+});
+
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 

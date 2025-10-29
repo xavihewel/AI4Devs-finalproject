@@ -30,7 +30,7 @@ describe('Bookings page', () => {
     await act(async () => {
       render(<Bookings />);
     });
-    expect(await screen.findByText('No tienes reservas')).toBeInTheDocument();
+    expect(await screen.findByText('No tienes ninguna reserva')).toBeInTheDocument();
   });
 
   it('renders list of bookings', async () => {

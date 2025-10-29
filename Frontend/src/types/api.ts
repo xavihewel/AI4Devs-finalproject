@@ -11,6 +11,8 @@ export interface TripDto {
   dateTime: string;
   seatsTotal: number;
   seatsFree: number;
+  direction: 'TO_SEDE' | 'FROM_SEDE';
+  pairedTripId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -23,6 +25,7 @@ export interface TripCreateDto {
   destinationSedeId: string;
   dateTime: string;
   seatsTotal: number;
+  direction: 'TO_SEDE' | 'FROM_SEDE';
 }
 
 export interface UserDto {

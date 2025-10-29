@@ -2,7 +2,9 @@
   "title": "Cercar Viatges",
   "search": {
     "title": "Cerca viatges",
+    "direction": "Direcció",
     "destination": "Destinació",
+    "originSede": "Sede d'Origen",
     "destinationPlaceholder": "Selecciona destinació...",
     "time": "Hora Preferida (HH:MM)",
     "timePlaceholder": "08:30",
@@ -11,7 +13,8 @@
     "originHelper": "Format: latitud,longitud",
     "search": "Cercar Viatges",
     "searching": "Cercant...",
-    "selectDestination": "Si us plau selecciona una destinació"
+    "selectDestination": "Si us plau selecciona una destinació",
+    "selectOriginSede": "Si us plau selecciona una sede d'origen"
   },
   "results": {
     "title": "Trobats {count} viatges compatibles",
@@ -41,12 +44,49 @@
     "bookingSuccess": "Reserva creada exitosament! {seats} seient(s) reservat(s). Ves a \"Reserves\" per veure la teva reserva.",
     "bookingError": "Error al crear la reserva",
     "searchError": "Error al cercar coincidències. Si us plau torna a intentar.",
+    "selectSeats": "Seleccionar Seients",
+    "availableSeats": "Seients disponibles: {seats}",
+    "selectSeatsDescription": "Tria quants seients vols reservar",
+    "selectedSeats": "Seients seleccionats",
+    "seat": "seient",
+    "seats": "seients",
+    "confirmBooking": "Confirmar Reserva",
+    "route": "Ruta",
+    "showMap": "Mostrar Mapa",
+    "hideMap": "Ocultar Mapa",
     "score": {
       "excellent": "Excel·lent",
       "good": "Bo", 
       "regular": "Regular",
-      "low": "Baix"
+      "low": "Baix",
+      "description": "Puntuació de compatibilitat: {score}%"
     }
+  },
+  "filters": {
+    "title": "Filtrar Resultats",
+    "minScore": "Puntuació Mínima",
+    "minSeats": "Seients Mínims",
+    "dateFrom": "Des de Data",
+    "dateTo": "Fins a Data",
+    "sortBy": "Ordenar Per",
+    "sortOrder": "Ordre",
+    "clear": "Netejar Filtres",
+    "activeCount": "{count} filtres actius",
+    "scoreChip": "Puntuació ≥ {score}%",
+    "seatsChip": "Seients ≥ {seats}",
+    "fromChip": "Des de {date}",
+    "toChip": "Fins a {date}",
+    "sort": {
+      "score": "Puntuació",
+      "date": "Data",
+      "seats": "Seients Disponibles"
+    },
+    "order": {
+      "desc": "Descendent",
+      "asc": "Ascendent"
+    },
+    "seat": "seient",
+    "seats": "seients"
   },
   "modals": {
     "trustProfile": {

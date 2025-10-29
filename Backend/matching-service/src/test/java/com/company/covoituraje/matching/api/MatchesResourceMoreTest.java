@@ -33,12 +33,12 @@ class MatchesResourceMoreTest {
 
     @Test
     void findMatches_requiresDestination() {
-        assertThrows(jakarta.ws.rs.BadRequestException.class, () -> resource.findMatches(null, "08:00", "Madrid"));
+        assertThrows(jakarta.ws.rs.BadRequestException.class, () -> resource.findMatches(null, null, "08:00", "Madrid", "TO_SEDE", "en"));
     }
 
     @Test
     void driverMatches_forbidden_whenDifferentUser() {
-        assertThrows(jakarta.ws.rs.ForbiddenException.class, () -> resource.getDriverMatches("driver-xyz", null, null));
+        assertThrows(jakarta.ws.rs.ForbiddenException.class, () -> resource.getDriverMatches("driver-xyz", null, null, "en"));
     }
 }
 

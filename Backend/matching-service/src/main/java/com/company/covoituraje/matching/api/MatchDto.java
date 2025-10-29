@@ -12,4 +12,6 @@ public class MatchDto {
     public double score;
     public String status;
     public List<String> reasons;
+    public String direction; // TO_SEDE or FROM_SEDE
+    public String pairedTripId; // Optional paired trip ID
 }

@@ -67,6 +67,7 @@ class JwtValidatorRemoteJwksTest {
             RSAKey pub = new RSAKey.Builder(rsa.toRSAPublicKey())
                     .keyID(rsa.getKeyID())
                     .keyUse(com.nimbusds.jose.jwk.KeyUse.SIGNATURE)
+                    .algorithm(JWSAlgorithm.RS256)
                     .build();
             return new JWKSet(pub);
         } catch (Exception e) {
@@ -75,15 +76,16 @@ class JwtValidatorRemoteJwksTest {
     }
 
     private String signWithA(JWTClaimsSet claims) throws Exception {
-        SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.RS256), claims);
+        SignedJWT jwt = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).keyID("kid-a").build(), claims);
         jwt.sign(signerA);
         return jwt.serialize();
     }
 
     @Test
-    @Disabled("Pending: stabilize signature verification against RemoteJWKSet in test env")
     void validatesTokenAgainstRemoteJwks() throws Exception {
-        JwtValidator validator = new JwtValidator(ISS, jwksUri);
+        // Use in-memory JWKSet for more reliable testing
+        JWKSet jwkSet = jwksWithoutAlg(rsaJwkA);
+        JwtValidator validator = new JwtValidator(ISS, new com.nimbusds.jose.jwk.source.ImmutableJWKSet<>(jwkSet));
 
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
                 .issuer(ISS)

@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TripDto, TripCreateDto } from '../../types/api';
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select, LoadingSpinner } from '../ui';
+import SimpleMapPreview from '../map/SimpleMapPreview';
 import { useValidation } from '../../utils/validation';
+import { env } from '../../env';
 
 interface FormErrors {
   lat?: string;
@@ -34,9 +36,11 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
     destinationSedeId: '',
     dateTime: '',
     seatsTotal: 1,
+    direction: 'TO_SEDE',
   });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [showMapPreview, setShowMapPreview] = useState(false);
 
   // Pre-fill form when trip changes
   useEffect(() => {
@@ -51,6 +55,7 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
         destinationSedeId: trip.destinationSedeId || '',
         dateTime: localDateTime,
         seatsTotal: trip.seatsTotal || 1,
+        direction: trip.direction || 'TO_SEDE',
       });
       setFormErrors({});
       setTouched({});
@@ -235,21 +240,57 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({
                 required
               />
 
-              <Input
-                label={`${t('trips:create.seatsTotal')} *`}
-                type="number"
-                min="1"
-                max="8"
-                value={formData.seatsTotal}
-                onChange={(e) => {
-                  const val = e.target.value === '' ? 1 : parseInt(e.target.value, 10);
-                  handleInputChange('seatsTotal', isNaN(val) ? 1 : val);
-                }}
-                onBlur={() => handleFieldBlur('seatsTotal')}
-                error={touched.seatsTotal ? formErrors.seatsTotal : undefined}
-                helperText={t('trips:create.maxSeats')}
-                required
-              />
+              <div className="space-y-2">
+                <Input
+                  label={`${t('trips:create.seatsTotal')} *`}
+                  type="number"
+                  min="1"
+                  max="8"
+                  value={formData.seatsTotal}
+                  onChange={(e) => {
+                    const val = e.target.value === '' ? 1 : parseInt(e.target.value, 10);
+                    handleInputChange('seatsTotal', isNaN(val) ? 1 : val);
+                  }}
+                  onBlur={() => handleFieldBlur('seatsTotal')}
+                  error={touched.seatsTotal ? formErrors.seatsTotal : undefined}
+                  helperText={t('trips:create.maxSeats')}
+                  required
+                />
+                
+                {/* Show currently booked seats warning */}
+                {trip && trip.seatsTotal && trip.seatsFree !== undefined && (
+                  <div className="text-sm text-amber-600 bg-amber-50 p-2 rounded">
+                    <strong>{t('trips:edit.bookedSeatsWarning')}</strong> {trip.seatsTotal - trip.seatsFree} {t('trips:edit.seatsAlreadyBooked')}
+                  </div>
+                )}
+              </div>
+
+              {/* Map preview section */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-700">
+                    {t('trips:edit.mapPreview')}
+                  </label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowMapPreview(!showMapPreview)}
+                  >
+                    {showMapPreview ? t('trips:map.hideMap') : t('trips:map.showMap')}
+                  </Button>
+                </div>
+                
+                {showMapPreview && formData.origin.lat !== 0 && formData.origin.lng !== 0 && (
+                  <div className="border rounded-lg overflow-hidden">
+                    <SimpleMapPreview
+                      origin={{ lat: formData.origin.lat, lng: formData.origin.lng }}
+                      height={200}
+                      interactive={true}
+                    />
+                  </div>
+                )}
+              </div>
 
               <div className="flex space-x-4 pt-4">
                 <Button

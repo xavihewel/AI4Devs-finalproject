@@ -1,15 +1,7 @@
 describe('Language Switching', () => {
   beforeEach(() => {
-    // Login before each test
-    cy.visit('/');
-    cy.get('button').contains('Iniciar Sesión').click();
-    cy.origin('http://localhost:8080', () => {
-      cy.get('#username').type('testuser');
-      cy.get('#password').type('testpassword');
-      cy.get('input[type="submit"]').click();
-    });
-    cy.url().should('include', '/callback');
-    cy.wait(2000);
+    // Use the smart authentication helper
+    cy.ensureAuthenticated();
   });
 
   it('should display language switcher in navbar', () => {

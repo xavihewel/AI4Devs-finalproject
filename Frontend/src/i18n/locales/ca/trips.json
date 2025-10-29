@@ -14,7 +14,20 @@
     "cancel": "Cancel·lar",
     "creating": "Creant...",
     "selectDestination": "Selecciona una destinació",
-    "maxSeats": "Màxim 8 seients"
+    "maxSeats": "Màxim 8 seients",
+    "helpText": "Pots crear viatges únics o recurrents. Els viatges únics són perfectes per a esdeveniments especials o viatges ocasionals.",
+    "tripType": {
+      "label": "Tipus de Viatge",
+      "oneTime": "Viatge únic",
+      "recurring": "Viatge recurrent",
+      "oneTimeDescription": "Perfecte per a esdeveniments especials o viatges ocasionals",
+      "recurringDescription": "Viatges regulars (ex. desplaçament diari)"
+    },
+    "direction": {
+      "label": "Direcció",
+      "toSede": "Cap a la seu",
+      "fromSede": "Des de la seu"
+    }
   },
   "list": {
     "title": "Els meus viatges",
@@ -44,6 +57,16 @@
     "time": "Hora:",
     "seats": "Seients:"
   },
+  "map": {
+    "showMap": "Veure al Mapa",
+    "hideMap": "Amagar Mapa"
+  },
+  "edit": {
+    "title": "Editar Viatge",
+    "mapPreview": "Vista prèvia del mapa",
+    "bookedSeatsWarning": "Advertència:",
+    "seatsAlreadyBooked": "seients ja estan reservats"
+  },
   "messages": {
     "createSuccess": "Viatge creat exitosament!",
     "createError": "Error al crear el viatge",
@@ -66,14 +89,17 @@
   "filters": {
     "title": "Filtres",
     "status": "Estat",
+    "direction": "Direcció",
     "destination": "Destinació",
     "dateFrom": "Data des de",
     "dateTo": "Data fins a",
     "allStatuses": "Tots els estats",
+    "allDirections": "Totes les direccions",
     "allDestinations": "Totes les destinacions",
     "from": "Des de",
     "to": "Fins a",
     "clearAll": "Netejar filtres",
+    "active": "actius",
     "noResults": "No s'han trobat viatges amb els filtres aplicats"
   }
 }

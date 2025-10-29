@@ -16,23 +16,29 @@ jest.mock('../auth/keycloak', () => ({
 }));
 
 // Mock axios
-const mockAxiosInstance = {
-  get: jest.fn(),
-  post: jest.fn(),
-  put: jest.fn(),
-  interceptors: { request: { use: jest.fn((fn: any) => fn({ headers: {} })) } },
-};
-
-jest.mock('axios', () => ({
-  __esModule: true,
-  default: {
-    create: () => mockAxiosInstance,
-  },
-}));
+jest.mock('axios', () => {
+  const instance = {
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    interceptors: { request: { use: jest.fn((fn: any) => fn({ headers: {} })) } },
+  };
+  return {
+    __esModule: true,
+    default: {
+      create: () => instance,
+    },
+    instance,
+  };
+});
 
 describe('BookingsService API', () => {
+  let mockAxiosInstance: any;
+  
   beforeEach(() => {
     jest.clearAllMocks();
+    const { instance } = jest.requireMock('axios');
+    mockAxiosInstance = instance;
   });
 
   it('getMyBookings returns list of bookings', async () => {

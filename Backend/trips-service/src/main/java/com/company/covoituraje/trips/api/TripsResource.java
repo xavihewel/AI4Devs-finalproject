@@ -2,10 +2,14 @@ package com.company.covoituraje.trips.api;
 
 import com.company.covoituraje.trips.domain.Trip;
 import com.company.covoituraje.trips.infrastructure.TripRepository;
+import com.company.covoituraje.trips.service.TripValidationService;
+import com.company.covoituraje.trips.integration.BookingServiceClient;
 import com.company.covoituraje.shared.i18n.MessageService;
 import com.company.covoituraje.shared.i18n.LocaleUtils;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,6 +25,8 @@ public class TripsResource {
 
     private final TripRepository repository;
     private final MessageService messageService;
+    private final TripValidationService validationService;
+    private final BookingServiceClient bookingServiceClient;
     
     static final class AuthContext {
         private static final ThreadLocal<String> USER_ID = new ThreadLocal<>();
@@ -32,24 +38,46 @@ public class TripsResource {
     public TripsResource() {
         this.repository = new TripRepository();
         this.messageService = new MessageService();
+        this.validationService = new TripValidationService();
+        this.bookingServiceClient = new BookingServiceClient();
     }
 
     public TripsResource(TripRepository repository) {
         this.repository = repository;
         this.messageService = new MessageService();
+        this.validationService = new TripValidationService();
+        this.bookingServiceClient = new BookingServiceClient();
     }
 
     public TripsResource(TripRepository repository, MessageService messageService) {
         this.repository = repository;
         this.messageService = messageService;
+        this.validationService = new TripValidationService();
+        this.bookingServiceClient = new BookingServiceClient();
+    }
+
+    public TripsResource(TripRepository repository, MessageService messageService, 
+                        TripValidationService validationService, BookingServiceClient bookingServiceClient) {
+        this.repository = repository;
+        this.messageService = messageService;
+        this.validationService = validationService;
+        this.bookingServiceClient = bookingServiceClient;
     }
 
     @POST
     public TripDto create(TripCreateDto create, @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("trips.error.user_id_required", locale);
+            throw new BadRequestException(message);
+        }
+
+        // Validate trip creation request
+        List<String> validationErrors = validationService.validateTripCreation(create, acceptLanguage);
+        if (!validationErrors.isEmpty()) {
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
+            String message = String.join("; ", validationErrors);
             throw new BadRequestException(message);
         }
 
@@ -59,10 +87,25 @@ public class TripsResource {
         // Convert origin to string format
         String originString = create.origin.lat + "," + create.origin.lng;
         
-        Trip trip = new Trip(currentUser, originString, create.destinationSedeId, dateTime, create.seatsTotal);
+        // Parse direction with default to TO_SEDE for backward compatibility
+        Trip.Direction direction = Trip.Direction.TO_SEDE;
+        if (create.direction != null && !create.direction.isBlank()) {
+            try {
+                direction = Trip.Direction.valueOf(create.direction);
+            } catch (IllegalArgumentException e) {
+                // Invalid direction, keep default
+            }
+        }
+        
+        Trip trip = new Trip(currentUser, originString, create.destinationSedeId, dateTime, create.seatsTotal, direction);
         trip = repository.save(trip);
         
         return mapToDto(trip);
+    }
+
+    // Convenience overloads for internal/test usage without Accept-Language
+    public TripDto create(TripCreateDto create) {
+        return create(create, null);
     }
 
     @GET
@@ -117,6 +160,10 @@ public class TripsResource {
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
     }
 
+    public List<TripDto> list(String destinationSedeId, String from, String to, String status) {
+        return list(destinationSedeId, from, to, status, null);
+    }
+
     private Integer parseTimeToMinutes(String hhmm) {
         if (hhmm == null || hhmm.isBlank()) return null;
         try {
@@ -151,11 +198,15 @@ public class TripsResource {
         UUID tripId = UUID.fromString(id);
         Trip trip = repository.findById(tripId)
                 .orElseThrow(() -> {
-                    Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                    Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
                     String message = messageService.getMessage("trips.error.trip_not_found", locale);
                     return new NotFoundException(message);
                 });
         return mapToDto(trip);
+    }
+
+    public TripDto getById(String id) {
+        return getById(id, null);
     }
 
     @PUT
@@ -163,7 +214,7 @@ public class TripsResource {
     public TripDto update(@PathParam("id") String id, TripCreateDto update, @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("trips.error.user_id_required", locale);
             throw new BadRequestException(message);
         }
@@ -171,16 +222,24 @@ public class TripsResource {
         UUID tripId = UUID.fromString(id);
         Trip trip = repository.findById(tripId)
                 .orElseThrow(() -> {
-                    Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                    Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
                     String message = messageService.getMessage("trips.error.trip_not_found", locale);
                     return new NotFoundException(message);
                 });
 
         // Only the driver can update their trip (basic rule)
         if (!currentUser.equals(trip.getDriverId())) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("trips.error.only_driver_can_update", locale);
             throw new ForbiddenException(message);
+        }
+
+        // Validate trip update request
+        List<String> validationErrors = validationService.validateTripUpdate(update, trip, acceptLanguage);
+        if (!validationErrors.isEmpty()) {
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
+            String message = String.join("; ", validationErrors);
+            throw new BadRequestException(message);
         }
 
         // Apply partial updates
@@ -203,10 +262,22 @@ public class TripsResource {
                 String originString = update.origin.lat + "," + update.origin.lng;
                 trip.setOrigin(originString);
             }
+            if (update.direction != null && !update.direction.isBlank()) {
+                try {
+                    Trip.Direction direction = Trip.Direction.valueOf(update.direction);
+                    trip.setDirection(direction);
+                } catch (IllegalArgumentException e) {
+                    // Invalid direction, skip update
+                }
+            }
         }
 
         trip = repository.save(trip);
         return mapToDto(trip);
+    }
+
+    public TripDto update(String id, TripCreateDto update) {
+        return update(id, update, null);
     }
 
     @DELETE
@@ -214,7 +285,7 @@ public class TripsResource {
     public void delete(@PathParam("id") String id, @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("trips.error.user_id_required", locale);
             throw new BadRequestException(message);
         }
@@ -222,18 +293,80 @@ public class TripsResource {
         UUID tripId = UUID.fromString(id);
         Trip trip = repository.findById(tripId)
                 .orElseThrow(() -> {
-                    Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+                    Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
                     String message = messageService.getMessage("trips.error.trip_not_found", locale);
                     return new NotFoundException(message);
                 });
 
         if (!currentUser.equals(trip.getDriverId())) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("trips.error.only_driver_can_delete", locale);
             throw new ForbiddenException(message);
         }
 
+        // Validate trip deletion (check for confirmed bookings)
+        List<String> validationErrors = validationService.validateTripDeletion(trip, acceptLanguage);
+        if (!validationErrors.isEmpty()) {
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
+            String message = String.join("; ", validationErrors);
+            throw new ClientErrorException(message, Response.Status.CONFLICT);
+        }
+
         repository.delete(trip);
+    }
+
+    public void delete(String id) {
+        delete(id, null);
+    }
+
+    @POST
+    @Path("/{id}/pair-with/{pairedTripId}")
+    public TripDto pairTrip(@PathParam("id") String id, 
+                           @PathParam("pairedTripId") String pairedTripId,
+                           @HeaderParam("Accept-Language") String acceptLanguage) {
+        String currentUser = AuthContext.getUserId();
+        if (currentUser == null || currentUser.isBlank()) {
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("trips.error.user_id_required", locale);
+            throw new BadRequestException(message);
+        }
+
+        UUID tripId = UUID.fromString(id);
+        UUID pairedId = UUID.fromString(pairedTripId);
+        
+        Trip trip = repository.findById(tripId)
+                .orElseThrow(() -> {
+                    Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
+                    String message = messageService.getMessage("trips.error.trip_not_found", locale);
+                    return new NotFoundException(message);
+                });
+
+        Trip pairedTrip = repository.findById(pairedId)
+                .orElseThrow(() -> {
+                    Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
+                    String message = messageService.getMessage("trips.error.paired_trip_not_found", locale);
+                    return new NotFoundException(message);
+                });
+
+        // Only the driver can pair their trip
+        if (!currentUser.equals(trip.getDriverId())) {
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("trips.error.only_driver_can_pair", locale);
+            throw new ForbiddenException(message);
+        }
+
+        // Set bidirectional pairing
+        trip.setPairedTripId(pairedId);
+        pairedTrip.setPairedTripId(tripId);
+        
+        repository.save(trip);
+        repository.save(pairedTrip);
+        
+        return mapToDto(trip);
+    }
+
+    public TripDto pairTrip(String id, String pairedTripId) {
+        return pairTrip(id, pairedTripId, null);
     }
 
     private TripDto mapToDto(Trip trip) {
@@ -252,6 +385,8 @@ public class TripsResource {
         dto.dateTime = trip.getDateTime().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
         dto.seatsTotal = trip.getSeatsTotal();
         dto.seatsFree = trip.getSeatsFree();
+        dto.direction = trip.getDirection().name();
+        dto.pairedTripId = trip.getPairedTripId() != null ? trip.getPairedTripId().toString() : null;
         return dto;
     }
 }

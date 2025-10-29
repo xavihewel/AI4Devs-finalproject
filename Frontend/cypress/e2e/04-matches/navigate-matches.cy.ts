@@ -33,8 +33,11 @@ describe('Matches Navigation', () => {
   it('should display map preview in search results when coordinates are available', () => {
     cy.visit('/matches')
     
+    // Wait for selects to be loaded
+    cy.get('select').should('have.length.at.least', 2);
+    
     // Perform a search to get results
-    cy.get('select').first().select('SEDE-1')
+    cy.get('select').eq(1).select('SEDE-1')
     cy.contains('Buscar Viajes').click()
     
     // Wait for results and check if maps are displayed

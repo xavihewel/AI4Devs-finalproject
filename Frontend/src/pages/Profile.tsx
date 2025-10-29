@@ -5,6 +5,7 @@ import { subscribePush, unsubscribePush } from '../api/notifications';
 import { UsersService } from '../api/users';
 import type { UserDto, UserUpdateDto } from '../types/api';
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select, LoadingSpinner } from '../components/ui';
+import { NotificationSettings } from '../components/notifications/NotificationSettings';
 
 interface FormErrors {
   name?: string;
@@ -284,29 +285,14 @@ export default function Profile() {
       </Card>
 
       {/* Notificaciones Push */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('notifications.title')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-3">
-            <Button type="button" onClick={() => enablePush(setPushSub, setPushError, t)}>
-              {t('notifications.enable')}
-            </Button>
-            <Button type="button" variant="secondary" onClick={() => disablePush(setPushSub, setPushError, t)} disabled={!pushSub}>
-              {t('notifications.disable')}
-            </Button>
-          </div>
-          {pushError && <p className="text-red-600 mt-2 text-sm">{pushError}</p>}
-        </CardContent>
-      </Card>
+      <NotificationSettings />
     </div>
   );
 }
 
 async function enablePush(setPushSub: (s: PushSubscription | null) => void, setPushError: (e: string | null) => void, t: (key: string) => string) {
   try {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) throw new Error('Push API no soportada');
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) throw new Error(t('notifications.pushApiNotSupported'));
     const reg = await navigator.serviceWorker.register('/sw.js');
     let sub = await reg.pushManager.getSubscription();
     if (!sub) {

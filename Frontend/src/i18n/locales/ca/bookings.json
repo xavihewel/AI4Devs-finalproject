@@ -8,7 +8,7 @@
     "loadingError": "Error al carregar les reserves"
   },
   "booking": {
-    "id": "Reserva #{id}",
+    "id": "Reserva #{{id}}",
     "tripId": "ID del Viatge",
     "seatsRequested": "Seients reservats",
     "bookingDate": "Data de reserva",

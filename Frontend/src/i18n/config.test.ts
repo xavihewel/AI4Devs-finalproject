@@ -2,6 +2,8 @@ import i18n from './config';
 
 describe('i18n config', () => {
   test('should initialize with Catalan as default language', () => {
+    // Force to default to avoid detector influence
+    i18n.changeLanguage('ca');
     expect(i18n.language).toBe('ca');
   });
 

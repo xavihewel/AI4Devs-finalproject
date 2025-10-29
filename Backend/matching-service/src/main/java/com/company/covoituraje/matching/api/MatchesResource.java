@@ -4,6 +4,7 @@ import com.company.covoituraje.matching.service.MatchingService;
 import com.company.covoituraje.matching.infrastructure.MatchRepository;
 import com.company.covoituraje.matching.integration.TripsServiceClient;
 import com.company.covoituraje.matching.integration.NotificationServiceClient;
+import com.company.covoituraje.matching.integration.NotificationEventPublisher;
 import com.company.covoituraje.shared.i18n.MessageService;
 import com.company.covoituraje.shared.i18n.LocaleUtils;
 import jakarta.ws.rs.*;
@@ -20,6 +21,7 @@ public class MatchesResource {
     private final MatchingService matchingService;
     private final MatchRepository matchRepository;
     private final NotificationServiceClient notificationClient;
+    private final NotificationEventPublisher eventPublisher;
     private final MessageService messageService;
     
     static final class AuthContext {
@@ -40,6 +42,7 @@ public class MatchesResource {
         this.matchRepository = matchRepository;
         String notificationServiceUrl = System.getenv().getOrDefault("NOTIFICATION_SERVICE_URL", "http://localhost:8085/api");
         this.notificationClient = new NotificationServiceClient(notificationServiceUrl);
+        this.eventPublisher = new NotificationEventPublisher(notificationClient);
         this.messageService = new MessageService();
     }
 
@@ -48,6 +51,7 @@ public class MatchesResource {
         this.matchRepository = matchRepository;
         String notificationServiceUrl = System.getenv().getOrDefault("NOTIFICATION_SERVICE_URL", "http://localhost:8085/api");
         this.notificationClient = new NotificationServiceClient(notificationServiceUrl);
+        this.eventPublisher = new NotificationEventPublisher(notificationClient);
         this.messageService = new MessageService();
     }
 
@@ -55,6 +59,7 @@ public class MatchesResource {
         this.matchingService = matchingService;
         this.matchRepository = matchRepository;
         this.notificationClient = notificationClient;
+        this.eventPublisher = new NotificationEventPublisher(notificationClient);
         this.messageService = new MessageService();
     }
 
@@ -62,36 +67,83 @@ public class MatchesResource {
         this.matchingService = matchingService;
         this.matchRepository = matchRepository;
         this.notificationClient = notificationClient;
+        this.eventPublisher = new NotificationEventPublisher(notificationClient);
         this.messageService = messageService;
     }
 
     @GET
     public List<MatchDto> findMatches(@QueryParam("destinationSedeId") String destinationSedeId,
+                                     @QueryParam("originSedeId") String originSedeId,
                                      @QueryParam("time") String time,
                                      @QueryParam("origin") String origin,
+                                     @QueryParam("direction") String direction,
                                      @HeaderParam("Accept-Language") String acceptLanguage) {
         
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("matches.error.user_id_required", locale);
             throw new BadRequestException(message);
         }
 
         // Validate required parameters
-        if (destinationSedeId == null || destinationSedeId.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
-            String message = messageService.getMessage("matches.error.destination_sede_required", locale);
+        if (direction == null || direction.isBlank()) {
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("matches.error.direction_required", locale);
+            throw new BadRequestException(message);
+        }
+
+        // Validate sede parameter based on direction
+        String sedeId;
+        if ("TO_SEDE".equals(direction)) {
+            if (destinationSedeId == null || destinationSedeId.isBlank()) {
+                Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
+                String message = messageService.getMessage("matches.error.destination_sede_required", locale);
+                throw new BadRequestException(message);
+            }
+            sedeId = destinationSedeId;
+        } else if ("FROM_SEDE".equals(direction)) {
+            if (originSedeId == null || originSedeId.isBlank()) {
+                Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
+                String message = messageService.getMessage("matches.error.origin_sede_required", locale);
+                throw new BadRequestException(message);
+            }
+            sedeId = originSedeId;
+        } else {
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
+            String message = messageService.getMessage("matches.error.invalid_direction", locale);
             throw new BadRequestException(message);
         }
 
         // Use the matching service to find real matches
         List<MatchResult> matches = matchingService.findMatches(
             currentUser, 
-            destinationSedeId, 
+            sedeId, 
             time, 
-            origin
+            origin,
+            direction
         );
+
+        // Emit match found events for high-score matches
+        Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
+        for (MatchResult match : matches) {
+            if (match.score >= 0.7) { // Only notify for good matches
+                try {
+                    // Get user email (simplified for now - in production would be async)
+                    String userEmail = "user-" + currentUser + "@example.com"; // TODO: Get real email from users-service
+                    eventPublisher.publishMatchFound(
+                        currentUser, 
+                        userEmail, 
+                        match.tripId, 
+                        match.driverId, 
+                        match.score, 
+                        locale
+                    );
+                } catch (Exception e) {
+                    System.err.println("Failed to publish match found event: " + e.getMessage());
+                }
+            }
+        }
 
         // Convert to DTOs
         return matches.stream()
@@ -106,7 +158,7 @@ public class MatchesResource {
                                        @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("matches.error.user_id_required", locale);
             throw new BadRequestException(message);
         }
@@ -133,7 +185,7 @@ public class MatchesResource {
                                            @HeaderParam("Accept-Language") String acceptLanguage) {
         String currentUser = AuthContext.getUserId();
         if (currentUser == null || currentUser.isBlank()) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("matches.error.user_id_required", locale);
             throw new BadRequestException(message);
         }
@@ -141,7 +193,7 @@ public class MatchesResource {
         // For now, only allow users to see their own matches
         // In the future, drivers should be able to see matches for their trips
         if (!currentUser.equals(driverId)) {
-            Locale locale = LocaleUtils.fromAcceptLanguage(acceptLanguage);
+            Locale locale = LocaleUtils.parseAcceptLanguage(acceptLanguage);
             String message = messageService.getMessage("matches.error.access_denied", locale);
             throw new ForbiddenException(message);
         }
@@ -170,6 +222,8 @@ public class MatchesResource {
         dto.seatsFree = matchResult.seatsFree;
         dto.score = matchResult.score;
         dto.reasons = matchResult.reasons;
+        dto.direction = matchResult.direction;
+        dto.pairedTripId = matchResult.pairedTripId;
         return dto;
     }
 

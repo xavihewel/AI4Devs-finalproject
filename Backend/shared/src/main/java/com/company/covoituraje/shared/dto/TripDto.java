@@ -34,6 +34,12 @@ public class TripDto {
     @JsonProperty("updatedAt")
     public String updatedAt;
     
+    @JsonProperty("direction")
+    public String direction;
+    
+    @JsonProperty("pairedTripId")
+    public String pairedTripId;
+    
     public static class Origin {
         @JsonProperty("lat")
         public Double lat;

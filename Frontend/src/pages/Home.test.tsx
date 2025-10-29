@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import Home from './Home';
 import { AuthProvider } from '../auth/AuthProvider';
+import i18n from '../i18n/config';
 
 jest.mock('../auth/keycloak', () => {
   return {
@@ -15,6 +16,10 @@ jest.mock('../auth/keycloak', () => {
 });
 
 describe('Home', () => {
+  beforeAll(async () => {
+    await i18n.changeLanguage('es');
+  });
+
   it('renders hero section with title', () => {
     render(
       <AuthProvider>
@@ -62,7 +67,29 @@ describe('Home', () => {
         <Home />
       </AuthProvider>
     );
-    expect(screen.getByText(/Comenzar Ahora/i)).toBeInTheDocument();
+    expect(screen.getByText(i18n.t('home.getStarted') as string)).toBeInTheDocument();
+  });
+
+  it('edge: renders fallback language when missing key', async () => {
+    await i18n.changeLanguage('fr');
+    render(
+      <AuthProvider>
+        <Home />
+      </AuthProvider>
+    );
+    // Title exists (will render FR if available, else fallback EN)
+    expect(screen.getByText(/home\.title|bonÀreaGo/i)).toBeInTheDocument();
+    await i18n.changeLanguage('es');
+  });
+
+  it('edge: shows auth actions based on auth state', () => {
+    // Not authenticated: shows getStarted
+    render(
+      <AuthProvider>
+        <Home />
+      </AuthProvider>
+    );
+    expect(screen.getByText(i18n.t('home.getStarted') as string)).toBeInTheDocument();
   });
 });
 

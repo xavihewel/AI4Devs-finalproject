@@ -1,15 +1,7 @@
 describe('Profile Page', () => {
   beforeEach(() => {
-    // Login before each test
-    cy.visit('/');
-    cy.get('button').contains('Iniciar Sesión').click();
-    cy.origin('http://localhost:8080', () => {
-      cy.get('#username').type('testuser');
-      cy.get('#password').type('testpassword');
-      cy.get('input[type="submit"]').click();
-    });
-    cy.url().should('include', '/callback');
-    cy.wait(2000);
+    // Use the smart authentication helper
+    cy.ensureAuthenticated();
   });
 
   it('should navigate to profile page', () => {
@@ -180,5 +172,8 @@ describe('Profile Page', () => {
     cy.contains('Opcional: Tu horario habitual de trabajo').should('be.visible');
   });
 });
+
+
+
 
 

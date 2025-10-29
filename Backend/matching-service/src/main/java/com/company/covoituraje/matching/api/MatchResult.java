@@ -11,4 +11,6 @@ public class MatchResult {
     public int seatsFree;
     public double score;
     public List<String> reasons;
+    public String direction; // TO_SEDE or FROM_SEDE
+    public String pairedTripId; // Optional paired trip ID
 }

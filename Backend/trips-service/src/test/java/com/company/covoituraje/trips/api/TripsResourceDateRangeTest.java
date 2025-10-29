@@ -29,6 +29,7 @@ class TripsResourceDateRangeTest {
     private EntityManagerFactory emf;
     private EntityManager em;
     private TripsResource resource;
+    private java.time.OffsetDateTime base;
 
     @BeforeEach
     void setUp() {
@@ -48,10 +49,11 @@ class TripsResourceDateRangeTest {
         resource = new TripsResource(repo);
         TripsResource.AuthContext.setUserId("driver-1");
 
-        // Seed three trips at 08:00, 08:30, 09:30
-        seedTrip("SEDE-1", "2025-01-01T08:00:00Z");
-        seedTrip("SEDE-1", "2025-01-01T08:30:00Z");
-        seedTrip("SEDE-1", "2025-01-01T09:30:00Z");
+        // Seed three trips at 08:00, 08:30, 09:30 (future day)
+        base = java.time.OffsetDateTime.now().plusDays(2).withHour(8).withMinute(0).withSecond(0).withNano(0);
+        seedTrip("SEDE-1", base.toString());
+        seedTrip("SEDE-1", base.plusMinutes(30).toString());
+        seedTrip("SEDE-1", base.plusMinutes(90).toString());
     }
 
     private void createSchema() {
@@ -66,7 +68,7 @@ class TripsResourceDateRangeTest {
 
     private void seedTrip(String sede, String iso) {
         TripCreateDto c = new TripCreateDto();
-        TripDto.Origin o = new TripDto.Origin();
+        TripCreateDto.Origin o = new TripCreateDto.Origin();
         o.lat = 1.0; o.lng = 2.0;
         c.origin = o;
         c.destinationSedeId = sede;
@@ -86,28 +88,34 @@ class TripsResourceDateRangeTest {
     void list_filtersByFromOnly() {
         List<TripDto> list = resource.list(null, "09:00", null, null);
         assertEquals(1, list.size());
-        assertEquals("2025-01-01T09:30:00Z", list.get(0).dateTime);
+        var expected = base.plusMinutes(90).withSecond(0).withNano(0);
+        var actual = java.time.OffsetDateTime.parse(list.get(0).dateTime);
+        assertEquals(expected, actual);
     }
 
     @Test
     void list_filtersByToOnly() {
         List<TripDto> list = resource.list(null, null, "08:15", null);
         assertEquals(1, list.size());
-        assertEquals("2025-01-01T08:00:00Z", list.get(0).dateTime);
+        var expectedStart = base.withSecond(0).withNano(0);
+        var actualStart = java.time.OffsetDateTime.parse(list.get(0).dateTime);
+        assertEquals(expectedStart, actualStart);
     }
 
     @Test
     void list_filtersByFullIsoDatetimeRange_withDestination() {
         // add another day outside range
-        seedTrip("SEDE-1", "2025-01-02T08:30:00Z");
-        List<TripDto> list = resource.list("SEDE-1", "2025-01-01T08:15:00Z", "2025-01-01T09:00:00Z", null);
+        seedTrip("SEDE-1", base.plusDays(1).withHour(8).withMinute(30).withSecond(0).withNano(0).toString());
+        List<TripDto> list = resource.list("SEDE-1", base.plusMinutes(15).toString(), base.plusMinutes(60).toString(), null);
         assertEquals(1, list.size());
-        assertEquals("2025-01-01T08:30:00Z", list.get(0).dateTime);
+        var expectedMid = base.plusMinutes(30).withSecond(0).withNano(0);
+        var actualMid = java.time.OffsetDateTime.parse(list.get(0).dateTime);
+        assertEquals(expectedMid, actualMid);
     }
 
     @Test
     void list_filtersByFullIsoDatetimeRange_withoutDestination() {
-        List<TripDto> list = resource.list(null, "2025-01-01T08:00:00Z", "2025-01-01T08:30:00Z", null);
+        List<TripDto> list = resource.list(null, base.toString(), base.plusMinutes(30).toString(), null);
         assertEquals(2, list.size());
     }
 }
