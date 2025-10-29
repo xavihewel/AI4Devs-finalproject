@@ -18,22 +18,25 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class JwtValidator {
+    private static final Logger LOGGER = Logger.getLogger(JwtValidator.class.getName());
     private final String expectedIssuer;
     private final JWKSource<SecurityContext> jwkSource;
 
     public JwtValidator(String issuer, String jwksUri) {
         this.expectedIssuer = Objects.requireNonNull(issuer, "issuer");
-        System.out.println("[JwtValidator] Initializing with issuer: " + issuer + ", JWKS URI: " + jwksUri);
+        LOGGER.log(Level.INFO, "Initializing JWT validator with issuer: {0}", issuer);
         try {
             URL url = new URL(jwksUri);
             // Increase timeout to 10 seconds for Docker networking
             DefaultResourceRetriever retriever = new DefaultResourceRetriever(10000, 10000);
             this.jwkSource = new RemoteJWKSet<>(url, retriever);
-            System.out.println("[JwtValidator] Successfully initialized RemoteJWKSet");
+            LOGGER.log(Level.INFO, "Successfully initialized RemoteJWKSet");
         } catch (MalformedURLException e) {
-            System.err.println("[JwtValidator] Invalid JWKS URI: " + jwksUri);
+            LOGGER.log(Level.SEVERE, "Invalid JWKS URI: {0}", jwksUri);
             throw new IllegalArgumentException("Invalid JWKS URI", e);
         }
     }
@@ -66,31 +69,31 @@ public class JwtValidator {
         }
 
         String iss = claims.getIssuer();
-        System.out.println("[JwtValidator] Token issuer: " + iss + ", Expected: " + expectedIssuer);
+        LOGGER.log(Level.FINE, "Validating token issuer: {0}, Expected: {1}", new Object[]{iss, expectedIssuer});
         if (!expectedIssuer.equals(iss)) {
-            System.err.println("[JwtValidator] Issuer mismatch!");
+            LOGGER.log(Level.WARNING, "Token issuer mismatch");
             throw new JwtValidationException("Invalid issuer");
         }
         Instant now = Instant.now();
         if (claims.getExpirationTime() == null || claims.getExpirationTime().toInstant().isBefore(now)) {
-            System.err.println("[JwtValidator] Token expired");
+            LOGGER.log(Level.WARNING, "Token expired");
             throw new JwtValidationException("Token expired");
         }
         if (claims.getNotBeforeTime() != null && claims.getNotBeforeTime().toInstant().isAfter(now)) {
-            System.err.println("[JwtValidator] Token not before in future");
+            LOGGER.log(Level.WARNING, "Token not before in future");
             throw new JwtValidationException("Token not before in future");
         }
         if (claims.getSubject() == null || claims.getSubject().isBlank()) {
-            System.err.println("[JwtValidator] Missing sub claim");
+            LOGGER.log(Level.WARNING, "Missing sub claim");
             throw new JwtValidationException("Missing sub claim");
         }
         List<String> aud = claims.getAudience();
-        System.out.println("[JwtValidator] Token audience: " + aud);
+        LOGGER.log(Level.FINE, "Token audience: {0}", aud);
         if (aud == null || aud.stream().noneMatch("backend-api"::equals)) {
-            System.err.println("[JwtValidator] Invalid audience - backend-api not found in: " + aud);
+            LOGGER.log(Level.WARNING, "Invalid audience - backend-api not found");
             throw new JwtValidationException("Invalid audience");
         }
-        System.out.println("[JwtValidator] Token validation successful");
+        LOGGER.log(Level.FINE, "Token validation successful");
     }
 }
 

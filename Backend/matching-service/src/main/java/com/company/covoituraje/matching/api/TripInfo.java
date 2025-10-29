@@ -8,4 +8,6 @@ public class TripInfo {
     public String dateTime;
     public int seatsTotal;
     public int seatsFree;
+    public String direction; // TO_SEDE or FROM_SEDE
+    public String pairedTripId; // Optional paired trip ID
 }

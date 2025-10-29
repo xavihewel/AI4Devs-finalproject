@@ -30,9 +30,13 @@ public class CorsFilter implements ContainerResponseFilter {
     public void filter(ContainerRequestContext requestContext,
                        ContainerResponseContext responseContext) {
 
+        // Add security headers to all responses
+        MultivaluedMap<String, Object> headers = responseContext.getHeaders();
+        addSecurityHeaders(headers);
+
+        // CORS handling - NO WILDCARD SUPPORT for security
         String origin = requestContext.getHeaderString("Origin");
-        if (origin != null && (ALLOWED_ORIGINS.contains("*") || ALLOWED_ORIGINS.contains(origin))) {
-            MultivaluedMap<String, Object> headers = responseContext.getHeaders();
+        if (origin != null && ALLOWED_ORIGINS.contains(origin)) {
             headers.putSingle("Access-Control-Allow-Origin", origin);
             headers.putSingle("Vary", "Origin");
             headers.putSingle("Access-Control-Allow-Credentials", "true");
@@ -45,6 +49,42 @@ public class CorsFilter implements ContainerResponseFilter {
                 headers.putSingle("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization");
             }
             headers.putSingle("Access-Control-Max-Age", "3600");
+        }
+    }
+
+    /**
+     * Add security headers to all responses.
+     * Follows OWASP security guidelines.
+     */
+    private void addSecurityHeaders(MultivaluedMap<String, Object> headers) {
+        // Prevent MIME type sniffing
+        headers.putSingle("X-Content-Type-Options", "nosniff");
+        
+        // Prevent clickjacking
+        headers.putSingle("X-Frame-Options", "DENY");
+        
+        // XSS Protection (legacy but still useful)
+        headers.putSingle("X-XSS-Protection", "1; mode=block");
+        
+        // Referrer Policy
+        headers.putSingle("Referrer-Policy", "strict-origin-when-cross-origin");
+        
+        // Content Security Policy (basic)
+        headers.putSingle("Content-Security-Policy", 
+            "default-src 'self'; " +
+            "script-src 'self' 'unsafe-inline'; " +
+            "style-src 'self' 'unsafe-inline'; " +
+            "img-src 'self' data: https:; " +
+            "connect-src 'self' https:; " +
+            "font-src 'self'; " +
+            "object-src 'none'; " +
+            "base-uri 'self'; " +
+            "form-action 'self'");
+        
+        // HSTS (only for HTTPS in production)
+        String protocol = System.getenv().getOrDefault("HTTPS_ENABLED", "false");
+        if ("true".equalsIgnoreCase(protocol)) {
+            headers.putSingle("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
         }
     }
 }

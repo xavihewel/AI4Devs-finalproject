@@ -1,4 +1,22 @@
 require('@testing-library/jest-dom');
+const i18n = require('./src/i18n/config').default;
+
+beforeAll(async () => {
+  try {
+    await i18n.changeLanguage('es');
+  } catch (e) {
+    // Fallback to Spanish if i18n fails
+    console.warn('Failed to set i18n language:', e);
+  }
+});
+
+// Remove MapPreview mock to allow real component testing
+// jest.mock('./src/components/map/MapPreview', () => ({
+//   __esModule: true,
+//   default: () => null,
+// }));
+
+require('@testing-library/jest-dom');
 
 // Polyfills for jsdom environment
 if (typeof global.TextEncoder === 'undefined') {
@@ -7,8 +25,8 @@ if (typeof global.TextEncoder === 'undefined') {
   global.TextDecoder = TextDecoder;
 }
 
-// Ensure test env
-process.env.NODE_ENV = 'test';
+// Ensure test env - React development mode for testing only
+process.env.NODE_ENV = 'development';
 
 // Mock env.ts to avoid import.meta issues
 jest.mock('./src/env', () => ({

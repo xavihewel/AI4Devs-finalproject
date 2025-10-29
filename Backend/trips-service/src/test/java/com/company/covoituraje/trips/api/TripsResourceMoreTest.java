@@ -66,11 +66,11 @@ class TripsResourceMoreTest {
 
     private TripCreateDto sampleCreate() {
         TripCreateDto c = new TripCreateDto();
-        TripDto.Origin o = new TripDto.Origin();
+        TripCreateDto.Origin o = new TripCreateDto.Origin();
         o.lat = 1.0; o.lng = 2.0;
         c.origin = o;
         c.destinationSedeId = "SEDE-1";
-        c.dateTime = "2025-01-01T08:00:00Z";
+        c.dateTime = java.time.OffsetDateTime.now().plusDays(2).withHour(8).withMinute(0).withSecond(0).withNano(0).toString();
         c.seatsTotal = 2;
         return c;
     }

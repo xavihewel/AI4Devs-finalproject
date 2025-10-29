@@ -14,7 +14,20 @@
     "cancel": "Cancel",
     "creating": "Creating...",
     "selectDestination": "Select a destination",
-    "maxSeats": "Maximum 8 seats"
+    "maxSeats": "Maximum 8 seats",
+    "helpText": "You can create one-time trips or recurring trips. One-time trips are perfect for special events or occasional travel.",
+    "tripType": {
+      "label": "Trip Type",
+      "oneTime": "One-time trip",
+      "recurring": "Recurring trip",
+      "oneTimeDescription": "Perfect for special events or occasional travel",
+      "recurringDescription": "Regular trips (e.g., daily commute)"
+    },
+    "direction": {
+      "label": "Direction",
+      "toSede": "To headquarters",
+      "fromSede": "From headquarters"
+    }
   },
   "list": {
     "title": "My trips",
@@ -44,6 +57,16 @@
     "time": "Time:",
     "seats": "Seats:"
   },
+  "map": {
+    "showMap": "Show on Map",
+    "hideMap": "Hide Map"
+  },
+  "edit": {
+    "title": "Edit Trip",
+    "mapPreview": "Map preview",
+    "bookedSeatsWarning": "Warning:",
+    "seatsAlreadyBooked": "seats are already booked"
+  },
   "messages": {
     "createSuccess": "Trip created successfully!",
     "createError": "Error creating trip",
@@ -66,14 +89,17 @@
   "filters": {
     "title": "Filters",
     "status": "Status",
+    "direction": "Direction",
     "destination": "Destination",
     "dateFrom": "Date from",
     "dateTo": "Date to",
     "allStatuses": "All statuses",
+    "allDirections": "All directions",
     "allDestinations": "All destinations",
     "from": "From",
     "to": "To",
     "clearAll": "Clear filters",
+    "active": "active",
     "noResults": "No trips found with the applied filters"
   }
 }

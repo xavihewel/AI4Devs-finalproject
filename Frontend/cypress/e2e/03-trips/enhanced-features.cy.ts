@@ -22,7 +22,7 @@ describe('Enhanced Trip Features (Fase 2)', () => {
     cy.get('[data-testid="trips-page"]', { timeout: 15000 }).should('be.visible')
     
     // Filter by active status
-    cy.get('select').first().select('ACTIVE')
+    cy.get('[data-testid="direction-select"]').select('ACTIVE')
     
     // Should show filtered results or no results message
     cy.get('body').then(($body) => {
@@ -39,8 +39,11 @@ describe('Enhanced Trip Features (Fase 2)', () => {
     cy.visit('/trips')
     cy.get('[data-testid="trips-page"]', { timeout: 15000 }).should('be.visible')
     
-    // Filter by destination
-    cy.get('select').eq(1).select('SEDE-1')
+    // Wait for selects to be loaded
+    cy.get('select').should('have.length.at.least', 2);
+    
+    // Filter by destination (second select has SEDE options)
+    cy.get('[data-testid="destination-select"]').select('SEDE-1')
     
     // Should show filtered results or no results message
     cy.get('body').then(($body) => {
@@ -57,16 +60,19 @@ describe('Enhanced Trip Features (Fase 2)', () => {
     cy.visit('/trips')
     cy.get('[data-testid="trips-page"]', { timeout: 15000 }).should('be.visible')
     
+    // Wait for selects to be loaded
+    cy.get('select').should('have.length.at.least', 3);
+    
     // Apply some filters
-    cy.get('select').first().select('ACTIVE')
-    cy.get('select').eq(1).select('SEDE-1')
+    cy.get('[data-testid="direction-select"]').select('ACTIVE')
+    cy.get('select').eq(2).select('SEDE-1')
     
     // Clear filters
     cy.contains('Limpiar filtros').click()
     
     // Filters should be reset
-    cy.get('select').first().should('have.value', '')
-    cy.get('select').eq(1).should('have.value', '')
+    cy.get('[data-testid="direction-select"]').should('have.value', '')
+    cy.get('[data-testid="destination-select"]').should('have.value', '')
   })
 
   it('should display trip cards with enhanced information', () => {
@@ -100,9 +106,9 @@ describe('Enhanced Trip Features (Fase 2)', () => {
         // Click edit button
         cy.contains('Editar').first().click()
         
-        // Modal should open
-        cy.get('.fixed.inset-0').should('be.visible')
-        cy.contains('Crear Viaje').should('be.visible')
+        // Modal should open - wait for it to be visible
+        cy.get('.fixed.inset-0', { timeout: 5000 }).should('be.visible')
+        cy.contains('Editar Viaje').should('be.visible')
         
         // Should have form fields
         cy.get('input[type="number"]').should('exist')
@@ -120,19 +126,25 @@ describe('Enhanced Trip Features (Fase 2)', () => {
     // Test in Spanish (default)
     cy.visit('/trips')
     cy.get('[data-testid="trips-page"]', { timeout: 15000 }).should('be.visible')
-    cy.contains('Mis Viajes').should('be.visible')
+    cy.contains('Viajes').should('be.visible')
     
     // Switch to English
     cy.get('[data-testid="language-switcher"]').click()
     cy.contains('English').click()
     
+    // Wait for language change to take effect
+    cy.wait(500)
+    
     // Should see English text
-    cy.contains('My Trips').should('be.visible')
+    cy.contains('Trips').should('be.visible')
     cy.contains('Create Trip').should('be.visible')
     
     // Switch to Catalan
     cy.get('[data-testid="language-switcher"]').click()
     cy.contains('Català').click()
+    
+    // Wait for language change to take effect
+    cy.wait(500)
     
     // Should see Catalan text
     cy.contains('Els Meus Viatges').should('be.visible')

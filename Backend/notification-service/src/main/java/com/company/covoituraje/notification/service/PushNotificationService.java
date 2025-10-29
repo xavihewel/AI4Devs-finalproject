@@ -1,97 +1,149 @@
 package com.company.covoituraje.notification.service;
 
-import com.company.covoituraje.notification.config.VapidConfig;
-import com.company.covoituraje.notification.domain.NotificationSubscription;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
+import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
 import nl.martijndwars.webpush.Subscription;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClients;
+import nl.martijndwars.webpush.Urgency;
 
-import java.nio.charset.StandardCharsets;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Base64;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+/**
+ * Service for sending push notifications using VAPID.
+ * Follows Single Responsibility Principle: only handles push notification sending.
+ * Follows Dependency Inversion Principle: depends on web-push library abstraction.
+ */
 @ApplicationScoped
 public class PushNotificationService {
-    
-    @Inject
-    private VapidConfig vapidConfig;
-    
-    private PushService pushService;
-    
-    public void sendNotification(NotificationSubscription subscription, String title, String body) {
-        try {
-            if (pushService == null) {
-                initializePushService();
-            }
-            
-            String payload = createPayload(title, body);
-            // Simplified implementation for now
-            System.out.println("Sending push notification to: " + subscription.getEndpoint());
-            System.out.println("Title: " + title + ", Body: " + body);
-            
-        } catch (Exception e) {
-            System.err.println("Error sending push notification: " + e.getMessage());
-            // Don't throw exception to avoid breaking the main flow
+
+    private final PushService pushService;
+    private final ExecutorService executorService;
+
+    public PushNotificationService() {
+        String vapidPublicKey = System.getProperty("VAPID_PUBLIC_KEY");
+        String vapidPrivateKey = System.getProperty("VAPID_PRIVATE_KEY");
+        
+        if (vapidPublicKey == null || vapidPrivateKey == null) {
+            throw new IllegalStateException("VAPID keys not configured. Please set VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY environment variables.");
         }
+        
+        this.pushService = new PushService();
+        this.executorService = Executors.newFixedThreadPool(10);
     }
 
-    public SendOutcome sendNotificationWithOutcome(NotificationSubscription subscription, String title, String body) {
+    /**
+     * Sends a push notification asynchronously.
+     * Handles errors gracefully to avoid breaking main business flow.
+     */
+    public CompletableFuture<SendOutcome> sendNotificationAsync(String endpoint, String p256dhKey, String authKey, String title, String body) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return sendNotificationWithOutcome(endpoint, p256dhKey, authKey, title, body);
+            } catch (Exception e) {
+                System.err.println("Error sending push notification: " + e.getMessage());
+                return SendOutcome.FAILURE;
+            }
+        }, executorService);
+    }
+
+    /**
+     * Sends a push notification synchronously and returns the outcome.
+     * Used for testing and immediate feedback scenarios.
+     */
+    public SendOutcome sendNotificationWithOutcome(String endpoint, String p256dhKey, String authKey, String title, String body) {
         try {
-            if (pushService == null) {
-                initializePushService();
-            }
-            String payload = createPayload(title, body);
-            // Here we would construct a real web push notification using subscription keys and endpoint.
-            // As a simplified placeholder, we log and assume success unless the endpoint looks clearly invalid.
-            if (subscription.getEndpoint() == null || subscription.getEndpoint().isBlank()) {
-                return SendOutcome.GONE;
-            }
-            System.out.println("[Push] -> " + subscription.getEndpoint() + " | payload=" + payload);
+            Subscription.Keys keys = new Subscription.Keys(p256dhKey, authKey);
+            Subscription subscription = new Subscription(endpoint, keys);
+            String payload = String.format("{\"title\":\"%s\",\"body\":\"%s\"}", title, body);
+            Notification notification = new Notification(subscription, payload, Urgency.NORMAL);
+            
+            pushService.send(notification);
             return SendOutcome.SUCCESS;
+            
         } catch (Exception e) {
-            String message = e.getMessage() == null ? "" : e.getMessage();
-            if (message.contains("410") || message.contains("404")) {
+            System.err.println("Failed to send push notification: " + e.getMessage());
+            
+            // Determine if this is a retryable failure
+            if (isRetryableError(e)) {
+                return SendOutcome.RETRYABLE_FAILURE;
+            } else if (isGoneError(e)) {
                 return SendOutcome.GONE;
+            } else {
+                return SendOutcome.FAILURE;
             }
-            return SendOutcome.RETRYABLE_FAILURE;
         }
     }
 
+    /**
+     * Overloaded method for compatibility with existing tests.
+     * Accepts NotificationSubscription object directly.
+     */
+    public SendOutcome sendNotificationWithOutcome(com.company.covoituraje.notification.domain.NotificationSubscription subscription, String title, String body) {
+        return sendNotificationWithOutcome(
+            subscription.getEndpoint(),
+            subscription.getP256dhKey(),
+            subscription.getAuthKey(),
+            title,
+            body
+        );
+    }
+
+    /**
+     * Sends a push notification with custom payload.
+     * Allows for rich notifications with actions, icons, etc.
+     */
+    public SendOutcome sendNotificationWithPayload(String endpoint, String p256dhKey, String authKey, String payload) {
+        try {
+            Subscription.Keys keys = new Subscription.Keys(p256dhKey, authKey);
+            Subscription subscription = new Subscription(endpoint, keys);
+            Notification notification = new Notification(subscription, payload, Urgency.NORMAL);
+            
+            pushService.send(notification);
+            return SendOutcome.SUCCESS;
+            
+        } catch (Exception e) {
+            System.err.println("Failed to send push notification with payload: " + e.getMessage());
+            
+            if (isRetryableError(e)) {
+                return SendOutcome.RETRYABLE_FAILURE;
+            } else if (isGoneError(e)) {
+                return SendOutcome.GONE;
+            } else {
+                return SendOutcome.FAILURE;
+            }
+        }
+    }
+
+    /**
+     * Determines if an error is retryable (network issues, temporary failures).
+     */
+    private boolean isRetryableError(Exception e) {
+        String message = e.getMessage().toLowerCase();
+        return message.contains("timeout") || 
+               message.contains("connection") || 
+               message.contains("network") ||
+               message.contains("temporary");
+    }
+
+    /**
+     * Determines if an error indicates the subscription is gone (user unsubscribed).
+     */
+    private boolean isGoneError(Exception e) {
+        String message = e.getMessage().toLowerCase();
+        return message.contains("gone") || 
+               message.contains("410") ||
+               message.contains("not found");
+    }
+
+    /**
+     * Enum representing the outcome of a push notification send attempt.
+     */
     public enum SendOutcome {
         SUCCESS,
         RETRYABLE_FAILURE,
-        GONE
+        GONE,
+        FAILURE
     }
-    
-    public String createPayload(String title, String body) {
-        JsonObject payload = Json.createObjectBuilder()
-            .add("title", title)
-            .add("body", body)
-            .add("icon", "/icon-192x192.png")
-            .add("badge", "/badge-72x72.png")
-            .add("data", Json.createObjectBuilder()
-                .add("url", "/")
-                .build())
-            .build();
-        
-        return payload.toString();
-    }
-    
-    private void initializePushService() throws Exception {
-        pushService = new PushService();
-        pushService.setSubject(vapidConfig.getSubject());
-        pushService.setPublicKey(vapidConfig.getPublicKey());
-        pushService.setPrivateKey(vapidConfig.getPrivateKey());
-    }
-    
-    // Simplified implementation - removed complex web push subscription creation
 }

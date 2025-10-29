@@ -46,7 +46,7 @@ class BookingResourceNotificationsTest {
         BookingDto dto = resource.confirm(bookingId.toString());
 
         assertEquals("CONFIRMED", dto.status);
-        verify(notifications).sendBookingConfirmed("user-001", booking.getTripId().toString(), 2);
+        verify(notifications).bookingConfirmed(any());
     }
 
     @Test

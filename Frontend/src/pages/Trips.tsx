@@ -12,6 +12,7 @@ import { env } from '../env';
 interface FormErrors {
   lat?: string;
   lng?: string;
+  direction?: string;
   destinationSedeId?: string;
   dateTime?: string;
   seatsTotal?: string;
@@ -35,6 +36,7 @@ export default function Trips() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [filters, setFilters] = useState<TripFiltersType>({
     status: '',
+    direction: '',
     destination: '',
     dateFrom: '',
     dateTo: ''
@@ -46,6 +48,7 @@ export default function Trips() {
     destinationSedeId: '',
     dateTime: '',
     seatsTotal: 1,
+    direction: 'TO_SEDE',
   });
 
   useEffect(() => {
@@ -77,6 +80,11 @@ export default function Trips() {
       errors.lng = validation.coordinates.longitude.required();
     } else if (formData.origin.lng < -180 || formData.origin.lng > 180) {
       errors.lng = validation.coordinates.longitude.range();
+    }
+
+    // Validar dirección
+    if (!formData.direction) {
+      errors.direction = validation.direction.required();
     }
 
     // Validar destino
@@ -118,7 +126,7 @@ export default function Trips() {
       setTrips(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error loading trips:', error);
-      showMessage('error', t('trips:messages.loadError'));
+      showMessage('error', t('messages.loadError'));
     } finally {
       setLoading(false);
     }
@@ -131,6 +139,7 @@ export default function Trips() {
     setTouched({
       lat: true,
       lng: true,
+      direction: true,
       destinationSedeId: true,
       dateTime: true,
       seatsTotal: true,
@@ -142,7 +151,7 @@ export default function Trips() {
 
     // Si hay errores, no enviar
     if (Object.keys(errors).length > 0) {
-      showMessage('error', t('trips:messages.formErrors'));
+      showMessage('error', t('messages.formErrors'));
       return;
     }
 
@@ -159,31 +168,32 @@ export default function Trips() {
         destinationSedeId: '',
         dateTime: '',
         seatsTotal: 1,
+        direction: 'TO_SEDE',
       });
       setFormErrors({});
       setTouched({});
       await loadTrips();
-      showMessage('success', t('trips:messages.createSuccess'));
+      showMessage('success', t('messages.createSuccess'));
     } catch (error) {
       console.error('Error creating trip:', error);
-      showMessage('error', t('trips:messages.createError'));
+      showMessage('error', t('messages.createError'));
     } finally {
       setCreating(false);
     }
   };
 
   const handleDelete = async (tripId: string) => {
-    if (!window.confirm(t('trips:messages.confirmDelete'))) {
+    if (!window.confirm(t('messages.confirmDelete'))) {
       return;
     }
     try {
       setActionInProgress(tripId);
       await TripsService.deleteTrip(tripId);
       await loadTrips();
-      showMessage('success', t('trips:messages.deleteSuccess'));
+      showMessage('success', t('messages.deleteSuccess'));
     } catch (error) {
       console.error('Error deleting trip:', error);
-      showMessage('error', t('trips:messages.deleteError'));
+      showMessage('error', t('messages.deleteError'));
     } finally {
       setActionInProgress(null);
     }
@@ -194,10 +204,10 @@ export default function Trips() {
       setActionInProgress(trip.id);
       await TripsService.updateTrip(trip.id, { seatsTotal: trip.seatsTotal + 1 });
       await loadTrips();
-      showMessage('success', t('trips:messages.seatsUpdated', { total: trip.seatsTotal + 1, free: trip.seatsFree + 1 }));
+      showMessage('success', t('messages.seatsUpdated', { total: trip.seatsTotal + 1, free: trip.seatsFree + 1 }));
     } catch (error) {
       console.error('Error updating trip:', error);
-      showMessage('error', t('trips:messages.updateError'));
+      showMessage('error', t('messages.updateError'));
     } finally {
       setActionInProgress(null);
     }
@@ -219,6 +229,11 @@ export default function Trips() {
         }
         return true;
       });
+    }
+
+    // Filter by direction
+    if (filters.direction) {
+      filtered = filtered.filter(trip => trip.direction === filters.direction);
     }
 
     // Filter by destination
@@ -257,12 +272,12 @@ export default function Trips() {
     try {
       await TripsService.updateTrip(tripId, data);
       await loadTrips();
-      showMessage('success', t('trips:messages.tripUpdated'));
+      showMessage('success', t('messages.tripUpdated'));
       setShowEditModal(false);
       setEditingTrip(null);
     } catch (error) {
       console.error('Error updating trip:', error);
-      showMessage('error', t('trips:messages.updateError'));
+      showMessage('error', t('messages.updateError'));
     } finally {
       setCreating(false);
     }
@@ -275,6 +290,7 @@ export default function Trips() {
   const handleClearFilters = () => {
     setFilters({
       status: '',
+      direction: '',
       destination: '',
       dateFrom: '',
       dateTo: ''
@@ -297,10 +313,15 @@ export default function Trips() {
   };
 
   const sedeOptions = [
-    { value: '', label: t('trips:sedes.select') },
-    { value: 'SEDE-1', label: t('trips:sedes.SEDE-1') },
-    { value: 'SEDE-2', label: t('trips:sedes.SEDE-2') },
-    { value: 'SEDE-3', label: t('trips:sedes.SEDE-3') },
+    { value: '', label: t('sedes.select') },
+    { value: 'SEDE-1', label: t('sedes.SEDE-1') },
+    { value: 'SEDE-2', label: t('sedes.SEDE-2') },
+    { value: 'SEDE-3', label: t('sedes.SEDE-3') },
+  ];
+
+  const directionOptions = [
+    { value: 'TO_SEDE', label: t('create.direction.toSede') },
+    { value: 'FROM_SEDE', label: t('create.direction.fromSede') },
   ];
 
   if (loading) {
@@ -314,13 +335,13 @@ export default function Trips() {
   return (
     <div className="space-y-6" data-testid="trips-page">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">{t('trips:list.title')}</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{t('list.title')}</h1>
         <Button
           variant="primary"
           onClick={() => setShowCreateForm(!showCreateForm)}
           data-testid="create-trip-button"
         >
-          {showCreateForm ? t('trips:create.cancel') : t('trips:create.title')}
+          {showCreateForm ? t('create.cancel') : t('create.title')}
         </Button>
       </div>
 
@@ -333,13 +354,13 @@ export default function Trips() {
       {showCreateForm && (
         <Card>
           <CardHeader>
-            <CardTitle>{t('trips:create.newTrip')}</CardTitle>
+            <CardTitle>{t('create.newTrip')}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  label={`${t('trips:create.latitude')} *`}
+                  label={`${t('create.latitude')} *`}
                   type="number"
                   step="any"
                   value={formData.origin.lat}
@@ -353,7 +374,7 @@ export default function Trips() {
                   required
                 />
                 <Input
-                  label={`${t('trips:create.longitude')} *`}
+                  label={`${t('create.longitude')} *`}
                   type="number"
                   step="any"
                   value={formData.origin.lng}
@@ -369,17 +390,29 @@ export default function Trips() {
               </div>
 
               <Select
-                label={`${t('trips:create.destination')} *`}
+                label={`${t('create.direction.label')} *`}
+                value={formData.direction}
+                onChange={(e) => handleInputChange('direction', e.target.value)}
+                onBlur={() => handleFieldBlur('direction')}
+                options={directionOptions}
+                error={touched.direction ? formErrors.direction : undefined}
+                required
+                data-testid="direction-select"
+              />
+
+              <Select
+                label={`${t('create.destination')} *`}
                 value={formData.destinationSedeId}
                 onChange={(e) => handleInputChange('destinationSedeId', e.target.value)}
                 onBlur={() => handleFieldBlur('destinationSedeId')}
                 options={sedeOptions}
                 error={touched.destinationSedeId ? formErrors.destinationSedeId : undefined}
                 required
+                data-testid="destination-select"
               />
 
               <Input
-                label={`${t('trips:create.date')} *`}
+                label={`${t('create.date')} *`}
                 type="datetime-local"
                 value={formData.dateTime}
                 onChange={(e) => handleInputChange('dateTime', e.target.value)}
@@ -389,7 +422,7 @@ export default function Trips() {
               />
 
               <Input
-                label={`${t('trips:create.seatsTotal')} *`}
+                label={`${t('create.seatsTotal')} *`}
                 type="number"
                 min="1"
                 max="8"
@@ -400,7 +433,7 @@ export default function Trips() {
                 }}
                 onBlur={() => handleFieldBlur('seatsTotal')}
                 error={touched.seatsTotal ? formErrors.seatsTotal : undefined}
-                helperText={t('trips:create.maxSeats')}
+                helperText={t('create.maxSeats')}
                 required
               />
 
@@ -411,14 +444,14 @@ export default function Trips() {
                   loading={creating}
                   disabled={creating}
                 >
-                  {creating ? t('trips:create.creating') : t('trips:create.submit')}
+                  {creating ? t('create.creating') : t('create.submit')}
                 </Button>
                 <Button
                   type="button"
                   variant="secondary"
                   onClick={() => setShowCreateForm(false)}
                 >
-                  {t('trips:create.cancel')}
+                  {t('create.cancel')}
                 </Button>
               </div>
             </form>
@@ -452,13 +485,13 @@ export default function Trips() {
         <Card>
           <CardContent>
             <div className="text-center py-8">
-              <p className="text-gray-500 text-lg">{t('trips:filters.noResults')}</p>
+              <p className="text-gray-500 text-lg">{t('filters.noResults')}</p>
               <Button
                 variant="secondary"
                 className="mt-4"
                 onClick={handleClearFilters}
               >
-                {t('trips:filters.clearAll')}
+                {t('filters.clearAll')}
               </Button>
             </div>
           </CardContent>
@@ -470,12 +503,12 @@ export default function Trips() {
           <CardContent>
             <div className="text-center py-8">
               <div className="text-4xl mb-4">🚗</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('trips:list.empty')}</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('list.empty')}</h3>
               <p className="text-gray-500 mb-4">
-                {t('trips:list.emptyDescription')}
+                {t('list.emptyDescription')}
               </p>
               <Button variant="primary" onClick={() => setShowCreateForm(true)}>
-                {t('trips:list.createFirst')}
+                {t('list.createFirst')}
               </Button>
             </div>
           </CardContent>

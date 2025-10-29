@@ -8,6 +8,10 @@ import java.util.UUID;
 @Table(name = "trips", schema = "trips")
 public class Trip {
     
+    public enum Direction {
+        TO_SEDE, FROM_SEDE
+    }
+    
     @Id
     @Column(name = "id")
     private UUID id;
@@ -35,13 +39,20 @@ public class Trip {
     
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "direction", nullable = false)
+    private Direction direction;
+    
+    @Column(name = "paired_trip_id")
+    private UUID pairedTripId;
 
     // Default constructor for JPA
     public Trip() {}
 
     // Constructor for creating new trips
     public Trip(String driverId, String origin, String destinationSedeId, 
-                OffsetDateTime dateTime, Integer seatsTotal) {
+                OffsetDateTime dateTime, Integer seatsTotal, Direction direction) {
         this.id = UUID.randomUUID();
         this.driverId = driverId;
         this.origin = origin;
@@ -49,8 +60,16 @@ public class Trip {
         this.dateTime = dateTime;
         this.seatsTotal = seatsTotal;
         this.seatsFree = seatsTotal; // Initially all seats are free
+        this.direction = direction;
         this.createdAt = OffsetDateTime.now();
         this.updatedAt = OffsetDateTime.now();
+    }
+    
+    // Constructor for creating new trips with paired trip
+    public Trip(String driverId, String origin, String destinationSedeId, 
+                OffsetDateTime dateTime, Integer seatsTotal, Direction direction, UUID pairedTripId) {
+        this(driverId, origin, destinationSedeId, dateTime, seatsTotal, direction);
+        this.pairedTripId = pairedTripId;
     }
 
     // Getters and Setters
@@ -80,6 +99,12 @@ public class Trip {
 
     public OffsetDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(OffsetDateTime updatedAt) { this.updatedAt = updatedAt; }
+    
+    public Direction getDirection() { return direction; }
+    public void setDirection(Direction direction) { this.direction = direction; }
+    
+    public UUID getPairedTripId() { return pairedTripId; }
+    public void setPairedTripId(UUID pairedTripId) { this.pairedTripId = pairedTripId; }
 
     // Business methods
     public boolean hasFreeSeats() {

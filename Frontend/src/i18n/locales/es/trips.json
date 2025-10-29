@@ -14,7 +14,20 @@
     "cancel": "Cancelar",
     "creating": "Creando...",
     "selectDestination": "Selecciona un destino",
-    "maxSeats": "Máximo 8 asientos"
+    "maxSeats": "Máximo 8 asientos",
+    "helpText": "Puedes crear viajes únicos o recurrentes. Los viajes únicos son perfectos para eventos especiales o viajes ocasionales.",
+    "tripType": {
+      "label": "Tipo de Viaje",
+      "oneTime": "Viaje único",
+      "recurring": "Viaje recurrente",
+      "oneTimeDescription": "Perfecto para eventos especiales o viajes ocasionales",
+      "recurringDescription": "Viajes regulares (ej. desplazamiento diario)"
+    },
+    "direction": {
+      "label": "Dirección",
+      "toSede": "Hacia la sede",
+      "fromSede": "Desde la sede"
+    }
   },
   "list": {
     "title": "Mis viajes",
@@ -44,6 +57,29 @@
     "time": "Hora:",
     "seats": "Asientos:"
   },
+  "map": {
+    "showMap": "Ver en Mapa",
+    "hideMap": "Ocultar Mapa"
+  },
+  "edit": {
+    "title": "Editar Viaje",
+    "mapPreview": "Vista previa del mapa",
+    "bookedSeatsWarning": "Advertencia:",
+    "seatsAlreadyBooked": "asientos ya están reservados"
+  },
+  "filters": {
+    "title": "Filtros",
+    "status": "Estado",
+    "direction": "Dirección",
+    "destination": "Destino",
+    "dateFrom": "Fecha desde",
+    "dateTo": "Fecha hasta",
+    "clearAll": "Limpiar filtros",
+    "active": "activos",
+    "allStatuses": "Todos los estados",
+    "allDirections": "Todas las direcciones",
+    "allDestinations": "Todos los destinos"
+  },
   "messages": {
     "createSuccess": "¡Viaje creado exitosamente!",
     "createError": "Error al crear el viaje",
@@ -66,10 +102,12 @@
   "filters": {
     "title": "Filtros",
     "status": "Estado",
+    "direction": "Dirección",
     "destination": "Destino",
     "dateFrom": "Fecha desde",
     "dateTo": "Fecha hasta",
     "allStatuses": "Todos los estados",
+    "allDirections": "Todas las direcciones",
     "allDestinations": "Todos los destinos",
     "from": "Desde",
     "to": "Hasta",

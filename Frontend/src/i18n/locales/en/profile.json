@@ -24,7 +24,8 @@
     "title": "Push Notifications",
     "enable": "Enable",
     "disable": "Disable",
-    "error": "Could not enable/disable notifications"
+    "error": "Could not enable/disable notifications",
+    "pushApiNotSupported": "Push API not supported"
   },
   "actions": {
     "save": "Save Changes",

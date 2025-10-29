@@ -8,7 +8,7 @@
     "loadingError": "Error loading bookings"
   },
   "booking": {
-    "id": "Booking #{id}",
+    "id": "Booking #{{id}}",
     "tripId": "Trip ID",
     "seatsRequested": "Reserved seats",
     "bookingDate": "Booking date",

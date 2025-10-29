@@ -36,6 +36,41 @@ public class TripsServiceClient {
     }
     
     /**
+     * Obtiene todos los trips disponibles para una sede de origen específica
+     * (para viajes FROM_SEDE)
+     */
+    public List<TripDto> getAvailableTripsFromSede(String originSedeId) throws ServiceIntegrationException {
+        try {
+            String path = "/trips?originSedeId=" + originSedeId;
+            TripDto[] trips = httpClient.get(path, TripDto[].class);
+            return Arrays.asList(trips);
+        } catch (ServiceIntegrationException e) {
+            throw new ServiceIntegrationException("Error fetching available trips from sede: " + originSedeId, e);
+        }
+    }
+    
+    /**
+     * Obtiene todos los trips disponibles con filtros de dirección y sede
+     */
+    public List<TripDto> getAvailableTrips(String sedeId, String direction) throws ServiceIntegrationException {
+        try {
+            String path;
+            if ("TO_SEDE".equals(direction)) {
+                path = "/trips?destinationSedeId=" + sedeId + "&direction=TO_SEDE";
+            } else if ("FROM_SEDE".equals(direction)) {
+                path = "/trips?originSedeId=" + sedeId + "&direction=FROM_SEDE";
+            } else {
+                // Fallback to old behavior
+                path = "/trips?destinationSedeId=" + sedeId;
+            }
+            TripDto[] trips = httpClient.get(path, TripDto[].class);
+            return Arrays.asList(trips);
+        } catch (ServiceIntegrationException e) {
+            throw new ServiceIntegrationException("Error fetching available trips for sede: " + sedeId + " direction: " + direction, e);
+        }
+    }
+    
+    /**
      * Obtiene un trip específico por ID
      */
     public TripDto getTripById(String tripId) throws ServiceIntegrationException {

@@ -27,6 +27,22 @@ public class NotificationServiceClient {
         httpClient.post("/notifications/send", new SendRequest(title, body), String.class);
     }
 
+    /**
+     * Publishes booking confirmed event to notification-service.
+     * Follows Open/Closed Principle: extends functionality without modifying existing code.
+     */
+    public void bookingConfirmed(BookingConfirmedRequest request) throws ServiceIntegrationException {
+        httpClient.post("/notifications/events/booking-confirmed", request, String.class);
+    }
+
+    /**
+     * Publishes trip cancelled event to notification-service.
+     * Follows Open/Closed Principle: extends functionality without modifying existing code.
+     */
+    public void tripCancelled(TripCancelledRequest request) throws ServiceIntegrationException {
+        httpClient.post("/notifications/events/trip-cancelled", request, String.class);
+    }
+
     public static class SendRequest {
         public String title;
         public String body;
@@ -35,6 +51,21 @@ public class NotificationServiceClient {
             this.title = title;
             this.body = body;
         }
+    }
+
+    public static class BookingConfirmedRequest {
+        public String userId;
+        public String email;
+        public String tripId;
+        public int seats;
+        public String locale;
+    }
+
+    public static class TripCancelledRequest {
+        public String userId;
+        public String email;
+        public String tripId;
+        public String locale;
     }
 }
 

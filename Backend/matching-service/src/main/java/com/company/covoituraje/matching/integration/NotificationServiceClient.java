@@ -27,6 +27,22 @@ public class NotificationServiceClient {
         httpClient.post("/notifications/send", new SendRequest(title, body), String.class);
     }
 
+    /**
+     * Publishes match found event to notification-service.
+     * Follows Open/Closed Principle: extends functionality without modifying existing code.
+     */
+    public void matchFound(MatchFoundRequest request) throws ServiceIntegrationException {
+        httpClient.post("/notifications/events/match-found", request, String.class);
+    }
+
+    /**
+     * Publishes match expired event to notification-service.
+     * Follows Open/Closed Principle: extends functionality without modifying existing code.
+     */
+    public void matchExpired(MatchExpiredRequest request) throws ServiceIntegrationException {
+        httpClient.post("/notifications/events/match-expired", request, String.class);
+    }
+
     public static class SendRequest {
         public String title;
         public String body;
@@ -35,6 +51,22 @@ public class NotificationServiceClient {
             this.title = title;
             this.body = body;
         }
+    }
+
+    public static class MatchFoundRequest {
+        public String userId;
+        public String email;
+        public String tripId;
+        public String driverId;
+        public double score;
+        public String locale;
+    }
+
+    public static class MatchExpiredRequest {
+        public String userId;
+        public String email;
+        public String tripId;
+        public String locale;
     }
 }
 

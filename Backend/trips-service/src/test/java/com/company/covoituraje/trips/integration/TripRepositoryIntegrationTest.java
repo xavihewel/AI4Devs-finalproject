@@ -70,7 +70,8 @@ class TripRepositoryIntegrationTest {
             "40.4168,-3.7038", // Madrid coordinates
             "SEDE-1",
             OffsetDateTime.now().plusHours(1),
-            3
+            3,
+            Trip.Direction.TO_SEDE
         );
 
         // When
@@ -88,9 +89,9 @@ class TripRepositoryIntegrationTest {
     @Test
     void shouldFindTripsByDestination() {
         // Given
-        Trip trip1 = new Trip("driver-1", "origin1", "SEDE-1", OffsetDateTime.now().plusHours(1), 2);
-        Trip trip2 = new Trip("driver-2", "origin2", "SEDE-2", OffsetDateTime.now().plusHours(2), 3);
-        Trip trip3 = new Trip("driver-3", "origin3", "SEDE-1", OffsetDateTime.now().plusHours(3), 4);
+        Trip trip1 = new Trip("driver-1", "origin1", "SEDE-1", OffsetDateTime.now().plusHours(1), 2, Trip.Direction.TO_SEDE);
+        Trip trip2 = new Trip("driver-2", "origin2", "SEDE-2", OffsetDateTime.now().plusHours(2), 3, Trip.Direction.TO_SEDE);
+        Trip trip3 = new Trip("driver-3", "origin3", "SEDE-1", OffsetDateTime.now().plusHours(3), 4, Trip.Direction.TO_SEDE);
         
         repository.save(trip1);
         repository.save(trip2);
@@ -107,8 +108,8 @@ class TripRepositoryIntegrationTest {
     @Test
     void shouldFindAvailableTrips() {
         // Given
-        Trip availableTrip = new Trip("driver-1", "origin1", "SEDE-1", OffsetDateTime.now().plusHours(1), 3);
-        Trip fullTrip = new Trip("driver-2", "origin2", "SEDE-1", OffsetDateTime.now().plusHours(2), 2);
+        Trip availableTrip = new Trip("driver-1", "origin1", "SEDE-1", OffsetDateTime.now().plusHours(1), 3, Trip.Direction.TO_SEDE);
+        Trip fullTrip = new Trip("driver-2", "origin2", "SEDE-1", OffsetDateTime.now().plusHours(2), 2, Trip.Direction.TO_SEDE);
         fullTrip.reserveSeats(2); // Make it full
         
         repository.save(availableTrip);
@@ -127,9 +128,9 @@ class TripRepositoryIntegrationTest {
     void shouldFilterOutPastTripsFromAvailableTrips() {
         // Given
         OffsetDateTime now = OffsetDateTime.now();
-        Trip futureTrip = new Trip("driver-1", "origin1", "SEDE-1", now.plusHours(1), 3);
-        Trip pastTrip = new Trip("driver-2", "origin2", "SEDE-1", now.minusHours(1), 2); // Past trip
-        Trip currentTrip = new Trip("driver-3", "origin3", "SEDE-1", now.minusMinutes(30), 2); // Just started
+        Trip futureTrip = new Trip("driver-1", "origin1", "SEDE-1", now.plusHours(1), 3, Trip.Direction.TO_SEDE);
+        Trip pastTrip = new Trip("driver-2", "origin2", "SEDE-1", now.minusHours(1), 2, Trip.Direction.TO_SEDE); // Past trip
+        Trip currentTrip = new Trip("driver-3", "origin3", "SEDE-1", now.minusMinutes(30), 2, Trip.Direction.TO_SEDE); // Just started
         
         repository.save(futureTrip);
         repository.save(pastTrip);
@@ -147,7 +148,7 @@ class TripRepositoryIntegrationTest {
     @Test
     void shouldUpdateTripSeats() {
         // Given
-        Trip trip = new Trip("driver-1", "origin1", "SEDE-1", OffsetDateTime.now().plusHours(1), 3);
+        Trip trip = new Trip("driver-1", "origin1", "SEDE-1", OffsetDateTime.now().plusHours(1), 3, Trip.Direction.TO_SEDE);
         trip = repository.save(trip);
 
         // When

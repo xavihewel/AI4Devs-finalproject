@@ -7,7 +7,7 @@ servers:
 paths:
   /matches:
     get:
-      summary: Get trip matches for the current user (basic score)
+      summary: Get trip matches for the current user (directional)
       security:
         - bearerAuth: []
       description: Requires Authorization header. Example: `Authorization: Bearer eyJ...`
@@ -16,11 +16,38 @@ paths:
           name: destinationSedeId
           schema:
             type: string
+          description: Required when direction is TO_SEDE
+        - in: query
+          name: originSedeId
+          schema:
+            type: string
+          description: Required when direction is FROM_SEDE
         - in: query
           name: time
           schema:
             type: string
             format: time
+          description: Preferred time in HH:mm (local user timezone)
+        - in: query
+          name: origin
+          schema:
+            type: string
+          description: Optional origin description (proximity scoring)
+        - in: query
+          name: direction
+          required: true
+          schema:
+            type: string
+            enum: [TO_SEDE, FROM_SEDE]
+          description: >-
+            Direction of travel. When TO_SEDE, destinationSedeId is required.
+            When FROM_SEDE, originSedeId is required.
+        - in: header
+          name: Accept-Language
+          required: false
+          schema:
+            type: string
+          description: Language for localized error messages
       responses:
         '200':
           description: List of matches
@@ -30,6 +57,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Match'
+        '400':
+          description: Bad request (e.g., missing required parameters based on direction)
         '401':
           description: Unauthorized (missing or invalid JWT)
         '403':

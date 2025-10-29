@@ -4,7 +4,9 @@ import { env } from '../env';
 import type { MatchDto } from '../types/api';
 
 export interface MatchSearchParams {
-  destinationSedeId: string;
+  destinationSedeId?: string;
+  originSedeId?: string;
+  direction?: 'TO_SEDE' | 'FROM_SEDE';
   time?: string;
   origin?: string;
 }
@@ -32,9 +34,19 @@ export class MatchesService {
    * Find matches for a specific destination and criteria
    */
   static async findMatches(params: MatchSearchParams): Promise<MatchDto[]> {
-    const searchParams = new URLSearchParams({
-      destinationSedeId: params.destinationSedeId,
-    });
+    const searchParams = new URLSearchParams();
+
+    if (params.direction) {
+      searchParams.append('direction', params.direction);
+    }
+
+    // Depending on direction, one sedeId is required. Keep backward compatibility when only destination is used
+    if (params.destinationSedeId) {
+      searchParams.append('destinationSedeId', params.destinationSedeId);
+    }
+    if (params.originSedeId) {
+      searchParams.append('originSedeId', params.originSedeId);
+    }
 
     if (params.time) {
       searchParams.append('time', params.time);

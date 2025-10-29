@@ -92,14 +92,14 @@ class MatchesResourceDateRangeIntegrationTest {
     @Test
     void myMatches_filtersByCreatedAtRange() {
         MatchesResource.AuthContext.setUserId("user-1");
-        List<MatchDto> list = resource.getMyMatches("2025-01-01T08:15:00Z", "2025-01-01T09:00:00Z");
+        List<MatchDto> list = resource.getMyMatches("2025-01-01T08:15:00Z", "2025-01-01T09:00:00Z", "en");
         assertEquals(1, list.size());
     }
 
     @Test
     void driverMatches_filtersByCreatedAtRange() {
         MatchesResource.AuthContext.setUserId("driver-1");
-        List<MatchDto> list = resource.getDriverMatches("driver-1", "2025-01-01T08:00:00Z", "2025-01-01T09:00:00Z");
+        List<MatchDto> list = resource.getDriverMatches("driver-1", "2025-01-01T08:00:00Z", "2025-01-01T09:00:00Z", "en");
         assertEquals(1, list.size());
     }
 }

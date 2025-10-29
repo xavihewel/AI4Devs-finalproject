@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TripDto } from '../../types/api';
 import { Button, Card, CardContent } from '../ui';
-import MapPreview from '../map/MapPreview';
+import SimpleMapPreview from '../map/SimpleMapPreview';
+import MapLinkButtons from '../map/MapLinkButtons';
 import { env } from '../../env';
 
 interface TripCardProps {
@@ -23,6 +24,7 @@ export const TripCard: React.FC<TripCardProps> = ({
   loading = false
 }) => {
   const { t } = useTranslation(['trips', 'common']);
+  const [showMap, setShowMap] = useState(false);
 
   const getStatusBadge = () => {
     const now = new Date();
@@ -41,6 +43,15 @@ export const TripCard: React.FC<TripCardProps> = ({
         {t('trips:status.active')}
       </span>
     );
+  };
+
+  const getDirectionIcon = () => {
+    if (trip.direction === 'TO_SEDE') {
+      return '🏢→'; // To headquarters
+    } else if (trip.direction === 'FROM_SEDE') {
+      return '→🏠'; // From headquarters
+    }
+    return '🚗'; // Default
   };
 
   const getSeatsInfo = () => {
@@ -66,7 +77,8 @@ export const TripCard: React.FC<TripCardProps> = ({
           {/* Header with status and date */}
           <div className="flex justify-between items-start">
             <div className="flex-1">
-              <h3 className="font-semibold text-lg">
+              <h3 className="font-semibold text-lg flex items-center gap-2">
+                <span className="text-xl">{getDirectionIcon()}</span>
                 {t('trips:list.tripTo', { destination: trip.destinationSedeId })}
               </h3>
               <div className="flex items-center space-x-2 mt-1">
@@ -119,15 +131,37 @@ export const TripCard: React.FC<TripCardProps> = ({
             </div>
           </div>
 
-          {/* Map preview */}
+          {/* Map section */}
           {typeof trip?.origin?.lat === 'number' && typeof trip?.origin?.lng === 'number' && (
             <div className="pt-2">
-              <MapPreview
-                origin={{ lat: trip.origin.lat, lng: trip.origin.lng }}
-                height={180}
-                interactive={false}
-                tilesUrl={env.mapTilesUrl}
-              />
+              {/* Map toggle button */}
+              <div className="flex justify-between items-center mb-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowMap(!showMap)}
+                  className="text-xs"
+                >
+                  {showMap ? t('trips:map.hideMap') : t('trips:map.showMap')}
+                </Button>
+                {showMap && (
+                    <MapLinkButtons
+                      lat={trip.origin.lat}
+                      lng={trip.origin.lng}
+                    />
+                )}
+              </div>
+              
+              {/* Map preview (collapsible) */}
+              {showMap && (
+                <div className="border rounded-lg overflow-hidden">
+                  <SimpleMapPreview
+                    origin={{ lat: trip.origin.lat, lng: trip.origin.lng }}
+                    height={200}
+                    interactive={true}
+                  />
+                </div>
+              )}
             </div>
           )}
 

@@ -47,6 +47,7 @@
 - Observabilidad: logs estructurados, tracing OTEL, métricas clave.
 - **Frontend moderno**: React 19 + TypeScript + Vite + Tailwind CSS para UI consistente.
 - **Frontend dual mode**: Docker + Nginx (producción-like) vs Local + Vite (desarrollo con hot reload).
+  - Bypass de autenticación para tests/local: `VITE_AUTH_DISABLED=true` habilita acceso directo en `Protected`/`AuthProvider`; Cypress usa `env.authDisabled=true`.
 - **Componentes reutilizables**: Biblioteca de UI con Button, Card, Input, LoadingSpinner.
 - **Servicios API**: Clases dedicadas para cada microservicio con tipos estrictos.
 - **Layout responsive**: Navbar con autenticación, Layout consistente en todas las páginas.

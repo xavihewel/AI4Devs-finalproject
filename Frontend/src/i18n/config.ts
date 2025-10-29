@@ -11,6 +11,7 @@ import caProfile from './locales/ca/profile.json';
 import caHistory from './locales/ca/history.json';
 import caTrust from './locales/ca/trust.json';
 import caValidation from './locales/ca/validation.json';
+import caNotifications from './locales/ca/notifications.json';
 
 import esCommon from './locales/es/common.json';
 import esTrips from './locales/es/trips.json';
@@ -20,6 +21,7 @@ import esProfile from './locales/es/profile.json';
 import esHistory from './locales/es/history.json';
 import esTrust from './locales/es/trust.json';
 import esValidation from './locales/es/validation.json';
+import esNotifications from './locales/es/notifications.json';
 
 import roCommon from './locales/ro/common.json';
 import roTrips from './locales/ro/trips.json';
@@ -29,6 +31,7 @@ import roProfile from './locales/ro/profile.json';
 import roHistory from './locales/ro/history.json';
 import roTrust from './locales/ro/trust.json';
 import roValidation from './locales/ro/validation.json';
+import roNotifications from './locales/ro/notifications.json';
 
 import ukCommon from './locales/uk/common.json';
 import ukTrips from './locales/uk/trips.json';
@@ -38,6 +41,7 @@ import ukProfile from './locales/uk/profile.json';
 import ukHistory from './locales/uk/history.json';
 import ukTrust from './locales/uk/trust.json';
 import ukValidation from './locales/uk/validation.json';
+import ukNotifications from './locales/uk/notifications.json';
 
 import enCommon from './locales/en/common.json';
 import enTrips from './locales/en/trips.json';
@@ -47,6 +51,7 @@ import enProfile from './locales/en/profile.json';
 import enHistory from './locales/en/history.json';
 import enTrust from './locales/en/trust.json';
 import enValidation from './locales/en/validation.json';
+import enNotifications from './locales/en/notifications.json';
 
 import frCommon from './locales/fr/common.json';
 import frTrips from './locales/fr/trips.json';
@@ -56,6 +61,7 @@ import frProfile from './locales/fr/profile.json';
 import frHistory from './locales/fr/history.json';
 import frTrust from './locales/fr/trust.json';
 import frValidation from './locales/fr/validation.json';
+import frNotifications from './locales/fr/notifications.json';
 
 const resources = {
   ca: {
@@ -67,6 +73,7 @@ const resources = {
     history: caHistory,
     trust: caTrust,
     validation: caValidation,
+    notifications: caNotifications,
   },
   es: {
     common: esCommon,
@@ -77,6 +84,7 @@ const resources = {
     history: esHistory,
     trust: esTrust,
     validation: esValidation,
+    notifications: esNotifications,
   },
   ro: {
     common: roCommon,
@@ -87,6 +95,7 @@ const resources = {
     history: roHistory,
     trust: roTrust,
     validation: roValidation,
+    notifications: roNotifications,
   },
   uk: {
     common: ukCommon,
@@ -97,6 +106,7 @@ const resources = {
     history: ukHistory,
     trust: ukTrust,
     validation: ukValidation,
+    notifications: ukNotifications,
   },
   en: {
     common: enCommon,
@@ -107,6 +117,7 @@ const resources = {
     history: enHistory,
     trust: enTrust,
     validation: enValidation,
+    notifications: enNotifications,
   },
   fr: {
     common: frCommon,
@@ -117,6 +128,7 @@ const resources = {
     history: frHistory,
     trust: frTrust,
     validation: frValidation,
+    notifications: frNotifications,
   },
 };
 
@@ -125,7 +137,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'ca', // Default language
+    lng: 'es', // Default language
     fallbackLng: 'en',
     defaultNS: 'common',
     supportedLngs: ['ca', 'es', 'ro', 'uk', 'en', 'fr'],
