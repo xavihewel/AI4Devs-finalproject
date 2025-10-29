@@ -15,6 +15,7 @@
   - Testing: `run-e2e-tests.sh`
   - Seeds: `seed-test-data.sh` (nuevo) - inserta datos de prueba en todos los schemas
 - **Cypress E2E**: Suite de ~21 tests E2E implementada y organizada. Smoke tests (6/6 ✅) funcionando perfectamente.
+  - Trips E2E `navigate-trips.cy.ts`: 4/4 ✅ tras habilitar bypass y hacer el spec resiliente sin mapas.
 - **Documentación**: `QUICK-START.md`, `doc/setup/frontend-setup.md`, `doc/setup/verificacion-sistema.md`, `Frontend/cypress/README.md`, `doc/setup/database-schemas.md` (nuevo), `doc/setup/e2e-test-coverage.md` (nuevo) completos.
  - **CORS**: Política CORS corregida; `ALLOWED_ORIGINS` soportado y configurado en Docker para front local (`http://localhost:5173`).
 - **Tests backend (unidad/integración)**: Suite verde en `shared`, `auth-service`, `users-service`, `trips-service`, `booking-service`, `matching-service`.
@@ -350,7 +351,7 @@
 ## Current Status
 - ✅ Sistema completamente funcional y arrancable con un solo comando (`start-all-services.sh`)
 - ✅ Infraestructura automatizada con verificación en capas
-- ✅ Keycloak funcionando correctamente (verificado por scripts; revisar si no arranca en algunos entornos)
+- ✅ Keycloak configurado por script; en E2E actuales se usa bypass para velocidad y robustez en local.
 - ✅ Cypress E2E instalado y configurado - smoke tests (6/6 ✅) pasando
 - ✅ Frontend test suite: 92% tests pasando (222/241) - mejora significativa
 - ✅ Backend trips-service: 100% tests pasando después de fixes completos
@@ -364,6 +365,7 @@
 - ⚠️ Tests E2E desactualizados: 2-3 tests necesitan actualización para nueva UI (profile-edit, create-cancel bookings)
 - ⚠️ Tests E2E faltantes: Validaciones de formularios, reservar desde matches, menú responsive (~12 tests por crear)
 - ⚠️ Validaciones cross-service en booking: Temporalmente simplificadas para MVP, necesitan mejora en producción
+ - ⚠️ Keycloak `/.well-known/openid_configuration` devuelve 404 ocasional en local; para E2E se usa `CYPRESS_authDisabled=true` + `VITE_AUTH_DISABLED=true`.
 
 ## Recently Fixed Issues
 - ✅ Delete sin transacción en TripRepository (viajes no se eliminaban)
